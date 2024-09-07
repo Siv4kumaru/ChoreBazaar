@@ -1,15 +1,11 @@
-from flask import render_template_string
+from flask import render_template_string,render_template
 from flask_security import auth_required,current_user,roles_accepted
 
 def create_view(app):
     @app.route('/')
     def home():
-        return render_template_string("""
-              <h1>Index Page</h1>
-              <a href="/profile">Profile</a>
-              <a href="/login">Login</a>                        
-        """
-        )
+        return render_template("index.html")
+
 
     @app.route('/profile')
     @auth_required('session','token','basic')
