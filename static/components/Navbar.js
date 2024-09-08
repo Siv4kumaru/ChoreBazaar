@@ -4,8 +4,13 @@ const Navbar ={
         <router-link to="/">Home</router-link>
         <router-link to="/login">Login</router-link>
         <router-link to="/signup">Signup</router-link>
-        <router-link to="/logout">logout</router-link>
-    </nav>`
-}
+        <a :href="url">logout</a>
+    </nav>`,
+    data(){
+        return {
+            url: window.location.origin + "/logout"
+        };
+    }
+};
 
 export default Navbar;
