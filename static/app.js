@@ -1,4 +1,15 @@
+import router from './utils/router.js';
+import Navbar from './components/Navbar.js';
 new Vue({
     el: '#app',
-    template: ` <h1>helll nah</h1> `
+    template: ` 
+    <div>
+    <Navbar/>
+    <router-view/>
+    </div>
+    `,
+    router,
+    components: {
+        Navbar,
+    },
 })
