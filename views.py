@@ -2,6 +2,7 @@ from flask import jsonify, render_template_string,render_template, request
 from flask_security import auth_required,current_user,roles_accepted,SQLAlchemyUserDatastore
 from flask_security.utils import hash_password
 from extensions import db
+from models import Professional,User
 
 def create_view(app,userdatastore:SQLAlchemyUserDatastore):
     @app.route('/')
@@ -23,14 +24,23 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
             return jsonify({"message":"User already exists"})
         
         #professional must be kept inactive until admin approves it
-        
         if role=='professional':
-            active=False
-        elif  role =='customer':
+            active=True #set false at end
+        if role=='customer':    
             active=True
         
         try:
-            userdatastore.create_user(email=email,password=hash_password(password),active=active,roles=[role])
+            user=userdatastore.create_user(email=email,password=hash_password(password),active=active,roles=[role])
+                    
+            db.session.add(user)
+            if role=='professional':
+                user=User.query.filter_by(email=email).first()
+                professional=Professional(user_id=user.id,name='hi',phone='123',address='hi',pincode='123',service='hi',experience='hi')
+                db.session.add(professional)
+            if role=='customer':
+                user=User.query.filter_by(email=email).first()
+                customer=Professional(user_id=user.id,name='hi',phone='123',address='hi',pincode='123')
+                db.session.add(customer)
             db.session.commit()
         except:
             print('Error creating user')

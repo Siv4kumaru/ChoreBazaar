@@ -1,6 +1,7 @@
 from flask import Flask
 import views
 from extensions import db,security
+from flask_migrate import Migrate
 # from create_initial_data import create_data
 
 def create_app():
@@ -19,6 +20,7 @@ def create_app():
         user_datastore = SQLAlchemyUserDatastore(db, User, Role)
         security.init_app(app, user_datastore)
         db.create_all()
+        migrate=Migrate(app, db)
         #create_data(user_datastore)
 
     app.config['WTF_CSRF_CHECK_DEFAULT'] = False

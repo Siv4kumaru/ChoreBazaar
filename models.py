@@ -12,6 +12,7 @@ class User(db.Model,UserMixin):
     fs_uniquifier=db.Column(db.String, nullable=False)
     roles=db.relationship('Role', secondary='user_roles')
 
+
 class Role(db.Model,RoleMixin):
     id=db.Column(db.Integer, primary_key=True)
     name=db.Column(db.String(50), unique=True, nullable=False)
@@ -22,3 +23,23 @@ class UserRoles(db.Model):
     user_id=db.Column(db.Integer,db.ForeignKey('user.id'))
     role_id=db.Column(db.Integer, db.ForeignKey('role.id'))
 
+class Professional(db.Model):
+    id=db.Column(db.Integer, primary_key=True)
+    user_id=db.Column(db.Integer, db.ForeignKey('user.id'))
+    name=db.Column(db.String)
+    phone=db.Column(db.String)
+    address=db.Column(db.String)
+    pincode=db.Column(db.String)
+    service=db.Column(db.String)
+    experience=db.Column(db.String)
+    #pdf
+    pro=db.relationship('User', backref='professional')
+
+class Customer(db.Model):
+    id=db.Column(db.Integer, primary_key=True)
+    user_id=db.Column(db.Integer, db.ForeignKey('user.id'))
+    name=db.Column(db.String)
+    phone=db.Column(db.String)
+    address=db.Column(db.String)    
+    pincode=db.Column(db.String)
+    cus=db.relationship('User', backref='customer')
