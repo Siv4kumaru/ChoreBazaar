@@ -65,6 +65,11 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
         return jsonify({"message":"created user"}),200
             
 
+    @app.route('/dropdownService', methods=['GET'])
+    def dropdown_services():
+        services = Service.query.all()
+        service_list = [{'id': service.id, 'name': service.name} for service in services]
+        return jsonify(service_list)
 
     @app.route('/profile')
     @auth_required('session','token')

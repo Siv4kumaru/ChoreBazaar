@@ -1,3 +1,4 @@
+[ ] if i delete services then the service id and name in prof must be set to service deleted
 [ ] make pro active = false
 [ ] dropdown in prosignup
 [ ] dropdown in navbar 

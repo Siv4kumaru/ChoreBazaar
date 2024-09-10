@@ -12,10 +12,14 @@ const ProSignup = {
           <input v-model="phone" type="number" class="form-control" placeholder="Phone" required/>
         </div>
         <div class="form-group mb-3">
-          <select v-model="service" type="text" class="form-control" required>
-          <option value="" disabled selected>Service Type</option>
-          <option value="cleaning home">cleaning home</option> </select>
+          <select v-model="service" class="form-control" required>
+            <option value="" disabled selected>Service Type</option>
+            <option v-for="service in services" :key="service.id" :value="service.name">
+              {{ service.name }}
+            </option>
+          </select>
         </div>
+        
         <div class="form-group mb-3">
           <input v-model="experience" type="number" class="form-control" placeholder="Experience in number" required/>
         </div>
@@ -32,6 +36,7 @@ const ProSignup = {
           <input v-model="password" type="password" class="form-control" placeholder="Password" required/>
         </div>
         <button class="btn btn-primary w-100" @click="submitInfo">Submit</button>
+        
       </div>
     </div>
   `,
@@ -45,10 +50,26 @@ const ProSignup = {
         service: "",
         experience: "",
         address: "",
-        pincode: ""
+        pincode: "",
+        services: []
     };
   },
+  mounted() {
+    this.fetchServices();  
+  },
   methods: {
+    async fetchServices() {
+      try {
+        const response = await fetch('/dropdownService');
+        if (response.ok) {
+          this.services = await response.json();
+        } else {
+          console.error('Failed to fetch services');
+        }
+      } catch (error) {
+        console.error('Error fetching services:', error);
+      }
+    },
     async submitInfo() {
       const origin = window.location.origin;
       const url = `${origin}/register`;

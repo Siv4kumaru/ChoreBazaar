@@ -59,7 +59,6 @@ class Service(db.Model):
     name = db.Column(db.String,unique=True)
     description = db.Column(db.String)
     price = db.Column(db.Float)
-    location=db.Column(db.String)
     description=db.Column(db.String)
 
     professionals = db.relationship('Professional', back_populates='service')
