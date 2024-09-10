@@ -2,7 +2,7 @@ from flask import jsonify, render_template_string,render_template, request
 from flask_security import auth_required,current_user,roles_accepted,SQLAlchemyUserDatastore
 from flask_security.utils import hash_password
 from extensions import db
-from models import Professional,User
+from models import Professional,User,Customer
 
 def create_view(app,userdatastore:SQLAlchemyUserDatastore):
     @app.route('/')
@@ -16,6 +16,9 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
         email=data.get('email')
         password=data.get('password')
         role=data.get('role')
+        
+        if role=='admin':
+            return jsonify({"message":"Not today Hacker, I'm the only Admin"})
         
         if not email or not password or role not in ['customer','professional']:
             return jsonify({"message":"Invalid data"})
@@ -34,12 +37,22 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
                     
             db.session.add(user)
             if role=='professional':
-                user=User.query.filter_by(email=email).first()
-                professional=Professional(user_id=user.id,name='hi',phone='123',address='hi',pincode='123',service='hi',experience='hi')
+                name=data.get('name')
+                phone=data.get('phone')
+                address=data.get('address')
+                pincode=data.get('pincode')
+                service=data.get('service')
+                experience=data.get('experience')
+                useru=User.query.filter_by(email=email).first()
+                professional=Professional(userId=useru.id,name=name,phone=phone,address=address,pincode=pincode,service=service,experience=experience)
                 db.session.add(professional)
             if role=='customer':
-                user=User.query.filter_by(email=email).first()
-                customer=Professional(user_id=user.id,name='hi',phone='123',address='hi',pincode='123')
+                name=data.get('name')
+                phone=data.get('phone')
+                address=data.get('address')
+                pincode=data.get('pincode')
+                useru=User.query.filter_by(email=email).first()
+                customer=Customer(userId=useru.id,name=name,phone=phone,address=address,pincode=pincode)
                 db.session.add(customer)
             db.session.commit()
         except:
@@ -66,7 +79,7 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
     def customers():
         return render_template_string("""
         <h1>Customer Page</h1>
-        <p> Wlecome Mr. {{current_user.email}}</p>
+        <p> Wlecome Mr.{{current_user.email}}</p>
         <a href="/logout">Logout</a> 
         """
         )

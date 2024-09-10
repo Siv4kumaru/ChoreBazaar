@@ -25,7 +25,7 @@ class UserRoles(db.Model):
 
 class Professional(db.Model):
     id=db.Column(db.Integer, primary_key=True)
-    user_id=db.Column(db.Integer, db.ForeignKey('user.id'))
+    userId=db.Column(db.Integer, db.ForeignKey('user.id'))
     name=db.Column(db.String)
     phone=db.Column(db.String)
     address=db.Column(db.String)
@@ -37,7 +37,7 @@ class Professional(db.Model):
 
 class Customer(db.Model):
     id=db.Column(db.Integer, primary_key=True)
-    user_id=db.Column(db.Integer, db.ForeignKey('user.id'))
+    userId=db.Column(db.Integer, db.ForeignKey('user.id'))
     name=db.Column(db.String)
     phone=db.Column(db.String)
     address=db.Column(db.String)    
