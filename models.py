@@ -33,11 +33,15 @@ class Professional(db.Model):
     name = db.Column(db.String)
     phone = db.Column(db.String)
     address = db.Column(db.String)
-    pincode = db.Column(db.String)
-    service = db.Column(db.String)
-    experience = db.Column(db.String)
 
+    pincode = db.Column(db.String)
+    serviceId = db.Column(db.Integer, db.ForeignKey('service.id'))
+    serviceName = db.Column(db.String)    
+    experience = db.Column(db.String)
+   
+    service = db.relationship('Service', back_populates='professionals')
     user = db.relationship('User', back_populates='professionals')
+    servicerequests = db.relationship('ServiceRequest', back_populates='professional')
 
 class Customer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -47,5 +51,30 @@ class Customer(db.Model):
     address = db.Column(db.String)
     pincode = db.Column(db.String)
 
-
+    servicerequests = db.relationship('ServiceRequest', back_populates='customer')
     user = db.relationship('User', back_populates='customers')
+
+class Service(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String,unique=True)
+    description = db.Column(db.String)
+    price = db.Column(db.Float)
+    location=db.Column(db.String)
+    description=db.Column(db.String)
+
+    professionals = db.relationship('Professional', back_populates='service')
+    servicerequests = db.relationship('ServiceRequest', back_populates='service')
+
+class ServiceRequest(db.Model):
+    id=db.Column(db.Integer, primary_key=True)
+    customerId=db.Column(db.Integer, db.ForeignKey('customer.id'))
+    professionalId=db.Column(db.Integer, db.ForeignKey('professional.id'))
+    serviceId=db.Column(db.Integer, db.ForeignKey('service.id'))
+    dateofrequest=db.Column(db.Date)
+    dateofcompletion=db.Column(db.Date)
+    serviceStatus=db.Column(db.String)
+    feedback=db.Column(db.String)
+
+    customer=db.relationship('Customer', back_populates='servicerequests')
+    professional=db.relationship('Professional', back_populates='servicerequests')
+    service=db.relationship('Service', back_populates='servicerequests')

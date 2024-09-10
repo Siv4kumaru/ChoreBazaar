@@ -2,7 +2,7 @@ from flask import jsonify, render_template_string,render_template, request
 from flask_security import auth_required,current_user,roles_accepted,SQLAlchemyUserDatastore
 from flask_security.utils import hash_password
 from extensions import db
-from models import Professional,User,Customer
+from models import Professional,User,Customer,Service,ServiceRequest
 
 def create_view(app,userdatastore:SQLAlchemyUserDatastore):
     @app.route('/')
@@ -41,10 +41,13 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
                 phone=data.get('phone')
                 address=data.get('address')
                 pincode=data.get('pincode')
-                service=data.get('service')
+                serviceName=data.get('service')
                 experience=data.get('experience')
                 useru=User.query.filter_by(email=email).first()
-                professional=Professional(userId=useru.id,name=name,phone=phone,address=address,pincode=pincode,service=service,experience=experience)
+                service=Service.query.filter_by(name=serviceName).first()
+                if service is None:
+                    return jsonify({"message":"Service not found"}),404
+                professional=Professional(userId=useru.id,serviceId=service.id,name=name,phone=phone,address=address,pincode=pincode,serviceName=serviceName,experience=experience)
                 db.session.add(professional)
             if role=='customer':
                 name=data.get('name')

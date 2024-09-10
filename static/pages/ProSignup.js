@@ -14,7 +14,7 @@ const ProSignup = {
         <div class="form-group mb-3">
           <select v-model="service" type="text" class="form-control" required>
           <option value="" disabled selected>Service Type</option>
-          <option value="TBD">blank Space</option> </select>
+          <option value="cleaning home">cleaning home</option> </select>
         </div>
         <div class="form-group mb-3">
           <input v-model="experience" type="number" class="form-control" placeholder="Experience in number" required/>
