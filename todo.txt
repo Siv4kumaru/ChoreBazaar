@@ -2,6 +2,7 @@
 [ ] make pro active = false
 [*] dropdown in prosignup
 [ ] dropdown in navbar 
+[ ] address form
 [ ] navbar design
 [ ] logo
 [ ] pdf in pro signup
