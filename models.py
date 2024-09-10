@@ -35,7 +35,7 @@ class Professional(db.Model):
     address = db.Column(db.String)
 
     pincode = db.Column(db.String)
-    serviceId = db.Column(db.Integer, db.ForeignKey('service.id'))
+    serviceId = db.Column(db.Integer, db.ForeignKey('service.id', ondelete='SET NULL'), nullable=True)
     serviceName = db.Column(db.String)    
     experience = db.Column(db.String)
    
@@ -77,3 +77,12 @@ class ServiceRequest(db.Model):
     customer=db.relationship('Customer', back_populates='servicerequests')
     professional=db.relationship('Professional', back_populates='servicerequests')
     service=db.relationship('Service', back_populates='servicerequests')
+
+    from sqlalchemy import event
+
+    # @event.listens_for(Service, 'after_delete')
+    # def update_professional_service_name(mapper, connection, target):
+    #     # Update all professionals linked to the deleted service
+    #     connection.execute(
+    #         f"UPDATE professional SET serviceName = 'Deleted plz switch' WHERE serviceId = {target.id}"
+    #     )

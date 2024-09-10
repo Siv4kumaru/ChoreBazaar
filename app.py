@@ -2,7 +2,7 @@ from flask import Flask
 import views
 from extensions import db,security
 from flask_migrate import Migrate
-# from create_initial_data import create_data
+from create_initial_data import create_data
 
 def create_app():
     app = Flask(__name__)
