@@ -59,7 +59,6 @@ class Service(db.Model):
     name = db.Column(db.String,unique=True)
     description = db.Column(db.String)
     price = db.Column(db.Float)
-    description=db.Column(db.String)
 
     professionals = db.relationship('Professional', back_populates='service')
     servicerequests = db.relationship('ServiceRequest', back_populates='service')
@@ -78,7 +77,7 @@ class ServiceRequest(db.Model):
     professional=db.relationship('Professional', back_populates='servicerequests')
     service=db.relationship('Service', back_populates='servicerequests')
 
-    from sqlalchemy import event
+
 
     # @event.listens_for(Service, 'after_delete')
     # def update_professional_service_name(mapper, connection, target):

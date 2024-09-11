@@ -1,8 +1,10 @@
 [*] if i delete services then the service id and name in prof must be set to service deleted
 [ ] make pro active = false
 [*] dropdown in prosignup
+[ ] if i click on the services in customer tab then take me to search bar wioth profs
 [ ] dropdown in navbar 
 [ ] address form
 [ ] navbar design
 [ ] logo
 [ ] pdf in pro signup
+[ ] read all hash

@@ -82,14 +82,15 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
         """
         )
         
-    @app.route('/customer')
+    @app.route('/customerDashboard')
     @roles_accepted('customer')
-    def customers():
+    def customer():
         return render_template_string("""
         <h1>Customer Page</h1>
         <p> Wlecome Mr.{{current_user.email}}</p>
         <a href="/logout">Logout</a> 
         """
         )
+    
     
     

@@ -1,8 +1,9 @@
 from flask import Flask
-import views
+import views,sauce
 from extensions import db,security
 from flask_migrate import Migrate
 from create_initial_data import create_data
+
 
 def create_app():
     app = Flask(__name__)
@@ -31,6 +32,9 @@ def create_app():
 
     views.create_view(app,user_datastore)
     
+    #resouces
+    sauce.api.init_app(app)
+
     return app
 
 if __name__ == '__main__':
