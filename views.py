@@ -1,6 +1,6 @@
 from flask import jsonify, render_template_string,render_template, request
 from flask_security import auth_required,current_user,roles_accepted,SQLAlchemyUserDatastore
-from flask_security.utils import hash_password
+from flask_security.utils import hash_password,verify_password
 from extensions import db
 from models import Professional,User,Customer,Service,ServiceRequest
 
@@ -9,6 +9,28 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
     def home():
         return render_template("index.html")
     
+    @app.route('/userLogin',methods=['POST'])
+    def userLogin():
+        data =request.get_json()
+        email=data.get('email')
+        password=data.get('password')
+
+        if not email:
+            return jsonify({"message":"Email is required"}),404
+        if not password:
+            return jsonify({"message":"Password is required"}),404
+        
+        user=userdatastore.find_user(email=email)
+
+        if not user:
+            return jsonify({"message":"User not found"}),404
+        if not user.active:
+            return jsonify({"message":"user is flagged, kindly contact the admin"}),404
+
+        if verify_password(password,user.password):
+            return jsonify({"token": user.get_auth_token(),"role":user.roles[0].name,"id":user.id,email:user.email}),200
+
+
     @app.route('/register',methods=['POST'])
     def register():
         data= request.get_json()

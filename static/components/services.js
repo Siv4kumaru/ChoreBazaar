@@ -10,7 +10,7 @@ const services = {
             <small>Base Amount: ₹{{ price }}</small>
           </div>
 
-      </div>
+      </div> 
       </div>
     `,
     props: {
