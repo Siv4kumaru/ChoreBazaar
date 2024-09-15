@@ -1,5 +1,6 @@
 from flask import Flask
-import views,sauce
+import views
+import ServiceSauce as ServiceSauce
 from extensions import db,security
 from flask_migrate import Migrate
 from create_initial_data import create_data
@@ -38,7 +39,7 @@ def create_app():
     views.create_view(app,user_datastore)
     
     #resouces
-    sauce.api.init_app(app)
+    ServiceSauce.api.init_app(app)
 
     return app
 
