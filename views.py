@@ -1,6 +1,6 @@
 from flask import jsonify, render_template_string,render_template, request
 from flask_security import auth_required,current_user,roles_accepted,SQLAlchemyUserDatastore
-from flask_security.utils import hash_password
+from flask_security.utils import hash_password,verify_password
 from extensions import db
 from models import Professional,User,Customer,Service,ServiceRequest
 
@@ -71,17 +71,7 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
         service_list = [{'id': service.id, 'name': service.name} for service in services]
         return jsonify(service_list)
 
-    @app.route('/profile')
-    @auth_required('session','token')
-    #@auth_required('session','token','basic')
-    def profile():
-        return render_template_string("""
-        <h1>Profile Page</h1>
-        <p> Wlecome Mr. {{current_user.email}}</p>
-        <a href="/logout">Logout</a> 
-        """
-        )
-        
+
     @app.route('/customerDashboard')
     @roles_accepted('customer')
     def customer():
@@ -91,6 +81,22 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
         <a href="/logout">Logout</a> 
         """
         )
-    
-    
-    
+        
+    @app.route('/userLogin', methods=['POST'])
+    def userLogin():
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
+
+        if not email or not password:
+            return jsonify({'message' : 'email or password not provided'}), 400
+        
+        user = userdatastore.find_user(email = email)
+
+        if not user:
+            return jsonify({'message' : ' user not found'}), 400
+        
+        if verify_password(password, user.password):
+            return jsonify({'token' : user.get_auth_token(), 'user' : user.email, 'role' : user.roles[0].name}), 200
+        else :
+            return jsonify({'message' : 'invalid password'}), 400

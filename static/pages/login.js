@@ -24,7 +24,7 @@ const Login = {
   methods: {
     async submitInfo() {
       const url = window.location.origin
-      const res = await fetch(url+'/login',{
+      const res = await fetch(url+'/userLogin',{
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -32,7 +32,13 @@ const Login = {
         body : JSON.stringify({email:this.email,password:this.password})
     });
     if (res.ok){
-      router.push("/profile");
+      const data = await res.json();
+      sessionStorage.setItem('token',data.token)
+      sessionStorage.setItem('role',data.role)
+      sessionStorage.setItem('email',this.email)
+      sessionStorage.setItem('id',this.id)
+      console.log("Login Successful, "+sessionStorage.getItem('role'));
+      router.push('/dashboard');
     }else{
       console.error("Login Failed");
     }

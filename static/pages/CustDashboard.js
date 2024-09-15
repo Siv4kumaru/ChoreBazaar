@@ -17,7 +17,11 @@ const CustDashboard = {
     };
   },
   async mounted() {
-    const res=await fetch(window.location.origin+"/api/services");
+    const res=await fetch(window.location.origin+"/api/services",{
+      headers:{
+        "Authentication":sessionStorage.getItem("token")
+      }
+    });
     const data = await res.json();
     this.allServices = data;
     console.log(this.allServices);  

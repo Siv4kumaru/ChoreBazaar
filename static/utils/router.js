@@ -1,3 +1,4 @@
+import Profile from '../pages/Profile.js'
 import Home from '../pages/Home.js'
 import CustomerSignup from '../pages/CustomerSignup.js'
 import ProSignup from '../pages/ProSignup.js'
@@ -11,7 +12,8 @@ const routes = [
     {path : '/proSignup', component: ProSignup},
     {path : '/login', component: Login},
     {path : '/logout', component: Logout},
-    { path: '/Custdashboard', component: CustDashboard }
+    {path: '/Dashboard', component: CustDashboard },
+    {path: '/Profile', component: Profile}
 ]
 
 const router = new VueRouter({
