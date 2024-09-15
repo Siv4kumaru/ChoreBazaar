@@ -28,7 +28,7 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
         
         #professional must be kept inactive until admin approves it
         if role=='professional':
-            active=True #set false at end
+            active=False #set false at end
         if role=='customer':    
             active=True
         
@@ -100,3 +100,37 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
             return jsonify({'token' : user.get_auth_token(), 'user' : user.email, 'role' : user.roles[0].name}), 200
         else :
             return jsonify({'message' : 'invalid password'}), 400
+        
+        
+    @app.route('/activate/<id>',methods=['GET'])
+    @roles_accepted('admin')
+    def activate(id):
+        user=userdatastore.find_user(id=id)
+        if not user:
+            return jsonify({"message":"user not found"}),400
+        if(user.active==True):
+            return jsonify({"message":f"user:{user.email} already activated"}),400
+        
+        user.active=True
+        db.session.commit()
+        return jsonify({"message":f"user {user.email} is activated"}),200
+    
+    @roles_accepted('admin')
+    @app.route('/deactivate/<id>',methods=['GET'])
+    def deactivate(id):
+        user=userdatastore.find_user(id=id)
+        if not user:
+            return jsonify({"message":"user not found"}),400
+        if(user.active==False):
+            return jsonify({"message":f"user:{user.email} already deactivated"}),400
+        
+        user.active=False
+        db.session.commit()
+        return jsonify({"message":f"user {user.email} is deactivated"}),200
+    
+    @roles_accepted('admin')
+    @app.route('/inactivePro',methods=['GET'])
+    def inactivePro():
+        users=User.query.filter_by(active=False).all()
+        inactiveUsers=[{'id':user.id,'email':user.email} for user in users]
+        return jsonify(inactiveUsers),200
