@@ -50,7 +50,7 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
         
         #professional must be kept inactive until admin approves it
         if role=='professional':
-            active=True #set false at end
+            active=False #set false at end
         if role=='customer':    
             active=True
         
@@ -93,17 +93,7 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
         service_list = [{'id': service.id, 'name': service.name} for service in services]
         return jsonify(service_list)
 
-    @app.route('/profile')
-    @auth_required('session','token')
-    #@auth_required('session','token','basic')
-    def profile():
-        return render_template_string("""
-        <h1>Profile Page</h1>
-        <p> Wlecome Mr. {{current_user.email}}</p>
-        <a href="/logout">Logout</a> 
-        """
-        )
-        
+
     @app.route('/customerDashboard')
     @roles_accepted('customer')
     def customer():
@@ -113,6 +103,56 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
         <a href="/logout">Logout</a> 
         """
         )
+        
+    @app.route('/userLogin', methods=['POST'])
+    def userLogin():
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
+
+        if not email or not password:
+            return jsonify({'message' : 'email or password not provided'}), 400
+        
+        user = userdatastore.find_user(email = email)
+
+        if not user:
+            return jsonify({'message' : ' user not found'}), 400
+        
+        if verify_password(password, user.password):
+            return jsonify({'token' : user.get_auth_token(), 'user' : user.email, 'role' : user.roles[0].name}), 200
+        else :
+            return jsonify({'message' : 'invalid password'}), 400
+        
+        
+    @app.route('/activate/<id>',methods=['GET'])
+    @roles_accepted('admin')
+    def activate(id):
+        user=userdatastore.find_user(id=id)
+        if not user:
+            return jsonify({"message":"user not found"}),400
+        if(user.active==True):
+            return jsonify({"message":f"user:{user.email} already activated"}),400
+        
+        user.active=True
+        db.session.commit()
+        return jsonify({"message":f"user {user.email} is activated"}),200
     
+    @roles_accepted('admin')
+    @app.route('/deactivate/<id>',methods=['GET'])
+    def deactivate(id):
+        user=userdatastore.find_user(id=id)
+        if not user:
+            return jsonify({"message":"user not found"}),400
+        if(user.active==False):
+            return jsonify({"message":f"user:{user.email} already deactivated"}),400
+        
+        user.active=False
+        db.session.commit()
+        return jsonify({"message":f"user {user.email} is deactivated"}),200
     
-    
+    @roles_accepted('admin')
+    @app.route('/inactivePro',methods=['GET'])
+    def inactivePro():
+        users=User.query.filter_by(active=False).all()
+        inactiveUsers=[{'id':user.id,'email':user.email} for user in users]
+        return jsonify(inactiveUsers),200

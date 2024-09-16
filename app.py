@@ -1,5 +1,6 @@
 from flask import Flask
-import views,sauce
+import views
+import ServiceSauce as ServiceSauce
 from extensions import db,security
 from flask_migrate import Migrate
 from create_initial_data import create_data
@@ -11,6 +12,11 @@ def create_app():
     app.config['SECRET_KEY'] = "abcd"
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
     app.config['SECURITY_PASSWORD_SALT'] = 'salt_in_your_eyes'
+    
+    #config for de token
+    app.config['SECURITY_TOKEN_AUTHENTICATION_HEADER'] = 'Authentication-Token' 
+    app.config['SECURITY_TOKEN_MAX_AGE'] = 3600
+    app.config['SECURITY_LOGIN_WITHOUT_CONFIRMATION'] = True #diff token evrytime 
     
     db.init_app(app)
 
@@ -33,7 +39,7 @@ def create_app():
     views.create_view(app,user_datastore)
     
     #resouces
-    sauce.api.init_app(app)
+    ServiceSauce.api.init_app(app)
 
     return app
 
