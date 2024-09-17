@@ -12,10 +12,10 @@ class User(db.Model, UserMixin):
     fs_uniquifier = db.Column(db.String, nullable=False)
 
 
-    roles = db.relationship('Role', secondary='user_roles',)
+    roles = db.relationship('Role', secondary='user_roles', cascade= "all, delete")
     
-    professionals = db.relationship('Professional',  back_populates='user')
-    customers = db.relationship('Customer',  back_populates='user')
+    professionals = db.relationship('Professional', back_populates='user', cascade= "all, delete")
+    customers = db.relationship('Customer', back_populates='user', cascade="all, delete")
 
 class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -65,8 +65,12 @@ class Service(db.Model):
 class ServiceRequest(db.Model):
     id=db.Column(db.Integer, primary_key=True)
     customerId=db.Column(db.Integer, db.ForeignKey('customer.id'))
+    #if customer is deleted/blocked, it will be set to NULL and servicestatus will be set to "customer blocked"
     professionalId=db.Column(db.Integer, db.ForeignKey('professional.id'))
+    #if pro is deleted/blocked, it will be set to NULL and servicestatus will be set to "Profssional Blocked"
     serviceId=db.Column(db.Integer, db.ForeignKey('service.id', ondelete="SET NULL"))
+    serviceName=db.Column(db.String)
+    #if servieID is deleted /blocked, it will be set to NULL and servicestatus will be set to "cancelled request (by admin)"
     dateofrequest=db.Column(db.String)
     dateofcompletion=db.Column(db.String)
     serviceStatus=db.Column(db.String)

@@ -23,7 +23,7 @@ def create_data(user_datastore:SQLAlchemyUserDatastore):
     if not user_datastore.find_user(email="pro@gmail.com"):
         user_datastore.create_user(email="pro@gmail.com", password=hash_password("password"),active=True,roles=['professional'])
         user=user_datastore.find_user(email="pro@gmail.com")
-        professional=Professional(userId=user.id,name="pro",phone="123",address="ChromePet , Chennai, TamilNadu",pincode="620014",experience="12")
+        professional=Professional(userId=user.id,name="pro",phone="123",serviceName="AC Mechanic",serviceId=1,address="ChromePet , Chennai, TamilNadu",pincode="620014",experience="12")
         db.session.add(professional)
 
     if not Service.query.filter_by(name="AC Mechanic").first():
