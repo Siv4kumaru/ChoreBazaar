@@ -2,7 +2,7 @@ import services from "../components/services.js";
 
 const CustDashboard = {
   template:`<div>
-    <h1>Customer Dashboard</h1>
+    <h1>Customere Dashboard</h1>
       <div class="d-flex flex-row justify-content-center">
          <div v-for="service in allServices"  >
         <services :name="service.name" :description="service.description" :price="service.price"></services>

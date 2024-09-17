@@ -28,7 +28,7 @@ def create_app():
         security.init_app(app, user_datastore)
         db.create_all()
         migrate=Migrate(app, db)
-        # create_data(user_datastore)
+        create_data(user_datastore)
 
     app.config['WTF_CSRF_CHECK_DEFAULT'] = False
     app.config['SECURITY_CSRF_PROTECT_MECHANISMS'] = []

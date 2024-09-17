@@ -11,11 +11,11 @@ class User(db.Model, UserMixin):
     active = db.Column(db.Boolean)
     fs_uniquifier = db.Column(db.String, nullable=False)
 
-    # Removing 'lazy=dynamic' to allow eager loading
-    roles = db.relationship('Role', secondary='user_roles', cascade="all, delete")
+
+    roles = db.relationship('Role', secondary='user_roles',)
     
-    professionals = db.relationship('Professional', cascade="all, delete", back_populates='user')
-    customers = db.relationship('Customer', cascade="all, delete", back_populates='user')
+    professionals = db.relationship('Professional',  back_populates='user')
+    customers = db.relationship('Customer',  back_populates='user')
 
 class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -33,11 +33,10 @@ class Professional(db.Model):
     name = db.Column(db.String)
     phone = db.Column(db.String)
     address = db.Column(db.String)
-
     pincode = db.Column(db.String)
     serviceId = db.Column(db.Integer, db.ForeignKey('service.id', ondelete='SET NULL'), nullable=True)
     serviceName = db.Column(db.String)    
-    experience = db.Column(db.String)
+    experience = db.Column(db.Integer)
    
     service = db.relationship('Service', back_populates='professionals')
     user = db.relationship('User', back_populates='professionals')
@@ -67,15 +66,16 @@ class ServiceRequest(db.Model):
     id=db.Column(db.Integer, primary_key=True)
     customerId=db.Column(db.Integer, db.ForeignKey('customer.id'))
     professionalId=db.Column(db.Integer, db.ForeignKey('professional.id'))
-    serviceId=db.Column(db.Integer, db.ForeignKey('service.id'))
-    dateofrequest=db.Column(db.Date)
-    dateofcompletion=db.Column(db.Date)
+    serviceId=db.Column(db.Integer, db.ForeignKey('service.id', ondelete="SET NULL"))
+    dateofrequest=db.Column(db.String)
+    dateofcompletion=db.Column(db.String)
     serviceStatus=db.Column(db.String)
     feedback=db.Column(db.String)
 
     customer=db.relationship('Customer', back_populates='servicerequests')
     professional=db.relationship('Professional', back_populates='servicerequests')
-    service=db.relationship('Service', back_populates='servicerequests')
+    service = db.relationship('Service', back_populates='servicerequests')  # Add this line
+
 
 
 

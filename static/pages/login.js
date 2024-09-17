@@ -38,7 +38,7 @@ const Login = {
       sessionStorage.setItem('email',this.email)
       sessionStorage.setItem('id',this.id)
       console.log("Login Successful, "+sessionStorage.getItem('role'));
-      router.push('/dashboard');
+      router.push('/Dashboard');
     }else{
       console.error("Login Failed");
     }

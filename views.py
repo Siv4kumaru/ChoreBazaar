@@ -104,24 +104,7 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
         """
         )
         
-    @app.route('/userLogin', methods=['POST'])
-    def userLogin():
-        data = request.get_json()
-        email = data.get('email')
-        password = data.get('password')
 
-        if not email or not password:
-            return jsonify({'message' : 'email or password not provided'}), 400
-        
-        user = userdatastore.find_user(email = email)
-
-        if not user:
-            return jsonify({'message' : ' user not found'}), 400
-        
-        if verify_password(password, user.password):
-            return jsonify({'token' : user.get_auth_token(), 'user' : user.email, 'role' : user.roles[0].name}), 200
-        else :
-            return jsonify({'message' : 'invalid password'}), 400
         
         
     @app.route('/activate/<id>',methods=['GET'])
