@@ -1,6 +1,7 @@
 from extensions import db
 from flask_security import UserMixin, RoleMixin
 from flask_security.models import fsqla_v3 as fsq
+from sqlalchemy import event
 
 fsq.FsModels.set_db_info(db)
 
@@ -13,9 +14,12 @@ class User(db.Model, UserMixin):
 
 
     roles = db.relationship('Role', secondary='user_roles', cascade= "all, delete")
+    roles = db.relationship('Role', secondary='user_roles')
     
     professionals = db.relationship('Professional', back_populates='user', cascade= "all, delete")
     customers = db.relationship('Customer', back_populates='user', cascade="all, delete")
+    professionals = db.relationship('Professional', back_populates='user', cascade="all, delete-orphan")
+    customers = db.relationship('Customer', back_populates='user',cascade="all, delete-orphan")
 
 class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -39,7 +43,7 @@ class Professional(db.Model):
     experience = db.Column(db.Integer)
    
     service = db.relationship('Service', back_populates='professionals')
-    user = db.relationship('User', back_populates='professionals')
+    user = db.relationship('User', back_populates='professionals', single_parent=True)
     servicerequests = db.relationship('ServiceRequest', back_populates='professional')
 
 class Customer(db.Model):
@@ -68,8 +72,13 @@ class ServiceRequest(db.Model):
     #if customer is deleted/blocked, it will be set to NULL and servicestatus will be set to "customer blocked"
     professionalId=db.Column(db.Integer, db.ForeignKey('professional.id'))
     #if pro is deleted/blocked, it will be set to NULL and servicestatus will be set to "Profssional Blocked"
+    customerId=db.Column(db.Integer, db.ForeignKey('customer.id',ondelete="SET NULL"))
+    #if customer is deleted/blocked, it will be set to NULL and servicestatus will be set to "customer blocked"
+    professionalId=db.Column(db.Integer, db.ForeignKey('professional.id',ondelete="SET NULL"))
+    #if pro is deleted/blocked, it will be set to NULL and servicestatus will be set to "Profssional Blocked"
     serviceId=db.Column(db.Integer, db.ForeignKey('service.id', ondelete="SET NULL"))
     serviceName=db.Column(db.String)
+    #if servieID is deleted /blocked, it will be set to NULL and servicestatus will be set to "cancelled request (by admin)"
     #if servieID is deleted /blocked, it will be set to NULL and servicestatus will be set to "cancelled request (by admin)"
     dateofrequest=db.Column(db.String)
     dateofcompletion=db.Column(db.String)
@@ -78,14 +87,15 @@ class ServiceRequest(db.Model):
 
     customer=db.relationship('Customer', back_populates='servicerequests')
     professional=db.relationship('Professional', back_populates='servicerequests')
-    service = db.relationship('Service', back_populates='servicerequests')  # Add this line
+    service = db.relationship('Service', back_populates='servicerequests')  
 
+@event.listens_for(ServiceRequest, 'before_insert')
+@event.listens_for(ServiceRequest, 'before_update')
+def set_service_status(mapper, connection, target):
+    if target.serviceId is None:
+        target.serviceStatus = "Request blocked"
+    if target.customerId is None:
+        target.serviceStatus = "customer blocked"
+    if target.professionalId is None:
+        target.serviceStatus = "professional blocked"
 
-
-
-    # @event.listens_for(Service, 'after_delete')
-    # def update_professional_service_name(mapper, connection, target):
-    #     # Update all professionals linked to the deleted service
-    #     connection.execute(
-    #         f"UPDATE professional SET serviceName = 'Deleted plz switch' WHERE serviceId = {target.id}"
-    #     )
