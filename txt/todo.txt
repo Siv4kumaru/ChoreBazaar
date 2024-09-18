@@ -3,6 +3,7 @@
 [*] dropdown in prosignup
 [ ] if i click on the services in customer tab then take me to search bar wioth profs
 [ ] dropdown in navbar 
+[ ] pro can have multiple services
 [ ] address form
 [ ] navbar design
 [ ] logo

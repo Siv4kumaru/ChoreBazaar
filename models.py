@@ -1,7 +1,7 @@
 from extensions import db
 from flask_security import UserMixin, RoleMixin
 from flask_security.models import fsqla_v3 as fsq
-from sqlalchemy import event
+from sqlalchemy import event, or_
 
 fsq.FsModels.set_db_info(db)
 
@@ -77,8 +77,6 @@ class ServiceRequest(db.Model):
     professionalId=db.Column(db.Integer, db.ForeignKey('professional.id',ondelete="SET NULL"))
     #if pro is deleted/blocked, it will be set to NULL and servicestatus will be set to "Profssional Blocked"
     serviceId=db.Column(db.Integer, db.ForeignKey('service.id', ondelete="SET NULL"))
-    serviceName=db.Column(db.String)
-    #if servieID is deleted /blocked, it will be set to NULL and servicestatus will be set to "cancelled request (by admin)"
     #if servieID is deleted /blocked, it will be set to NULL and servicestatus will be set to "cancelled request (by admin)"
     dateofrequest=db.Column(db.String)
     dateofcompletion=db.Column(db.String)
@@ -89,13 +87,15 @@ class ServiceRequest(db.Model):
     professional=db.relationship('Professional', back_populates='servicerequests')
     service = db.relationship('Service', back_populates='servicerequests')  
 
+#to trigger this use db.seession.commit()
 @event.listens_for(ServiceRequest, 'before_insert')
 @event.listens_for(ServiceRequest, 'before_update')
 def set_service_status(mapper, connection, target):
-    if target.serviceId is None:
-        target.serviceStatus = "Request blocked"
+    if target.serviceId is None :
+        target.serviceStatus += "<Service Deleted>"
     if target.customerId is None:
-        target.serviceStatus = "customer blocked"
+        target.serviceStatus += "<customer Deleted>"      
     if target.professionalId is None:
-        target.serviceStatus = "professional blocked"
+        target.serviceStatus += "<professional Deleted>"
 
+      

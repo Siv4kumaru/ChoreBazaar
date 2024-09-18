@@ -1,7 +1,7 @@
 from flask_security import SQLAlchemyUserDatastore
 from flask_security.utils import hash_password
 from extensions import db
-from models import Customer,Professional,Service,ServiceRequest
+from models import Customer,Professional,Service,ServiceRequest,User
 
 
 def create_data(user_datastore:SQLAlchemyUserDatastore):
@@ -21,7 +21,7 @@ def create_data(user_datastore:SQLAlchemyUserDatastore):
         customer=Customer(userId=user.id,name="cust",phone="1234567890",address="Bezulla Road, Tnagar, Chennai, TamilNadu",pincode="620014")
         db.session.add(customer)
     if not user_datastore.find_user(email="pro@gmail.com"):
-        user_datastore.create_user(email="pro@gmail.com", password=hash_password("password"),active=True,roles=['professional'])
+        user_datastore.create_user(email="pro@gmail.com", password=hash_password("password"),active=False,roles=['professional'])
         user=user_datastore.find_user(email="pro@gmail.com")
         professional=Professional(userId=user.id,name="pro",phone="123",serviceName="AC Mechanic",serviceId=1,address="ChromePet , Chennai, TamilNadu",pincode="620014",experience="12")
         db.session.add(professional)
@@ -31,12 +31,9 @@ def create_data(user_datastore:SQLAlchemyUserDatastore):
         db.session.add(ac_mechanic)
 
     if not ServiceRequest.query.filter_by(id=1).first():
-        service_request=ServiceRequest(customerId=1,professionalId=1,serviceId=1,dateofrequest="2024-02-02",dateofcompletion="2024-02-02",serviceStatus="completed",feedback="good")
+        service_request=ServiceRequest(customerId=1,professionalId=1,serviceId=1,dateofrequest="2024-02-02",dateofcompletion="2024-02-02",serviceStatus="ongoing",feedback="good")
         db.session.add(service_request)
         
-    if Service.query.filter_by(name="AC Mechanic").first():
-        delete=Service.query.filter_by(name="AC Mechanic").first()
-        db.session.delete(delete)
 
 
     db.session.commit()

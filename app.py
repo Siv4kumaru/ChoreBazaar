@@ -1,6 +1,6 @@
 from flask import Flask
 import views
-import ServiceSauce as ServiceSauce
+import Sauce as Sauce
 from extensions import db,security
 from create_initial_data import create_data
 
@@ -37,7 +37,7 @@ def create_app():
     views.create_view(app,user_datastore)
     
     #resouces
-    ServiceSauce.api.init_app(app)
+    Sauce.api.init_app(app)
 
     return app
 
