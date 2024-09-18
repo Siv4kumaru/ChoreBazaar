@@ -33,9 +33,10 @@ def create_data(user_datastore:SQLAlchemyUserDatastore):
     if not ServiceRequest.query.filter_by(id=1).first():
         service_request=ServiceRequest(customerId=1,professionalId=1,serviceId=1,dateofrequest="2024-02-02",dateofcompletion="2024-02-02",serviceStatus="completed",feedback="good")
         db.session.add(service_request)
-
-
-
+        
+    if Service.query.filter_by(name="AC Mechanic").first():
+        delete=Service.query.filter_by(name="AC Mechanic").first()
+        db.session.delete(delete)
 
 
     db.session.commit()
