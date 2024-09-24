@@ -1,7 +1,7 @@
 const services = {
     template: `
       <div >
-        <div class="card shadow-sm p-4 mb-4 study-resource-card " >
+        <div class="card shadow-sm p-4 mb-4 services-card " >
           <div class="card-body ">
             <h3 class="card-title text-center mb-3 text-primary text">{{ name }}</h3>
             <p class="card-text text-secondary text">{{ description }}</p>
@@ -37,13 +37,13 @@ const services = {
     mounted() {
       const style = document.createElement("style");
       style.textContent = `
-        .study-resource-card {
+        .services-card{
           max-width: 600px;
           margin: auto;
           border-radius: 15px;
           transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
-        .study-resource-card:hover {
+        .services-card:hover{
           transform: scale(1.02);
           box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         }

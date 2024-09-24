@@ -36,14 +36,23 @@ const Login = {
       sessionStorage.setItem('token',data.token)
       sessionStorage.setItem('role',data.role)
       sessionStorage.setItem('email',this.email)
-      sessionStorage.setItem('id',this.id)
+      sessionStorage.setItem('password',"state.loggedIn")
       console.log("Login Successful, "+sessionStorage.getItem('role'));
+      
+      this.$store.commit("setRole", data.role);
+      this.$store.commit("setLogin", true);
+
       router.push('/Dashboard');
     }else{
       console.error("Login Failed");
     }
     }
   },
+  computed:{
+    state(){
+        return this.$store.state;
+    }
+}
 };
 
 export default Login;

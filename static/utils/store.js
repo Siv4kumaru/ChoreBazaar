@@ -3,7 +3,7 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
   state: {
     loggedIn: false,
-    role: null,
+    role: "",
   },
 
   mutations: {
@@ -12,7 +12,7 @@ const store = new Vuex.Store({
     },
     logout(state) {
       state.loggedIn = false;
-      state.role = null;
+      state.role = "";
     },
     setRole(state, role) {
       state.role = role;

@@ -22,9 +22,11 @@ const CustDashboard = {
         "Authentication":sessionStorage.getItem("token")
       }
     });
+    if (res.ok) {
     const data = await res.json();
     this.allServices = data;
     console.log(this.allServices);  
+    }
   },
   components: { services },
 };
