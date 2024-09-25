@@ -5,7 +5,9 @@ import ProSignup from '../pages/ProSignup.js'
 import Login from '../pages/login.js'
 import Logout from '../pages/logout.js'
 import store from '../utils/store.js' 
-import CustDashboard from '../pages/CustDashboard.js'
+import proDashboard from '../pages/Professional/proDashboard.js'
+import adminDashboard from '../pages/Admin/adminDashboard.js'
+import custDashboard from '../pages/Customer/custDashboard.js'
 
 const routes = [
     {path : '/', component: Home},
@@ -13,8 +15,10 @@ const routes = [
     {path : '/proSignup', component: ProSignup},
     {path : '/login', component: Login},
     {path : '/logout', component: Logout},
-    {path: '/Dashboard', component: CustDashboard , meta: { requiresLogin: true, role: "customer" }},
-    {path: '/Profile', component: Profile, meta: { loggedIn: true }}
+    {path: '/Dashboard-Customer', component: custDashboard , meta: { requiresLogin: true, role: "customer" }},
+    {path: '/Dashboard-Professional', component: proDashboard , meta: { requiresLogin: true, role: "professional" }},
+    {path: '/Dashboard-Admin', component: adminDashboard , meta: { requiresLogin: true, role: "admin" }},
+    {path: '/Profile', component: Profile, meta: { loggedIn: true }},
 ]
 
 const router = new VueRouter({

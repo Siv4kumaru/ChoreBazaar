@@ -3,7 +3,9 @@ const Navbar ={
     template : 
     `<nav>
         <router-link to="/">Home</router-link>
-        <router-link v-if="state.loggedIn" to="/Dashboard">Dashboard</router-link>
+        <router-link v-if="state.loggedIn && state.role === 'customer'" to="/dashboard-Customer">DashboardC</router-link>
+        <router-link v-if="state.loggedIn && state.role === 'professional'" to="/dashboard-Professional">DashboardP</router-link>
+        <router-link v-if="state.loggedIn && state.role === 'admin'" to="/dashboard-admin">DashboardA</router-link>
         <router-link v-if="!state.loggedIn" to="/customerSignup">Customer Signup</router-link>
         <router-link v-if="!state.loggedIn" to="/proSignup">Professional Signup</router-link>
         <router-link v-if="!state.loggedIn" to="/login">Login</router-link>

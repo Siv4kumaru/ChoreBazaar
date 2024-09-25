@@ -45,11 +45,13 @@ const Login = {
 
       switch (data.role) {
         case "customer":
-          this.$router.push("/Dashboard");
+          this.$router.push("/Dashboard-Customer");
           break;
         case "professional":
+          this.$router.push("/Dashboard-Professional");
           break;
         case "admin":
+          this.$router.push("/Dashboard-Admin");
           break;
       }
     }else{

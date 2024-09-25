@@ -1,6 +1,6 @@
-import services from "../components/services.js";
+import services from "../../components/services.js";
 
-const CustDashboard = {
+const custDashboard = {
   template:`<div>
     <h1>Customere Dashboard</h1>
       <div class="d-flex flex-row justify-content-center">
@@ -30,4 +30,4 @@ const CustDashboard = {
   },
   components: { services },
 };
-export default CustDashboard;
+export default custDashboard;
