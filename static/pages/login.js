@@ -33,16 +33,25 @@ const Login = {
     });
     if (res.ok){
       const data = await res.json();
+      this.$store.commit("setRole", data.role);
+      this.$store.commit("setLogin", true);
+      
       sessionStorage.setItem('token',data.token)
       sessionStorage.setItem('role',data.role)
       sessionStorage.setItem('email',this.email)
-      sessionStorage.setItem('password',"state.loggedIn")
-      console.log("Login Successful, "+sessionStorage.getItem('role'));
       
-      this.$store.commit("setRole", data.role);
-      this.$store.commit("setLogin", true);
 
       router.push('/Dashboard');
+
+      switch (data.role) {
+        case "customer":
+          this.$router.push("/Dashboard");
+          break;
+        case "professional":
+          break;
+        case "admin":
+          break;
+      }
     }else{
       console.error("Login Failed");
     }

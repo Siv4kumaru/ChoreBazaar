@@ -1,3 +1,11 @@
-[ ] if thee active is flask the page is still loading!!! (reason maybe i use UserLogin instead of login(flask dfaut) )
+[*] put vuex store loggedIn variable in sessiom storage
 
-[ ] if services got deleted/update, cascade on pro and servicerequest
+[*] if in one browser , if we log in with ie. pro@gmail.com and cust@gmail.com the nav bar gaurd is not working 
+
+[ ] finish admin and pro endpoint
+
+[*] some more login endpoint rbac security left
+
+[*] if thee active is flask the page is still loading!!! (reason maybe i use UserLogin instead of login(flask dfaut) )
+
+[*] if services got deleted/update, cascade on pro and servicerequest

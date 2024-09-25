@@ -8,7 +8,7 @@ const Navbar ={
         <router-link v-if="!state.loggedIn" to="/proSignup">Professional Signup</router-link>
         <router-link v-if="!state.loggedIn" to="/login">Login</router-link>
         <router-link v-if="state.loggedIn" to="/Profile">Profile</router-link>
-        <button class="btn btn-warning text-xl"  @click="logout">Logout</button>
+        <button class="btn btn-warning text-xl" v-if="state.loggedIn" @click="logout">Logout</button>
         </nav>`,
         methods:{
             logout(){
