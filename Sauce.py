@@ -72,6 +72,19 @@ class CustomerSauce(Resource):
             list.append({"name":cus.name,"email":emailu,"phone":cus.phone,"address":cus.address,"pincode":cus.pincode})
         return list,200
 
+class ProfessionalSauce(Resource):
+    @auth_required('token')
+    @roles_accepted('admin','customer')
+    def get(self):
+        list=[]
+        pro=Professional.query.all()
+        if pro is None :
+            return {"message":"No Customer Left"},404
+        for p in pro:
+            emailu=User.query.filter_by(id=p.userId).first().email
+            list.append({"name":p.name,"email":emailu,"phone":p.phone,"address":p.address,"pincode":p.pincode})
+        return list,200
+
 
 class requestSauce(Resource):
     @auth_required('token')
@@ -204,6 +217,9 @@ class ServiceSauce(Resource):
             service.price = args['price']
         db.session.commit()
         return {"message":"Service Updated"},200
+
+
+api.add_resource(ProfessionalSauce,'/professional')
 api.add_resource(CustomerSauce,'/customer')
 api.add_resource(ServiceSauce,'/services')
 api.add_resource(requestSauce,'/requests')

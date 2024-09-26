@@ -1,4 +1,3 @@
-import router from '../utils/router.js';
 const Navbar ={
     template : 
     `<nav>
