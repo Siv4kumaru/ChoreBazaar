@@ -1,8 +1,10 @@
+[ ] if one email logouts it logout sessions of all emails
+
 [*] put vuex store loggedIn variable in sessiom storage
 
 [*] if in one browser , if we log in with ie. pro@gmail.com and cust@gmail.com the nav bar gaurd is not working 
 
-[ ] finish admin and pro endpoint
+[*] finish admin and pro endpoint
 
 [*] some more login endpoint rbac security left
 

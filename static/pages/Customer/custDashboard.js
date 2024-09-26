@@ -9,8 +9,7 @@ const custDashboard = {
       </div>
       </div>
     </div>
-
-  `,
+  `,  
   data() {
     return {
       allServices: [],

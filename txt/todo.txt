@@ -1,3 +1,5 @@
+[ ] pro resgister must need a pdf accepter
+[ ] if logout in one session, logout other sessions with same email
 [*] if i delete services then the service id and name in prof must be set to service deleted
 [ ] make pro active = false
 [*] dropdown in prosignup
@@ -8,4 +10,4 @@
 [ ] navbar design
 [ ] logo
 [ ] pdf in pro signup
-[ ] read all hash
+[ ] read all hashtag

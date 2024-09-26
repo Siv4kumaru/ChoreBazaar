@@ -1,2 +1,3 @@
 dynamic service drop down
 if service deletd Pro serviceId becomes null
+session based role storage,one browser tab is a isolated entity, so can do many accounts in single browser
