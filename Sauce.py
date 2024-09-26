@@ -58,7 +58,19 @@ reqPatchparser.add_argument('feedback', type=str)
 reqPatchparser.add_argument('dateofcompletion', type=str)
 reqPatchparser.add_argument('dateofrequest', type=str)
 
-reqDelparser = reqparse.RequestParser()
+
+class CustomerSauce(Resource):
+    @auth_required('token')
+    @roles_accepted('admin')
+    def get(self):
+        list=[]
+        customer=Customer.query.all()
+        if customer is None :
+            return {"message":"No Customer Left"},404
+        for cus in customer:
+            emailu=User.query.filter_by(id=cus.userId).first().email
+            list.append({"name":cus.name,"email":emailu,"phone":cus.phone,"address":cus.address,"pincode":cus.pincode})
+        return list,200
 
 
 class requestSauce(Resource):
@@ -192,6 +204,6 @@ class ServiceSauce(Resource):
             service.price = args['price']
         db.session.commit()
         return {"message":"Service Updated"},200
-    
+api.add_resource(CustomerSauce,'/customer')
 api.add_resource(ServiceSauce,'/services')
 api.add_resource(requestSauce,'/requests')

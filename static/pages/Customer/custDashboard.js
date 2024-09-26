@@ -18,7 +18,7 @@ const custDashboard = {
   async mounted() {
     const res=await fetch(window.location.origin+"/api/services",{
       headers:{
-        "Authentication":sessionStorage.getItem("token")
+        "Authentication-token":sessionStorage.getItem("token")
       }
     });
     if (res.ok) {
