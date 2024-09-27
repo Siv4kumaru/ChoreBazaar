@@ -68,8 +68,8 @@ class CustomerSauce(Resource):
         if customer is None :
             return {"message":"No Customer Left"},404
         for cus in customer:
-            emailu=User.query.filter_by(id=cus.userId).first().email
-            list.append({"name":cus.name,"email":emailu,"phone":cus.phone,"address":cus.address,"pincode":cus.pincode})
+            user=User.query.filter_by(id=cus.userId).first()
+            list.append({"id":user.id,"name":cus.name,"email":user.email,"phone":cus.phone,"address":cus.address,"pincode":cus.pincode})
         return list,200
 
 class ProfessionalSauce(Resource):
@@ -81,8 +81,8 @@ class ProfessionalSauce(Resource):
         if pro is None :
             return {"message":"No Customer Left"},404
         for p in pro:
-            emailu=User.query.filter_by(id=p.userId).first().email
-            list.append({"name":p.name,"email":emailu,"phone":p.phone,"address":p.address,"pincode":p.pincode})
+            user=User.query.filter_by(id=p.userId).first()
+            list.append({"id":user.id,"name":p.name,"email":user.email,"phone":p.phone,"address":p.address,"pincode":p.pincode,"serviceName":p.serviceName,"serviceId":p.serviceId,"experience":p.experience})
         return list,200
 
 

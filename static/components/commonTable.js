@@ -1,7 +1,7 @@
 const commonTable={
     template:`<div class="container">
                 <h2>{{ title }}</h2>
-                <table id="table" class="table display cell-border compact">
+                <table class="table display cell-border compact" :id="selector">
                 <thead class="table-dark">  
                 </thead>
                 </table>
@@ -12,6 +12,9 @@ const commonTable={
         };
     },
     props: {
+        selector: {
+            type: String
+        },
         title: {
         type: String
         },
@@ -28,18 +31,30 @@ const commonTable={
     },
     methods: {
         commonTable(data,columns) {
-            new DataTable("#table", {
+            new DataTable(this.selector, {
                 "data": data,
                 "columns": columns,
+                "lengthChange": false,
                 "columnDefs": [
                     {
                         "targets": '_all',
                         className: 'dt-body-left'
+                    },
+                    {
+                        "targets": columns.reduce((acc, col, index) => {
+                            if (col.title.toLowerCase().includes('id')) {
+                                acc.push(index);
+                            }
+                            return acc;
+                        }, []),
+                        "visible": false
                     }
                 ],
-                "lengthChange": false,
+                
             });
-        }   
+        },
+         
+
     }
 
 }
