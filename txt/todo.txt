@@ -1,4 +1,5 @@
 [ ] pro resgister must need a pdf accepter
+[ ] one hour once token acess cut, config that
 [ ] if logout in one session, logout other sessions with same email
 [*] if i delete services then the service id and name in prof must be set to service deleted
 [ ] make pro active = false

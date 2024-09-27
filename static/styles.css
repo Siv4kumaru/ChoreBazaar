@@ -1,0 +1,11 @@
+
+     table.dataTable td {
+        white-space: normal;  /* Allow content to wrap onto multiple lines */
+        word-break: break-word; /* Break words if they are too long */
+        word-wrap: break-word;
+    }
+
+    
+
+
+    
