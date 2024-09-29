@@ -31,7 +31,8 @@ const commonTable={
     },
     methods: {
         commonTable(data,columns) {
-            new DataTable(this.selector, {
+            var sel='#'+this.selector;//thos tookk me 2 days to figure out
+            new DataTable(sel, {
                 "data": data,
                 "columns": columns,
                 "lengthChange": false,
