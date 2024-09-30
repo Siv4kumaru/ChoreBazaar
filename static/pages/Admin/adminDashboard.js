@@ -59,6 +59,7 @@
                 title:[],
                 data:[],
                 columns:[],
+                viewRow: {}
             };
         },
         methods: {
