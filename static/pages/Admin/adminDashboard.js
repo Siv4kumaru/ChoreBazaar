@@ -17,7 +17,9 @@
             };
         },
         methods: {
-
+            hi(){   
+                console.log("hi");
+            }
         },
         async mounted() {
 
@@ -67,7 +69,7 @@
                         "data": null, // No data needed from the source
                         "title":"Actions",
                         "render": function(data, type, row) {
-                            return `<button class="btn btn-success" onclick="app.hi()"><i class="fa-regular fa-circle-check"></i> Accept</button>
+                            return `<button class="btn btn-success" onclick="hi()"><i class="fa-regular fa-circle-check"></i> Accept</button>
                             <button class="btn btn-danger "><i class="fa-regular fa-circle-xmark"></i> Reject</button>
                             <button class="btn btn-primary "><i class="fa-regular fa-eye"></i> View</button>`;
                         }}, 
