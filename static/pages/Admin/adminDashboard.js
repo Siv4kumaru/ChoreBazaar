@@ -98,6 +98,12 @@
                     })
                     .then(data => {
                         console.log(data);
+                        // Find the index of the row in the relevant data array and remove it
+                        const tableIndex = 3; // Adjust this according to which table you're modifying
+                        const index = this.data[tableIndex].findIndex(item => item.id === row.id);
+                        if (index !== -1) {
+                            this.data[tableIndex].splice(index, 1); // Remove the row from the array
+                        }
 
                     })
                     .catch(error => {
@@ -125,6 +131,12 @@
                 })
                 .then(data => {
                     console.log(data);
+                    // Find the index of the row in the relevant data array and remove it
+                    const tableIndex = 2; // Adjust this according to which table you're modifying
+                    const index = this.data[tableIndex].findIndex(item => item.id === row.id);
+                    if (index !== -1) {
+                        this.data[tableIndex].splice(index, 1); // Remove the row from the array
+                    }
                 })
                 .catch(error => {
                     console.error('There has been a problem with your fetch operation:', error);
