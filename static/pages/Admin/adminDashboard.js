@@ -13,7 +13,7 @@
 
             <commonTable v-if="this.columns[1]" :title="title[1]" :data="data[1]" :selector="selector[1]" :columns="columns[1]">
                 <template v-slot:actions="{ row }">
-                <button class="btn btn-primary btn-sm" @click="viewCus(row)">View</button>
+                <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
                 <button class="btn btn-danger btn-sm" @click="blockUser(row.id)">Block</button>
                 <button class="btn btn-warning btn-sm" @click="unblockUser(row.id)">Unblock</button>
                 </template>
@@ -21,17 +21,37 @@
 
             <commonTable v-if="this.columns[2]" :title="title[2]" :data="data[2]" :selector="selector[2]" :columns="columns[2]">
                 <template v-slot:actions="{ row }">
-                <button class="btn btn-primary btn-sm" @click="hi(row)">View</button>
+                <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
                 <button class="btn btn-danger btn-sm" @click="deleteServ(row)">Delete</button>
                 </template>
             </commonTable>
 
             <commonTable v-if="this.columns[3]" :title="title[3]" :data="data[3]" :selector="selector[3]" :columns="columns[3]">
                 <template v-slot:actions="{ row }">
-                <button class="btn btn-primary btn-sm" @click="viewCustomer(row)">View</button>
+                <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
                 <button class="btn btn-danger btn-sm" @click="deleteRequest(row)">Delete</button>
                 </template>
             </commonTable>
+
+            <!-- Modal -->
+                <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="viewModalLabel">Row Details</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div v-for="(value, key) in viewRow" :key="key">
+                                    <strong>{{ key }}:</strong> {{ value }}
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>`,
         data() {
             return {
@@ -39,9 +59,25 @@
                 title:[],
                 data:[],
                 columns:[],
+                viewRow: {},
             };
         },
         methods: {
+
+            view(row) {
+                this.viewRow = { ...row }; // Copy row data
+                // Remove 'id' from viewRow if it exists
+                for (let v in this.viewRow) {
+                    console.log(`${v}: ${this.viewRow[v]}`);
+                    if ((v.includes('id')) || (v.includes('Id'))) {
+                        delete this.viewRow[v];
+                    }
+                }
+                // Show the modal
+                const modal = new bootstrap.Modal(document.getElementById('viewModal'));
+                modal.show();
+            },
+
             
             deleteRequest(row) {
                     
@@ -124,8 +160,6 @@
                       throw new Error(errorData.message || "Something went wrong");
                     });
                   }
-
-              
             },
             async unblockUser(id) {
                 const resUB=await fetch(`api/unblock/${id}`, {
@@ -144,8 +178,6 @@
                       throw new Error(errorData.message || "Something went wrong");
                     });
                   }
-
-              
             },
           },
 
@@ -210,7 +242,6 @@
                 this.selector.push("table2");
                 this.title.push("Professionals");
                 this.columns.push([
-                    { "data":"id","title":"Id" },
                     { "data": "name", "title": "Name" },
                     { "data": "email", "title": "Email" },
                     { "data": "phone", "title": "Phone" },
@@ -235,7 +266,6 @@
                 this.selector.push("table3");
                 this.title.push("Services");
                 this.columns.push([
-                    { "data":"id","title":"Id"},
                     { "data": "name", "title": "Name" },
                     { "data": "description", "title": "Description" },
                     { "data": "price", "title": "Price" },
@@ -254,7 +284,6 @@
                 this.selector.push("table4");
                 this.title.push("Requests");
                 this.columns.push([
-                    { "data":"id","title":"Id"},
                     { "data": "dateofrequest", "title": "Date of Request" },
                     { "data": "dateofcompletion", "title": "date of Completion" },
                     { "data": "serviceStatus", "title": "Service Status" },
