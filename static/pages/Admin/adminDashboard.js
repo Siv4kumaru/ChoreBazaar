@@ -22,6 +22,7 @@
             <commonTable v-if="this.columns[2]" :title="title[2]" :data="data[2]" :selector="selector[2]" :columns="columns[2]">
                 <template v-slot:actions="{ row }">
                 <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
+                <button class="btn btn-success btn-sm" @click="editService(row)">Edit</button>
                 <button class="btn btn-danger btn-sm" @click="deleteServ(row)">Delete</button>
                 </template>
             </commonTable>
@@ -33,7 +34,37 @@
                 </template>
             </commonTable>
 
-            <!-- Modal -->
+            <!-- Edit Service Modal -->
+                <div class="modal fade" id="editServiceModal" tabindex="-1" aria-labelledby="editServiceModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editServiceModalLabel">Edit Service</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form @submit.prevent="updateService">
+                                    <div class="mb-3">
+                                        <label for="serviceName" class="form-label">Service Name</label>
+                                        <input type="text" class="form-control" id="serviceName" v-model="editService.name" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="serviceDescription" class="form-label">Description</label>
+                                        <textarea class="form-control" id="serviceDescription" v-model="editService.description" required></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="servicePrice" class="form-label">Price</label>
+                                        <input type="number" class="form-control" id="servicePrice" v-model="editService.price" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Update Service</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            <!-- view Modal -->
                 <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -60,9 +91,44 @@
                 data:[],
                 columns:[],
                 viewRow: {},
+                editServicedata: {
+                    id: null,
+                    name: '',
+                    description: '',
+                    price: null,
+                },
             };
         },
         methods: {
+
+            editService(row) {
+                this.editServicedata = { ...row }; // Copy row data to editService
+                const modal = new bootstrap.Modal(document.getElementById('editServiceModal'));
+                modal.show();
+            },
+            async updateService() {
+                const res = await fetch(`api/services`, {
+                    method: 'PATCH',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authentication-token": sessionStorage.getItem("token"),
+                    },
+                    body: JSON.stringify(this.editServicedata),
+                });
+        
+                if (res.ok) {
+                    // Update the local data array
+                    const index = this.data[2].findIndex(item => item.id === this.editServicedata.id);
+                    if (index !== -1) {
+                        this.data[2][index] = { ...this.editServicedata }; // Update the service in data
+                    }
+                    this.editServicedata = { id: null, name: '', description: '', price: null }; // Reset form
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editServiceModal'));
+                    modal.hide(); // Hide the modal
+                } else {
+                    console.error('Failed to update service');
+                }
+            },
 
             view(row) {
                 this.viewRow = { ...row }; // Copy row data
