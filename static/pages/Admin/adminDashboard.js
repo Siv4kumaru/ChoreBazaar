@@ -63,12 +63,7 @@
                     })
                     .then(data => {
                         console.log(data);
-                        // Find the index of the row in the relevant data array and remove it
-                        const tableIndex = 3; // Adjust this according to which table you're modifying
-                        const index = this.data[tableIndex].findIndex(item => item.id === row.id);
-                        if (index !== -1) {
-                            this.data[tableIndex].splice(index, 1); // Remove the row from the array
-                        }
+
                     })
                     .catch(error => {
                         console.error('There has been a problem with your fetch operation:', error);
@@ -95,12 +90,6 @@
                 })
                 .then(data => {
                     console.log(data);
-                    // Find the index of the row in the relevant data array and remove it
-                    const tableIndex = 2; // Adjust this according to which table you're modifying
-                    const index = this.data[tableIndex].findIndex(item => item.id === row.id);
-                    if (index !== -1) {
-                        this.data[tableIndex].splice(index, 1); // Remove the row from the array
-                    }
                 })
                 .catch(error => {
                     console.error('There has been a problem with your fetch operation:', error);
@@ -210,7 +199,6 @@
                 this.selector.push("table2");
                 this.title.push("Professionals");
                 this.columns.push([
-                    { "data":"id","title":"Id" },
                     { "data": "name", "title": "Name" },
                     { "data": "email", "title": "Email" },
                     { "data": "phone", "title": "Phone" },
@@ -235,7 +223,6 @@
                 this.selector.push("table3");
                 this.title.push("Services");
                 this.columns.push([
-                    { "data":"id","title":"Id"},
                     { "data": "name", "title": "Name" },
                     { "data": "description", "title": "Description" },
                     { "data": "price", "title": "Price" },
@@ -254,8 +241,7 @@
                 this.selector.push("table4");
                 this.title.push("Requests");
                 this.columns.push([
-                    { "data":"id","title":"Id"},
-                    { "data": "dateofrequest", "title": "Date of Request" },
+                        { "data": "dateofrequest", "title": "Date of Request" },
                     { "data": "dateofcompletion", "title": "date of Completion" },
                     { "data": "serviceStatus", "title": "Service Status" },
                     { "data": "feedback", "title": "FeedBack" },
