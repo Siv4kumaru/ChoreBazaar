@@ -276,7 +276,10 @@
                 this.selector.push("table4");
                 this.title.push("Requests");
                 this.columns.push([
-                        { "data": "dateofrequest", "title": "Date of Request" },
+                    { "data": "custemail", "title": "Customer Email" },
+                    { "data": "proemail", "title": "Professional Email" },
+                    { "data": "serviceName", "title": "Service" },
+                    { "data": "dateofrequest", "title": "Date of Request" },
                     { "data": "dateofcompletion", "title": "date of Completion" },
                     { "data": "serviceStatus", "title": "Service Status" },
                     { "data": "feedback", "title": "FeedBack" },

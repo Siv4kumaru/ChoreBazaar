@@ -140,11 +140,22 @@ class ProfessionalSauce(Resource):
 class requestSauce(Resource):
     @auth_required('token')
     @roles_accepted('admin')
-    @marshal_with(request_fields)
     def get(self):
-        allRequests=ServiceRequest.query.all()
-        return allRequests
-    
+        list=[]
+        requests=ServiceRequest.query.all()
+        if requests is None:
+            return {"message":"No Requests"},404
+        for req in requests:
+            id=req.id
+            customeruserid=Customer.query.filter_by(id=req.customerId).first().userId
+            prouserid=Professional.query.filter_by(id=req.professionalId).first().userId
+            custemail=User.query.filter_by(id=customeruserid).first().email
+            proemail=User.query.filter_by(id=prouserid).first().email
+            serviceName=Service.query.filter_by(id=req.serviceId).first().name
+            requ={"id":req.id,"custemail":custemail,"proemail":proemail,"serviceName":serviceName,"dateofrequest":req.dateofrequest,"dateofcompletion":req.dateofcompletion,"serviceStatus":req.serviceStatus,"feedback":req.feedback}
+            list.append(requ)
+        return list,200
+
     @auth_required('token')
     #@roles_accepted('customer')
     def post(self):
