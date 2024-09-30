@@ -108,7 +108,7 @@ class CustomerSauce(Resource):
             return {"message":"No Customer Left"},404
         for cus in customer:
             user=User.query.filter_by(id=cus.userId).first()
-            list.append({"id":user.id,"name":cus.name,"email":user.email,"phone":cus.phone,"address":cus.address,"pincode":cus.pincode})
+            list.append({"id":user.id,"name":cus.name,"email":user.email,"phone":cus.phone,"address":cus.address,"pincode":cus.pincode,"active":user.active})
         return list,200
     
     # def patch(self):
@@ -133,7 +133,7 @@ class ProfessionalSauce(Resource):
             return {"message":"No Customer Left"},404
         for p in pro:
             user=User.query.filter_by(id=p.userId).first()
-            list.append({"id":user.id,"name":p.name,"email":user.email,"phone":p.phone,"address":p.address,"pincode":p.pincode,"serviceName":p.serviceName,"serviceId":p.serviceId,"experience":p.experience})
+            list.append({"id":user.id,"name":p.name,"email":user.email,"phone":p.phone,"address":p.address,"pincode":p.pincode,"serviceName":p.serviceName,"serviceId":p.serviceId,"experience":p.experience,"active":user.active})
         return list,200
 
 
@@ -151,7 +151,11 @@ class requestSauce(Resource):
             prouserid=Professional.query.filter_by(id=req.professionalId).first().userId
             custemail=User.query.filter_by(id=customeruserid).first().email
             proemail=User.query.filter_by(id=prouserid).first().email
-            serviceName=Service.query.filter_by(id=req.serviceId).first().name
+            service=Service.query.filter_by(id=req.serviceId).first()
+            if service is None:
+                serviceName="Service Not Found"
+            else:
+                serviceName=service.name
             requ={"id":req.id,"custemail":custemail,"proemail":proemail,"serviceName":serviceName,"dateofrequest":req.dateofrequest,"dateofcompletion":req.dateofcompletion,"serviceStatus":req.serviceStatus,"feedback":req.feedback}
             list.append(requ)
         return list,200

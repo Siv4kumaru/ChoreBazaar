@@ -6,22 +6,24 @@
             <commonTable v-if="this.columns[0]" :title="title[0]" :data="data[0]" :selector="selector[0]" :columns="columns[0]" >
                 <template v-slot:actions="{ row }">
                 <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
-                <button class="btn btn-danger btn-sm" @click="blockUser(row.id)">Block</button>
-                <button class="btn btn-warning btn-sm" @click="unblockUser(row.id)">Unblock</button>
+                <button class="btn btn-danger btn-sm" @click="blockCus(row)" v-if="row.active">Block</button>
+                <button class="btn btn-warning btn-sm" @click="unblockCus(row)" v-if="!row.active">Unblock</button>
                 </template>
             </commonTable>
 
             <commonTable v-if="this.columns[1]" :title="title[1]" :data="data[1]" :selector="selector[1]" :columns="columns[1]">
                 <template v-slot:actions="{ row }">
+                
                 <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
-                <button class="btn btn-danger btn-sm" @click="blockUser(row.id)">Block</button>
-                <button class="btn btn-warning btn-sm" @click="unblockUser(row.id)">Unblock</button>
+                <button class="btn btn-danger btn-sm" @click="blockPro(row)" v-if="row.active">Block</button>
+                <button class="btn btn-warning btn-sm" @click="unblockPro(row)" v-if="!row.active">Unblock</button>
                 </template>
             </commonTable>
 
             <commonTable v-if="this.columns[2]" :title="title[2]" :data="data[2]" :selector="selector[2]" :columns="columns[2]">
                 <template v-slot:actions="{ row }">
                 <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
+                <button class="btn btn-success btn-sm" @click="editServ(row)">Edit</button>
                 <button class="btn btn-danger btn-sm" @click="deleteServ(row)">Delete</button>
                 </template>
             </commonTable>
@@ -143,43 +145,130 @@
                 });
             },
 
-            async blockUser(id) {
-                const resB=await fetch(`api/block/${id}`, {
-                  method: 'GET',
-                  headers:{
-                    "Authentication-token":sessionStorage.getItem("token")
-                }, 
+            async blockCus(row) {       
+                fetch(`api/block/${row.id}`, {
+                    method: 'get',
+                    headers:{
+                        "Content-Type": "application/json",
+                        "Authentication-token":sessionStorage.getItem("token")
+                    }, 
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                    
+
+                })
+                .then(data => {
+                    console.log(data);
+                    
+                    // Find the index of the row in the relevant data array and remove it
+                    const tableIndex = 0; // Adjust this according to which table you're modifying
+                    const index = this.data[tableIndex].findIndex(item => item.id === row.id);
+                    if (index !== -1) {
+                         this.data[tableIndex][index].active = false; // Remove the row from the array
+                    }
+                })
+                .catch(error => {
+                    console.error('There has been a problem with your fetch operation:', error);
                 });
-                
-                  if (resB.ok) {
-                    // If the request was successful (status code 200-299), parse the response
-                    return console.log(resB.json());
-                  } else {
-                    // If the response was not OK, handle the error
-                    return resB.json().then(errorData => {
-                      throw new Error(errorData.message || "Something went wrong");
-                    });
-                  }
 
               
             },
-            async unblockUser(id) {
-                const resUB=await fetch(`api/unblock/${id}`, {
-                  method: 'GET',
-                  headers:{
-                    "Authentication-token":sessionStorage.getItem("token")
-                }, 
+            async unblockCus(row) {       
+                fetch(`api/unblock/${row.id}`, {
+                    method: 'get',
+                    headers:{
+                        "Content-Type": "application/json",
+                        "Authentication-token":sessionStorage.getItem("token")
+                    }, 
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                    
+
+                })
+                .then(data => {
+                    console.log(data);
+                    
+                    // Find the index of the row in the relevant data array and remove it
+                    const tableIndex = 0; // Adjust this according to which table you're modifying
+                    const index = this.data[tableIndex].findIndex(item => item.id === row.id);
+                    if (index !== -1) {
+                         this.data[tableIndex][index].active = true; // Remove the row from the array
+                    }
+                })
+                .catch(error => {
+                    console.error('There has been a problem with your fetch operation:', error);
                 });
-                
-                  if (resUB.ok) {
-                    // If the request was successful (status code 200-299), parse the response
-                    return console.log(resUB.json());
-                  } else {
-                    // If the response was not OK, handle the error
-                    return resUB.json().then(errorData => {
-                      throw new Error(errorData.message || "Something went wrong");
-                    });
-                  }
+
+              
+            },
+            async blockPro(row) {       
+                fetch(`api/block/${row.id}`, {
+                    method: 'get',
+                    headers:{
+                        "Content-Type": "application/json",
+                        "Authentication-token":sessionStorage.getItem("token")
+                    }, 
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                    
+
+                })
+                .then(data => {
+                    console.log(data);
+                    
+                    // Find the index of the row in the relevant data array and remove it
+                    const tableIndex = 1; // Adjust this according to which table you're modifying
+                    const index = this.data[tableIndex].findIndex(item => item.id === row.id);
+                    if (index !== -1) {
+                         this.data[tableIndex][index].active = false; // Remove the row from the array
+                    }
+                })
+                .catch(error => {
+                    console.error('There has been a problem with your fetch operation:', error);
+                });
+
+              
+            },
+            async unblockPro(row) {
+                fetch(`api/unblock/${row.id}`, {
+                    method: 'get',
+                    headers:{
+                        "Content-Type": "application/json",
+                        "Authentication-token":sessionStorage.getItem("token")
+                    }, 
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                    
+
+                })
+                .then(data => {
+                    console.log(data);
+                    // Find the index of the row in the relevant data array and remove it
+                    const tableIndex = 1; // Adjust this according to which table you're modifying
+                    const index = this.data[tableIndex].findIndex(item => item.id === row.id);
+                    if (index !== -1) {
+                         this.data[tableIndex][index].active = true; // Remove the row from the array
+                    }
+                })
+                .catch(error => {
+                    console.error('There has been a problem with your fetch operation:', error);
+                });
 
               
             },
@@ -229,7 +318,8 @@
                     { "data": "email", "title": "Email" },
                     { "data": "phone", "title": "Phone" },
                     { "data": "address", "title": "Address" },
-                    { "data": "pincode", "title": "Pincode" }, 
+                    { "data": "pincode", "title": "Pincode" },
+                    { "data": `active`, "title": "Active Status" },
                     ]);
             }
             else {
@@ -253,7 +343,7 @@
                     { "data": "pincode", "title": "Pincode" },
                     { "data":"serviceName","title":"ServiceName" },
                     { "data": "experience", "title": "Experience" },
-
+                    { "data": "active", "title": "Active Status" },
                 ]);
             }
             else {
