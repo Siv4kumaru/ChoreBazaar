@@ -1,3 +1,7 @@
+[ ] cust and pro must have active ban or unban status showing
+[ ] service must have update
+[ ] block and unblock only one should be there
+[ ] newly regestered pro in new page and accept and reject must be there
 [ ] pro resgister must need a pdf accepter
 [ ] one hour once token acess cut, config that
 [ ] if logout in one session, logout other sessions with same email
