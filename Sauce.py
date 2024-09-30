@@ -1,6 +1,6 @@
 from flask_restful import marshal_with,Resource,Api,fields,reqparse
 from flask_security import auth_required,roles_accepted
-from models import User,Service,ServiceRequest,Customer,Professional
+from models import User,UserRoles,Service,ServiceRequest,Customer,Professional
 from extensions import db
 
 
@@ -58,6 +58,45 @@ reqPatchparser.add_argument('feedback', type=str)
 reqPatchparser.add_argument('dateofcompletion', type=str)
 reqPatchparser.add_argument('dateofrequest', type=str)
 
+custPatch = reqparse.RequestParser()
+custPatch.add_argument('id',type=int,required=True)
+custPatch.add_argument('active',type=bool)
+
+class BlockUserResource(Resource):
+    @roles_accepted('admin')
+    def get(self, id):
+        user = User.query.filter_by(id=id).first()
+        userroles=UserRoles.query.filter_by(user_id=id).first().role_id
+        if userroles == 1 :
+            return {"message": f"{user.email} is an admin  "}, 212
+        if not user:
+            return {"message": "User not found"}, 214
+        if not user.active:
+            return {"message": f"User {user.email} is already blocked"}, 210
+        
+        user.active = False
+        db.session.commit()
+        return {"message": f"User {user.email} has been blocked"}, 200
+
+api.add_resource(BlockUserResource, '/block/<int:id>')
+
+class UnBlockUserResource(Resource):
+    @roles_accepted('admin')
+    def get(self, id):
+        user = User.query.filter_by(id=id).first()
+        userroles=UserRoles.query.filter_by(user_id=id).first().role_id
+        if userroles == 1 :
+            return {"message": f"{user.email} is an admin"}, 212
+        if not user:
+            return {"message": "User not found"}, 210
+        if user.active:
+            return {"message": f"User {user.email} is already not blocked"}, 213
+        
+        user.active = True
+        db.session.commit()
+        return {"message": f"User {user.email} has been Unblocked"}, 200
+
+api.add_resource(UnBlockUserResource, '/unblock/<int:id>')
 
 class CustomerSauce(Resource):
     @auth_required('token')
@@ -71,6 +110,18 @@ class CustomerSauce(Resource):
             user=User.query.filter_by(id=cus.userId).first()
             list.append({"id":user.id,"name":cus.name,"email":user.email,"phone":cus.phone,"address":cus.address,"pincode":cus.pincode})
         return list,200
+    
+    # def patch(self):
+    #     args=custPatch.parse_args()
+    #     customer=User.query.filter_by(id=args['id']).first()
+    #     if customer is None:
+    #         return {"message":"Customer not Found"}, 404
+    #     if 'active' in args:
+    #         customer.active=args['active']
+    #         db.session.commit()
+    #         return {"message": "Customer updated successfully"}, 200
+            
+
 
 class ProfessionalSauce(Resource):
     @auth_required('token')
