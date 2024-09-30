@@ -13,7 +13,7 @@
 
             <commonTable v-if="this.columns[1]" :title="title[1]" :data="data[1]" :selector="selector[1]" :columns="columns[1]">
                 <template v-slot:actions="{ row }">
-                <button class="btn btn-primary btn-sm" @click="viewCus(row)">View</button>
+                <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
                 <button class="btn btn-danger btn-sm" @click="blockUser(row.id)">Block</button>
                 <button class="btn btn-warning btn-sm" @click="unblockUser(row.id)">Unblock</button>
                 </template>
@@ -21,14 +21,14 @@
 
             <commonTable v-if="this.columns[2]" :title="title[2]" :data="data[2]" :selector="selector[2]" :columns="columns[2]">
                 <template v-slot:actions="{ row }">
-                <button class="btn btn-primary btn-sm" @click="hi(row)">View</button>
+                <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
                 <button class="btn btn-danger btn-sm" @click="deleteServ(row)">Delete</button>
                 </template>
             </commonTable>
 
             <commonTable v-if="this.columns[3]" :title="title[3]" :data="data[3]" :selector="selector[3]" :columns="columns[3]">
                 <template v-slot:actions="{ row }">
-                <button class="btn btn-primary btn-sm" @click="viewCustomer(row)">View</button>
+                <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
                 <button class="btn btn-danger btn-sm" @click="deleteRequest(row)">Delete</button>
                 </template>
             </commonTable>
@@ -42,6 +42,10 @@
             };
         },
         methods: {
+            view(row){
+                console.log(row);
+                
+            },
             
             deleteRequest(row) {
                     
