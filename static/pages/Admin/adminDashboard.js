@@ -3,10 +3,33 @@
     const adminDashboard ={
         template:`
         <div>
-            <commonTable v-if="this.columns[0]" :title="title[0]" :data="data[0]" :selector="selector[0]" :columns="columns[0]" ></commonTable>
-            <commonTable v-if="this.columns[1]" :title="title[1]" :data="data[1]" :selector="selector[1]" :columns="columns[1]"></commonTable>
-            <commonTable v-if="this.columns[2]" :title="title[2]" :data="data[2]" :selector="selector[2]" :columns="columns[2]"></commonTable>
-            <commonTable v-if="this.columns[3]" :title="title[3]" :data="data[3]" :selector="selector[3]" :columns="columns[3]"></commonTable>
+            <commonTable v-if="this.columns[0]" :title="title[0]" :data="data[0]" :selector="selector[0]" :columns="columns[0]" >
+                <template v-slot:actions="{ row }">
+                <button class="btn btn-primary btn-sm" @click="viewCustomer(row)">View</button>
+                <button class="btn btn-danger btn-sm" @click="deleteCustomer(row.id)">Delete</button>
+                </template>
+            </commonTable>
+
+            <commonTable v-if="this.columns[1]" :title="title[1]" :data="data[1]" :selector="selector[1]" :columns="columns[1]">
+                <template v-slot:actions="{ row }">
+                <button class="btn btn-primary btn-sm" @click="viewCustomer(row)">View</button>
+                <button class="btn btn-danger btn-sm" @click="deleteCustomer(row.id)">Delete</button>
+                </template>
+            </commonTable>
+
+            <commonTable v-if="this.columns[2]" :title="title[2]" :data="data[2]" :selector="selector[2]" :columns="columns[2]">
+                <template v-slot:actions="{ row }">
+                <button class="btn btn-primary btn-sm" @click="viewCustomer(row)">View</button>
+                <button class="btn btn-danger btn-sm" @click="deleteCustomer(row.id)">Delete</button>
+                </template>
+            </commonTable>
+
+            <commonTable v-if="this.columns[3]" :title="title[3]" :data="data[3]" :selector="selector[3]" :columns="columns[3]">
+                <template v-slot:actions="{ row }">
+                <button class="btn btn-primary btn-sm" @click="viewCustomer(row)">View</button>
+                <button class="btn btn-danger btn-sm" @click="deleteCustomer(row.id)">Delete</button>
+                </template>
+            </commonTable>
             </div>`,
         data() {
             return {
@@ -63,17 +86,7 @@
                     { "data": "email", "title": "Email" },
                     { "data": "phone", "title": "Phone" },
                     { "data": "address", "title": "Address" },
-                    { "data": "pincode", "title": "Pincode" },
-                    { 
-                        // New column for the button
-                        "data": null, // No data needed from the source
-                        "title":"Actions",
-                        "render": function(data, type, row) {
-                            return `<button class="btn btn-success" onclick="hi()"><i class="fa-regular fa-circle-check"></i> Accept</button>
-                            <button class="btn btn-danger "><i class="fa-regular fa-circle-xmark"></i> Reject</button>
-                            <button class="btn btn-primary "><i class="fa-regular fa-eye"></i> View</button>`;
-                        }}, 
-                    {"data":"id","title":"Id"},
+                    { "data": "pincode", "title": "Pincode" }, 
                     ]);
             }
             else {
@@ -98,15 +111,7 @@
                     { "data": "pincode", "title": "Pincode" },
                     { "data":"serviceName","title":"ServiceName" },
                     { "data": "experience", "title": "Experience" },
-                    { 
-                        // New column for the button
-                        "data": null, // No data needed from the source
-                        "title":"Actions",
-                        "render": function(data, type, row) {
-                            return `<button class="btn btn-success"  ><i class="fa-regular fa-circle-check"></i> Accept</button>
-                            <button class="btn btn-danger"><i class="fa-regular fa-circle-xmark"></i> Reject</button>
-                            <button class="btn btn-primary"><i class="fa-regular fa-eye"></i> View</button>`;
-                        }} 
+
                 ]);
             }
             else {
@@ -127,15 +132,6 @@
                     { "data": "name", "title": "Name" },
                     { "data": "description", "title": "Description" },
                     { "data": "price", "title": "Price" },
-                    { 
-                        // New column for the button
-                        "data": null, // No data needed from the source
-                        "title":"Actions",
-                        "render": function(data, type, row) {
-                            return `<button class="btn btn-success"><i class="fa-regular fa-circle-check"></i> Accept</button>
-                            <button class="btn btn-danger "><i class="fa-regular fa-circle-xmark"></i> Reject</button>
-                            <button class="btn btn-primary "><i class="fa-regular fa-eye"></i> View</button>`;
-                        }} 
                 ]);
             }
             else {
@@ -156,15 +152,6 @@
                     { "data": "dateofcompletion", "title": "date of Completion" },
                     { "data": "serviceStatus", "title": "Service Status" },
                     { "data": "feedback", "title": "FeedBack" },
-                    { 
-                        // New column for the button
-                        "data": null, // No data needed from the source
-                        "title":"Actions",
-                        "render": function(data, type, row) {
-                            return `<button class="btn btn-success"><i class="fa-regular fa-circle-check"></i> Accept</button>
-                            <button class="btn btn-danger "><i class="fa-regular fa-circle-xmark"></i> Reject</button>
-                            <button class="btn btn-primary "><i class="fa-regular fa-eye"></i> View</button>`;
-                        }} 
                 ]);
             }
             else {

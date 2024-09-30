@@ -3,7 +3,19 @@ const commonTable={
                 <h2>{{ title }}</h2>
                 <table class="table display cell-border compact" :id="selector">
                 <thead class="table-dark">  
+                    <tr>
+                        <th v-for="col in columns">{{ col.title }}</th>
+                        <th>Actions</th>
+                    </tr>
                 </thead>
+                <tbody>
+                    <tr v-for="row in data">
+                        <td v-for="col in columns">{{ row[col.data] }}</td>
+                        <td>
+                        <slot name="actions" :row="row"></slot>
+                        </td>
+                    </tr>
+                </tbody>
                 </table>
                 </div>`,
     data() {
@@ -27,33 +39,10 @@ const commonTable={
 
     },
     async mounted(){
-        this.commonTable(this.data,this.columns);
+        
     },
     methods: {
-        commonTable(data,columns) {
-            var sel='#'+this.selector;//thos tookk me 2 days to figure out
-            new DataTable(sel, {
-                "data": data,
-                "columns": columns,
-                "lengthChange": false,
-                "columnDefs": [
-                    {
-                        "targets": '_all',
-                        className: 'dt-body-left'
-                    },
-                    {
-                        "targets": columns.reduce((acc, col, index) => {
-                            if (col.title.toLowerCase().includes('id')) {
-                                acc.push(index);
-                            }
-                            return acc;
-                        }, []),
-                        "visible": false
-                    }
-                ],
-                
-            });
-        },
+        
          
 
     }
