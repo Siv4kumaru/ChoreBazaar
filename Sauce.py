@@ -283,8 +283,17 @@ class ServiceSauce(Resource):
             service.price = args['price']
         db.session.commit()
         return {"message":"Service Updated"},200
+    
+class ServiceIdSauce(Resource):
+    @auth_required('token')
+    @roles_accepted('admin')
+    def get(self,id):
+        service=Service.query.filter_by(id=id).first()
+        if service is None:
+            return {"message":"Service not found"},404
+        return {"id":service.id,"name":service.name,"description":service.description,"price":service.price},200
 
-
+api.add_resource(ServiceIdSauce,'/services/<int:id>')
 api.add_resource(ProfessionalSauce,'/professional')
 api.add_resource(CustomerSauce,'/customer')
 api.add_resource(ServiceSauce,'/services')

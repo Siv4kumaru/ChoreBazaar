@@ -84,7 +84,6 @@
             },
             
             deleteRequest(row) {
-                    
                     fetch(`api/requests`, {
                         method: 'delete',
                         headers:{
