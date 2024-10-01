@@ -40,7 +40,12 @@ const EditService = {
       const serviceId = this.$route.params.id;
       console.log(serviceId) // Assuming the service ID is passed in the route
       try {
-        const response = await fetch(`/api/services/${serviceId}`);
+        const response = await fetch(`/api/services/${serviceId}`
+          ,{headers:{
+            "Content-Type": "application/json",
+            "Authentication-token":sessionStorage.getItem("token")
+      }},
+        );
         if (!response.ok) {
           throw new Error("Error fetching service details");
         }
@@ -54,14 +59,16 @@ const EditService = {
 
     // Update the service using PATCH
     async updateService() {
+      const serviceId = this.$route.params.id;
       try {
         const response = await fetch('/api/services', {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
+            "Authentication-token":sessionStorage.getItem("token")
           },
           body: JSON.stringify({
-            id: this.service.id,
+            id: serviceId,
             name: this.service.name,
             description: this.service.description,
             price: this.service.price,
@@ -71,7 +78,6 @@ const EditService = {
         if (!response.ok) {
           throw new Error("Error updating service");
         }
-
         const data = await response.json();
         this.message = data.message;
       } catch (error) {

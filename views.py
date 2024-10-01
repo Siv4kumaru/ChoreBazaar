@@ -21,6 +21,7 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
             return jsonify({"message":"Password is required"}),404
         
         user=userdatastore.find_user(email=email)
+        print(user.get_auth_token())
 
         if not user:
             return jsonify({"message":"User not found"}),404
@@ -29,6 +30,8 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
 
         if verify_password(password,user.password):
             return jsonify({"token": user.get_auth_token(),"role":user.roles[0].name,"id":user.id,email:user.email}),200
+        
+
 
 
     @app.route('/register',methods=['POST'])
@@ -57,12 +60,12 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
         try:
             user=userdatastore.create_user(email=email,password=hash_password(password),active=active,roles=[role])
                     
+            name=data.get('name')
+            phone=data.get('phone')
+            address=data.get('address')
+            pincode=data.get('pincode')
             db.session.add(user)
             if role=='professional':
-                name=data.get('name')
-                phone=data.get('phone')
-                address=data.get('address')
-                pincode=data.get('pincode')
                 serviceName=data.get('service')
                 experience=data.get('experience')
                 useru=User.query.filter_by(email=email).first()
@@ -72,10 +75,6 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
                 professional=Professional(userId=useru.id,serviceId=service.id,name=name,phone=phone,address=address,pincode=pincode,serviceName=serviceName,experience=experience)
                 db.session.add(professional)
             if role=='customer':
-                name=data.get('name')
-                phone=data.get('phone')
-                address=data.get('address')
-                pincode=data.get('pincode')
                 useru=User.query.filter_by(email=email).first()
                 customer=Customer(userId=useru.id,name=name,phone=phone,address=address,pincode=pincode)
                 db.session.add(customer)

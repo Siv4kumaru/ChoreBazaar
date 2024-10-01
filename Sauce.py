@@ -255,7 +255,7 @@ class ServiceSauce(Resource):
     
     @auth_required('token')
     @roles_accepted('admin')
-    def delete(self):
+    def delete(self): 
         args=delParser.parse_args()
         service=Service.query.filter_by(id=args['id']).first()
         if service is None:
