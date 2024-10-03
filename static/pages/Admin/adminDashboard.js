@@ -21,7 +21,8 @@
             </commonTable>
 
             <commonTable v-if="this.columns[2]" :title="title[2]" :data="data[2]" :selector="selector[2]" :columns="columns[2]">
-                <template v-slot:actions="{ row }">
+            <button><a href='#/addService'>Add Service</a></button>
+            <template v-slot:actions="{ row }">
                 <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
                 <button class="btn btn-success btn-sm" @click="edit(row)">Edit</button>
                 <button class="btn btn-danger btn-sm" @click="deleteServ(row)">Delete</button>
@@ -31,6 +32,7 @@
             <commonTable v-if="this.columns[3]" :title="title[3]" :data="data[3]" :selector="selector[3]" :columns="columns[3]">
                 <template v-slot:actions="{ row }">
                 <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
+                <button class="btn btn-success btn-sm" @click="editR(row)">Edit</button>
                 <button class="btn btn-danger btn-sm" @click="deleteRequest(row)">Delete</button>
                 </template>
             </commonTable>
@@ -65,6 +67,12 @@
             };
         },
         methods: {
+            editR(row) {
+
+
+                this.$router.push({ name: 'editRequest', params: { id: row.id } });
+
+            },
             edit(row) {
                 // Redirect to the edit page, passing the row's ID as a query parameter
                 this.$router.push({ name: 'editService', params: { id: row.id } });

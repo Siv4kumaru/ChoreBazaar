@@ -1,6 +1,8 @@
 const commonTable={
     template:`<div class="container">
-                <h2>{{ title }}</h2>
+                <h2>{{ title }}
+                <button v-if="title=='Services'" class="btn btn-primary" @click="add">Add</button>
+                </h2>
                 <table class="table display cell-border compact" :id="selector">
                 <thead class="table-dark">  
                     <tr>
@@ -43,8 +45,11 @@ const commonTable={
     },
     methods: {
         
-         
-
+         add(){
+            console.log("add");
+            this.$router.push("/addService");
+        },
+        
     }
 
 }

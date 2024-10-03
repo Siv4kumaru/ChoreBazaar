@@ -271,7 +271,7 @@ class ServiceSauce(Resource):
         service=Service.query.filter_by(id=args['id']).first()
         if service is None:
             return {"message":"Service not found"},404
-        if Service.query.filter_by(name=args['name']).first() is not None:
+        if Service.query.filter_by(name=args['name']).first() is not None and service.name != args['name']:
             return {"message":"Service already exists"},400
         if args.get('name'):
             service.name = args['name']

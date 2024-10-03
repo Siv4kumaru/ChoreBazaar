@@ -15,6 +15,8 @@ import searchA from '../pages/Admin/searchA.js'
 import searchC from '../pages/Customer/searchC.js'
 import searchP from '../pages/Professional/searchP.js'
 import EditService from '../pages/Admin/EditService.js'
+import addService from '../pages/Admin/addService.js'
+import EditRequest from '../pages/Admin/EditRequest.js'
 
 const routes = [
     {path : '/', component: Home},
@@ -33,6 +35,8 @@ const routes = [
     {path: '/searchP', component: searchP, meta: { requiresLogin: true, role: "professional" }},    
     {path : '/logout', component: Logout},
     {path: '/editService/:id',name:"editService",component: EditService, meta: { requiresLogin: true, role: "admin" }},
+    {path: '/addService',name:"addService",component: addService, meta: { requiresLogin: true, role: "admin" }},
+    {path: '/editRequest/:id',name:"editRequest",component: EditRequest, meta: { requiresLogin: true, role: "admin" }}
     ,
 
 ]

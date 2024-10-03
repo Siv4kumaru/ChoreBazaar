@@ -4,8 +4,8 @@ const EditService = {
       <h1>Edit Service</h1>
       <form @submit.prevent="updateService">
         <div>
-          <label for="name">Service Name:</label>
-          <input v-model="service.name" type="text" id="name" required />
+          <label for="custE">Customer Email:</label>
+          <input v-model="service.custE" type="text" id="custE" required />
         </div>
         <div>
           <label for="description">Description:</label>
@@ -68,12 +68,17 @@ const EditService = {
             "Authentication-token":sessionStorage.getItem("token")
           },
           body: JSON.stringify({
-            id: serviceId,
-            name: this.service.name,
-            description: this.service.description,
-            price: this.service.price,
+            "id": serviceId,
+            "name": this.service.name,
+            "description": this.service.description,
+            "price": this.service.price,
           }),
         });
+        if (response.ok) {
+          this.message = 'Service updated successfully.';
+          console.log(this.message);
+          this.$router.push("/Dashboard-Admin");
+        }
 
         if (!response.ok) {
           throw new Error("Error updating service");
