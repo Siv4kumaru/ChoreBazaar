@@ -1,7 +1,7 @@
 const EditService = {
     template: `
       <div>
-        <h1>Edit Service</h1>
+        <h1>Edit Request</h1>
         <form @submit.prevent="updateService">
           <div>
             <label for="custE">Customer Email:</label>
@@ -57,10 +57,10 @@ const EditService = {
       };
     },
     mounted() {
-      this.fetchService();
+      this.dropdown();
     },
     methods: {
-        async fetchService() {
+        async dropdown() {
             const id = this.$route.params.id;
             console.log(id) // Assuming the service ID is passed in the route
             try {
@@ -87,30 +87,7 @@ const EditService = {
             }
           },
 
-      async dropdown() {
-        const serviceId = this.$route.params;
-        console.log(serviceId) // Assuming the service ID is passed in the route
-        try {
-          const response = await fetch(`/api/services/{}`, {
-            method: 'patch',
-            headers: {
-              'Content-Type': 'application/json',
-              "Authentication-token": sessionStorage.getItem("token"),
-            },
-            body: JSON.stringify(this.service),
-          });
-          if (!response.ok) {
-            throw new Error("Error updating service");
-          }
-          const data = await response.json();
-          this.message = 'Service updated successfully.';
-          this.$router.push("/Dashboard-Admin");
-        } catch (error) {
-          console.error(error);
-          this.message = 'Error updating service.';
-        }
-      },
-    },
+
   };
   
   export default EditService;
