@@ -5,13 +5,13 @@ const EditService = {
         <form @submit.prevent="updateService">
           <div>
             <label for="custE">Customer Email:</label>
-            <select v-model="service.custE" id="custE" required>
+            <select v-model="request.custE" id="custE" required>
               <option v-for="email in customerEmails" :key="email" :value="email">{{ email }}</option>
             </select>
           </div>
           <div>
             <label for="proE">Professional Email:</label>
-            <select v-model="service.proE" id="proE" required>
+            <select v-model="request.proE" id="proE" required>
               <option v-for="email in professionalEmails" :key="email" :value="email">{{ email }}</option>
             </select>
           </div>
@@ -23,15 +23,15 @@ const EditService = {
           </div>
           <div>
             <label for="dateofrequest">Date of Request:</label>
-            <input v-model="service.dateofrequest" type="date" id="dateofrequest" required />
+            <input v-model="request.dateofrequest" type="date" id="dateofrequest" required />
           </div>
           <div>
             <label for="dateofcompletion">Date of Completion:</label>
-            <input v-model="service.dateofcompletion" type="date" id="dateofcompletion" required />
+            <input v-model="request.dateofcompletion" type="date" id="dateofcompletion" required />
           </div>
           <div>
             <label for="serviceStatus">Service Status:</label>
-            <input v-model="service.serviceStatus" type="text" id="serviceStatus" required />
+            <input v-model="request.serviceStatus" type="text" id="serviceStatus" required />
           </div>
           <button type="submit">Update Service</button>
         </form>
@@ -40,11 +40,11 @@ const EditService = {
     `,
     data(){
       return {
-        service: {
+        request: {
           id: null,
-          servieName:'',
           custE: '',
           proE: '',
+          servName: '',
           dateofrequest: '',
           dateofcompletion: '',
           serviceStatus: '',
@@ -58,11 +58,11 @@ const EditService = {
     },
     mounted() {
       this.dropdown();
+      this.fetchRequest();
     },
     methods: {
         async dropdown() {
             const id = this.$route.params.id;
-            console.log(id) // Assuming the service ID is passed in the route
             try {
               const response = await fetch(`/api/services`, {
                 headers: {
@@ -86,8 +86,26 @@ const EditService = {
     
             }
           },
+        async fetchRequest() {
+            const reqId = this.$route.params.id;
 
-
+            try {
+              const response = await fetch(`/api/requests/${reqId}`
+                ,{headers:{
+                  "Authentication-token":sessionStorage.getItem("token")
+            }},
+            );
+              if (!response.ok) {
+                throw new Error("Error fetching service details");
+              }
+              const data = await response.json();
+              this.service = data;
+            } catch (error) {
+              console.error(error);
+              this.message = 'Error fetching service details.';
+            }
+          }
+        },
   };
   
   export default EditService;

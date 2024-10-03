@@ -292,7 +292,21 @@ class ServiceIdSauce(Resource):
         if service is None:
             return {"message":"Service not found"},404
         return {"id":service.id,"name":service.name,"description":service.description,"price":service.price},200
+    
+class RequestIdsauce(Resource):
+    @auth_required('token')
+    @roles_accepted('admin')
+    def get(dself,id):
+        request=ServiceRequest.query.filter_by(id=id).first()
+        if request is None:
+            return {"message":"Request not found"},404
+        service=Service.query.filter_by(id=request.serviceId).first().name
+        serviceName=service.name
+        customeremail=User.query.filter_by(id=Customer.query.filter_by(id=request.customerId).first().userId).first().email
+        proemail=User.query.filter_by(id=Professional.query.filter_by(id=request.professionalId).first().userId).first().email
+        return {"id":request.id,"custEmail":customeremail,"proEmail":proemail,"serviceName":serviceName,"dateofrequest":request.dateofrequest,"dateofcompletion":request.dateofcompletion,"serviceStatus":request.serviceStatus,"feedback":request.feedback},200
 
+api.add_resource(RequestIdsauce,'/requests/<int:id>')
 api.add_resource(ServiceIdSauce,'/services/<int:id>')
 api.add_resource(ProfessionalSauce,'/professional')
 api.add_resource(CustomerSauce,'/customer')

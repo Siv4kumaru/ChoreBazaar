@@ -68,10 +68,7 @@
         },
         methods: {
             editR(row) {
-
-
-                this.$router.push({ name: 'editRequest', params: { id: row.id } });
-
+                this.$router.push({ name: 'editRequest', params:{ id: row.id }});
             },
             edit(row) {
                 // Redirect to the edit page, passing the row's ID as a query parameter
