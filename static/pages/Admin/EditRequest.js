@@ -5,14 +5,14 @@ const EditService = {
         <form @submit.prevent="updateService">
           <div>
             <label for="custE">Customer Email:</label>
-            <select v-model="request.custE" id="custE" required>
-              <option v-for="email in customerEmails" :key="email" :value="email">{{ email }}</option>
+            <select v-model="selectedCustEmail" id="custE" required>
+              <option v-for="email in custEmail" :value="email">{{ email }}</option>
             </select>
           </div>
           <div>
             <label for="proE">Professional Email:</label>
-            <select v-model="request.proE" id="proE" required>
-              <option v-for="email in professionalEmails" :key="email" :value="email">{{ email }}</option>
+            <select v-model="selectedProEmail" id="proE" required>
+              <option v-for="email in proEmail" :key="email" :value="email">{{ email }}</option>
             </select>
           </div>
           <div>
@@ -42,26 +42,29 @@ const EditService = {
       return {
         request: {
           id: null,
-          custE: '',
-          proE: '',
-          servName: '',
+          custEmail: '',
+          proEmail: '',
+          serviceName: '',
           dateofrequest: '',
           dateofcompletion: '',
           serviceStatus: '',
         },
         serviceName: [],
         selectedService:'',
-        customerEmails: ['cust1@example.com', 'cust2@example.com'], // replace with actual data
-        professionalEmails: ['pro1@example.com', 'pro2@example.com'], // replace with actual data
+        custEmail: [],
+        proEmail: [],
+        selectedCustEmail: '',
+        selectedProEmail: '',
         message: '',
       };
     },
     mounted() {
       this.dropdown();
       this.fetchRequest();
-
+      
     },
     methods: {
+      
         async dropdown() {
             const id = this.$route.params.id;
             try {
@@ -74,16 +77,41 @@ const EditService = {
                 throw new Error("Error fetching service details");
               }
               const data = await response.json();
-              console.log(data);
-              const Snames = [];
                 for (let i in data) {
-                Snames.push(data[i].name);
+                this.serviceName.push(data[i].name);
                 };
-              
-              this.serviceName = Snames;
+
+                const response2 = await fetch(`/api/customer`, {
+                  headers: {
+                    "Authentication-token": sessionStorage.getItem("token"),
+                  },
+                });
+                if (!response2.ok) {
+                  throw new Error("Error fetching customer details");
+                }
+                const data2 = await response2.json();
+                for (let i in data2){
+                  this.custEmail.push(data2[i].email);
+                }
+
+                const response3 = await fetch(`/api/professional`, {
+                  headers: {
+                    "Authentication-token": sessionStorage.getItem("token"),
+                  },
+                });
+                if (!response3.ok) {
+                  throw new Error("Error fetching professional details");
+                }
+                const data3 = await response3.json();
+                for (let i in data3){
+                  this.proEmail.push(data3[i].email);
+                }
+
+                
+  
             } catch (error) {
               console.error(error);
-              this.message = 'Error fetching service details.';
+              this.message = 'Error fetching details.';
     
             }
           },
@@ -99,17 +127,58 @@ const EditService = {
               if (!response.ok) {
                 throw new Error("Error fetching service details");
               }
+
               const data = await response.json();
               this.request = data;
-              this.selectedService = this.request.servName;
-              console.log(this.selectedService);
-              console.log(this.request.servName);
+              console.log(this.request);
+
+              this.selectedService = this.request.serviceName;
+              this.selectedCustEmail = this.request.custEmail; 
+              this.selectedProEmail = this.request.proEmail;
+              
             } catch (error) {
               console.error(error);
               this.message = 'Error fetching service details.';
             }
-          }
+          },
+          async updateService() {
+            const reqId = this.$route.params.id;
+            try {
+              const response = await fetch('/api/requests', {
+                method: 'PATCH',
+                headers: {
+                  'Content-Type': 'application/json',
+                  "Authentication-token":sessionStorage.getItem("token")
+                },
+                body: JSON.stringify({
+                  "id": reqId,
+                  "custEmail": this.selectedCustEmail,
+                  "proEmail": this.selectedProEmail,
+                  "serviceName": this.selectedService,
+                  "dateofrequest": this.request.dateofrequest,
+                  "dateofcompletion": this.request.dateofcompletion,
+                  "serviceStatus": this.request.serviceStatus,
+                }),
+              });
+              if (response.ok) {
+                this.message = 'Service updated successfully.';
+                console.log(this.message);
+                this.$router.push("/Dashboard-Admin");
+              }
+      
+              if (!response.ok) {
+                throw new Error("Error updating service");
+              }
+              else{
+              const data = await response.json();
+              this.message = data.message;}
+            } catch (error) {
+              console.error(error);
+              this.message = 'Error updating service.';
+            }
+          },
         },
+
   };
   
   export default EditService;

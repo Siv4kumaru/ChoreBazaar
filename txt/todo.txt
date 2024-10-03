@@ -1,16 +1,16 @@
-[ ] cust and pro must have active ban or unban status showing
-[ ] service must have update
-[ ] block and unblock only one should be there
+[ ] sign up has no email duplicate vaidation
+[ ] user userdatastore
+[*] cust and pro must have active ban or unban status showing
+[*] service must have update
+[*] block and unblock only one should be there
 [ ] newly regestered pro in new page and accept and reject must be there
 [ ] pro resgister must need a pdf accepter
 [ ] one hour once token acess cut, config that
 [ ] if logout in one session, logout other sessions with same email
 [*] if i delete services then the service id and name in prof must be set to service deleted
-[ ] make pro active = false
+[*] make pro active = false
 [*] dropdown in prosignup
 [ ] if i click on the services in customer tab then take me to search bar wioth profs
-[ ] dropdown in navbar 
-[ ] pro can have multiple services
 [ ] address form
 [ ] navbar design
 [ ] logo

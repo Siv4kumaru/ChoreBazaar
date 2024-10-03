@@ -50,13 +50,13 @@ reqPostparser.add_argument('feedback', type=str)
 
 reqPatchparser = reqparse.RequestParser()
 reqPatchparser.add_argument('id', type=int, required=True)
-reqPatchparser.add_argument('customerId', type=int)
-reqPatchparser.add_argument('professionalId', type=int)
-reqPatchparser.add_argument('serviceId', type=int)
+reqPatchparser.add_argument('custEmail', type=str)
+reqPatchparser.add_argument('proEmail', type=str)
+reqPatchparser.add_argument('serviceName', type=str)
 reqPatchparser.add_argument('serviceStatus', type=str)
-reqPatchparser.add_argument('feedback', type=str)
 reqPatchparser.add_argument('dateofcompletion', type=str)
 reqPatchparser.add_argument('dateofrequest', type=str)
+reqPatchparser.add_argument('serviceStatus', type=str)
 
 custPatch = reqparse.RequestParser()
 custPatch.add_argument('id',type=int,required=True)
@@ -198,23 +198,27 @@ class requestSauce(Resource):
 
         if request is None:
             return {"message":"Request not found"},404
-        if args.get('customerId') and Customer.query.filter_by(id=args['customerId']).first() is None:
-            return {"message": "Customer does not exist"}, 400
 
-        if args.get('professionalId') and Professional.query.filter_by(id=args.get('professionalId')).first() is None:
-            return {"message": "Professional does not exist"}, 400
+        if args.get('custEmail') and User.query.filter_by(email=args['custEmail']).first() is None:
+            return {"message":"Customer does not exist"},400
+        
+        if args.get('proEmail') and User.query.filter_by(email=args['proEmail']).first() is None:
+            return {"message":"Professional does not exist"},400
+        
+        if args.get('serviceName') and Service.query.filter_by(name=args['serviceName']).first() is None:
+            return {"message":"Service does not exist"},400
 
-        if args.get('serviceId') and Service.query.filter_by(id=args.get('serviceId')).first() is None:
-            return {"message": "Service does not exist"}, 400
+        if args.get('custEmail'):
+            custid=Customer.query.filter_by(userId=User.query.filter_by(email=args['custEmail']).first().id).first().id
+            request.customerId = custid
 
-        if args.get('customerId'):
-            request.customerId = args['customerId']
-
-        if args.get('professionalId'):
-            request.professionalId = args['professionalId']
-
-        if args.get('serviceId'):
-            request.serviceId = args['serviceId']
+        if args.get('proEmail'):
+            proid=Professional.query.filter_by(userId=User.query.filter_by(email=args['proEmail']).first().id).first().id
+            request.professionalId = proid
+            
+        if args.get('serviceName'):
+            serid=Service.query.filter_by(name=args['serviceName']).first().id
+            request.serviceId = serid
         
         if args.get('serviceStatus'):
             request.serviceStatus = args['serviceStatus']

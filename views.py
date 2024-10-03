@@ -43,13 +43,14 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
         role=data.get('role')
         
         if role=='admin':
-            return jsonify({"message":"Not today Hacker, I'm the only Admin"})
+            return jsonify({"message":"Not today Hacker, I'm the only Admin"},400)
         
         if not email or not password or role not in ['customer','professional']:
-            return jsonify({"message":"Invalid data"})
+            return jsonify({"message":"Invalid data"},400)
         
         if userdatastore.find_user(email=email):
-            return jsonify({"message":"User already exists"})
+            return jsonify({"message":"User already exists"},400)
+
         
         #professional must be kept inactive until admin approves it
         if role=='professional':
