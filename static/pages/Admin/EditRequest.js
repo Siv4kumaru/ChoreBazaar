@@ -59,6 +59,7 @@ const EditService = {
     mounted() {
       this.dropdown();
       this.fetchRequest();
+
     },
     methods: {
         async dropdown() {
@@ -99,7 +100,10 @@ const EditService = {
                 throw new Error("Error fetching service details");
               }
               const data = await response.json();
-              this.service = data;
+              this.request = data;
+              this.selectedService = this.request.servName;
+              console.log(this.selectedService);
+              console.log(this.request.servName);
             } catch (error) {
               console.error(error);
               this.message = 'Error fetching service details.';

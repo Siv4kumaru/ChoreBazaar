@@ -4,8 +4,8 @@ const EditService = {
       <h1>Edit Service</h1>
       <form @submit.prevent="updateService">
         <div>
-          <label for="custE">Customer Email:</label>
-          <input v-model="service.custE" type="text" id="custE" required />
+          <label for="name">Service Name:</label>
+          <input v-model="service.name" type="text" id="serviceName" required />
         </div>
         <div>
           <label for="description">Description:</label>

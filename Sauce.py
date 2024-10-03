@@ -300,8 +300,11 @@ class RequestIdsauce(Resource):
         request=ServiceRequest.query.filter_by(id=id).first()
         if request is None:
             return {"message":"Request not found"},404
-        service=Service.query.filter_by(id=request.serviceId).first().name
-        serviceName=service.name
+        service=Service.query.filter_by(id=request.serviceId).first()
+        if service is None:
+            serviceName="Service Not Found"
+        else:
+            serviceName=service.name
         customeremail=User.query.filter_by(id=Customer.query.filter_by(id=request.customerId).first().userId).first().email
         proemail=User.query.filter_by(id=Professional.query.filter_by(id=request.professionalId).first().userId).first().email
         return {"id":request.id,"custEmail":customeremail,"proEmail":proemail,"serviceName":serviceName,"dateofrequest":request.dateofrequest,"dateofcompletion":request.dateofcompletion,"serviceStatus":request.serviceStatus,"feedback":request.feedback},200
