@@ -59,9 +59,9 @@ const CustomerSignup = {
         credentials: "same-origin",
       });
 
+      const data = await res.json();
+      console.log(data);
       if (res.ok) {
-        const data = await res.json();
-        console.log(data);
         // Handle successful sign up, e.g., redirect or store token
         router.push("/login");
       } else {

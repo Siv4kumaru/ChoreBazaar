@@ -50,13 +50,13 @@ reqPostparser.add_argument('feedback', type=str)
 
 reqPatchparser = reqparse.RequestParser()
 reqPatchparser.add_argument('id', type=int, required=True)
-reqPatchparser.add_argument('customerId', type=int)
-reqPatchparser.add_argument('professionalId', type=int)
-reqPatchparser.add_argument('serviceId', type=int)
+reqPatchparser.add_argument('custEmail', type=str)
+reqPatchparser.add_argument('proEmail', type=str)
+reqPatchparser.add_argument('serviceName', type=str)
 reqPatchparser.add_argument('serviceStatus', type=str)
-reqPatchparser.add_argument('feedback', type=str)
 reqPatchparser.add_argument('dateofcompletion', type=str)
 reqPatchparser.add_argument('dateofrequest', type=str)
+reqPatchparser.add_argument('serviceStatus', type=str)
 
 custPatch = reqparse.RequestParser()
 custPatch.add_argument('id',type=int,required=True)
@@ -108,7 +108,7 @@ class CustomerSauce(Resource):
             return {"message":"No Customer Left"},404
         for cus in customer:
             user=User.query.filter_by(id=cus.userId).first()
-            list.append({"id":user.id,"name":cus.name,"email":user.email,"phone":cus.phone,"address":cus.address,"pincode":cus.pincode})
+            list.append({"id":user.id,"name":cus.name,"email":user.email,"phone":cus.phone,"address":cus.address,"pincode":cus.pincode,"active":user.active})
         return list,200
     
     # def patch(self):
@@ -133,18 +133,33 @@ class ProfessionalSauce(Resource):
             return {"message":"No Customer Left"},404
         for p in pro:
             user=User.query.filter_by(id=p.userId).first()
-            list.append({"id":user.id,"name":p.name,"email":user.email,"phone":p.phone,"address":p.address,"pincode":p.pincode,"serviceName":p.serviceName,"serviceId":p.serviceId,"experience":p.experience})
+            list.append({"id":user.id,"name":p.name,"email":user.email,"phone":p.phone,"address":p.address,"pincode":p.pincode,"serviceName":p.serviceName,"serviceId":p.serviceId,"experience":p.experience,"active":user.active})
         return list,200
 
 
 class requestSauce(Resource):
     @auth_required('token')
     @roles_accepted('admin')
-    @marshal_with(request_fields)
     def get(self):
-        allRequests=ServiceRequest.query.all()
-        return allRequests
-    
+        list=[]
+        requests=ServiceRequest.query.all()
+        if requests is None:
+            return {"message":"No Requests"},404
+        for req in requests:
+            id=req.id
+            customeruserid=Customer.query.filter_by(id=req.customerId).first().userId
+            prouserid=Professional.query.filter_by(id=req.professionalId).first().userId
+            custemail=User.query.filter_by(id=customeruserid).first().email
+            proemail=User.query.filter_by(id=prouserid).first().email
+            service=Service.query.filter_by(id=req.serviceId).first()
+            if service is None:
+                serviceName="Service Not Found"
+            else:
+                serviceName=service.name
+            requ={"id":req.id,"custemail":custemail,"proemail":proemail,"serviceName":serviceName,"dateofrequest":req.dateofrequest,"dateofcompletion":req.dateofcompletion,"serviceStatus":req.serviceStatus,"feedback":req.feedback}
+            list.append(requ)
+        return list,200
+
     @auth_required('token')
     #@roles_accepted('customer')
     def post(self):
@@ -183,23 +198,27 @@ class requestSauce(Resource):
 
         if request is None:
             return {"message":"Request not found"},404
-        if args.get('customerId') and Customer.query.filter_by(id=args['customerId']).first() is None:
-            return {"message": "Customer does not exist"}, 400
 
-        if args.get('professionalId') and Professional.query.filter_by(id=args.get('professionalId')).first() is None:
-            return {"message": "Professional does not exist"}, 400
+        if args.get('custEmail') and User.query.filter_by(email=args['custEmail']).first() is None:
+            return {"message":"Customer does not exist"},400
+        
+        if args.get('proEmail') and User.query.filter_by(email=args['proEmail']).first() is None:
+            return {"message":"Professional does not exist"},400
+        
+        if args.get('serviceName') and Service.query.filter_by(name=args['serviceName']).first() is None:
+            return {"message":"Service does not exist"},400
 
-        if args.get('serviceId') and Service.query.filter_by(id=args.get('serviceId')).first() is None:
-            return {"message": "Service does not exist"}, 400
+        if args.get('custEmail'):
+            custid=Customer.query.filter_by(userId=User.query.filter_by(email=args['custEmail']).first().id).first().id
+            request.customerId = custid
 
-        if args.get('customerId'):
-            request.customerId = args['customerId']
-
-        if args.get('professionalId'):
-            request.professionalId = args['professionalId']
-
-        if args.get('serviceId'):
-            request.serviceId = args['serviceId']
+        if args.get('proEmail'):
+            proid=Professional.query.filter_by(userId=User.query.filter_by(email=args['proEmail']).first().id).first().id
+            request.professionalId = proid
+            
+        if args.get('serviceName'):
+            serid=Service.query.filter_by(name=args['serviceName']).first().id
+            request.serviceId = serid
         
         if args.get('serviceStatus'):
             request.serviceStatus = args['serviceStatus']
@@ -240,7 +259,7 @@ class ServiceSauce(Resource):
     
     @auth_required('token')
     @roles_accepted('admin')
-    def delete(self):
+    def delete(self): 
         args=delParser.parse_args()
         service=Service.query.filter_by(id=args['id']).first()
         if service is None:
@@ -256,7 +275,7 @@ class ServiceSauce(Resource):
         service=Service.query.filter_by(id=args['id']).first()
         if service is None:
             return {"message":"Service not found"},404
-        if Service.query.filter_by(name=args['name']).first() is not None:
+        if Service.query.filter_by(name=args['name']).first() is not None and service.name != args['name']:
             return {"message":"Service already exists"},400
         if args.get('name'):
             service.name = args['name']
@@ -268,8 +287,34 @@ class ServiceSauce(Resource):
             service.price = args['price']
         db.session.commit()
         return {"message":"Service Updated"},200
+    
+class ServiceIdSauce(Resource):
+    @auth_required('token')
+    @roles_accepted('admin')
+    def get(self,id):
+        service=Service.query.filter_by(id=id).first()
+        if service is None:
+            return {"message":"Service not found"},404
+        return {"id":service.id,"name":service.name,"description":service.description,"price":service.price},200
+    
+class RequestIdsauce(Resource):
+    @auth_required('token')
+    @roles_accepted('admin')
+    def get(dself,id):
+        request=ServiceRequest.query.filter_by(id=id).first()
+        if request is None:
+            return {"message":"Request not found"},404
+        service=Service.query.filter_by(id=request.serviceId).first()
+        if service is None:
+            serviceName="Service Not Found"
+        else:
+            serviceName=service.name
+        customeremail=User.query.filter_by(id=Customer.query.filter_by(id=request.customerId).first().userId).first().email
+        proemail=User.query.filter_by(id=Professional.query.filter_by(id=request.professionalId).first().userId).first().email
+        return {"id":request.id,"custEmail":customeremail,"proEmail":proemail,"serviceName":serviceName,"dateofrequest":request.dateofrequest,"dateofcompletion":request.dateofcompletion,"serviceStatus":request.serviceStatus,"feedback":request.feedback},200
 
-
+api.add_resource(RequestIdsauce,'/requests/<int:id>')
+api.add_resource(ServiceIdSauce,'/services/<int:id>')
 api.add_resource(ProfessionalSauce,'/professional')
 api.add_resource(CustomerSauce,'/customer')
 api.add_resource(ServiceSauce,'/services')

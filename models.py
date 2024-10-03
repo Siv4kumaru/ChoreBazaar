@@ -93,9 +93,6 @@ class ServiceRequest(db.Model):
 def set_service_status(mapper, connection, target):
     if target.serviceId is None :
         target.serviceStatus += "<Service Deleted>"
-    if target.customerId is None:
-        target.serviceStatus += "<customer Deleted>"      
-    if target.professionalId is None:
-        target.serviceStatus += "<professional Deleted>"
+
 
       

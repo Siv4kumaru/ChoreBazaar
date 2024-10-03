@@ -31,6 +31,7 @@ const Login = {
         },
         body : JSON.stringify({email:this.email,password:this.password})
     });
+    console.log(res)
     if (res.ok){
       const data = await res.json();
       this.$store.commit("setRole", data.role);
