@@ -313,6 +313,32 @@ class RequestIdsauce(Resource):
         proemail=User.query.filter_by(id=Professional.query.filter_by(id=request.professionalId).first().userId).first().email
         return {"id":request.id,"custEmail":customeremail,"proEmail":proemail,"serviceName":serviceName,"dateofrequest":request.dateofrequest,"dateofcompletion":request.dateofcompletion,"serviceStatus":request.serviceStatus,"feedback":request.feedback},200
 
+class search(Resource):
+    @auth_required('token')
+    @roles_accepted('admin')
+    def get(self,queryy,searchType):
+        list=[]
+        if searchType=="service":
+            services=Service.query.filter(Service.name.like(f'%{queryy}%')).all()
+            for service in services:
+                list.append({"id":service.id,"name":service.name,"description":service.description,"price":service.price})
+            return list,200
+
+ 
+class searchall(Resource):
+    @auth_required('token')
+    @roles_accepted('admin')
+    def get(self,searchType):
+        list=[]
+        if searchType=="service":
+            service=Service.query.all()
+            for ser in service:
+                list.append({"id":ser.id,"name":ser.name,"description":ser.description,"price":ser.price})
+            return list,200
+
+
+api.add_resource(searchall,'/search/<string:searchType>/')
+api.add_resource(search,'/search/<string:searchType>/<string:queryy>')
 api.add_resource(RequestIdsauce,'/requests/<int:id>')
 api.add_resource(ServiceIdSauce,'/services/<int:id>')
 api.add_resource(ProfessionalSauce,'/professional')

@@ -283,7 +283,7 @@
 
         async mounted() {
 
-            
+            console.log("mounted");
 
             const res=await fetch(window.location.origin+`/api/customer`,{
                 method: "GET", 

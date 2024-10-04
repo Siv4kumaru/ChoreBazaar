@@ -50,6 +50,8 @@ const commonTable={
             this.$router.push("/addService");
         },
         
+        
+        
     }
 
 }
