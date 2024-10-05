@@ -8,12 +8,12 @@ const searchA = {
         <select v-model="selectedType"  id="searchType" @change="cat()" >
             <option :value="s" v-for="s in searchType">{{s}}</option>
         </select>
-        <input v-model="queryy" type="text" placeholder="Search.." id="query" name="query" @keydown="eachkey()">
+        <input v-model="queryy" type="text" placeholder="Search.." id="query" name="query" @keyup="eachkey()">
         <button><i class="fa-solid fa-magnifying-glass"></i></button>
 
         <br>
         <br>
-        <commonTable v-if="this.columns[0]" :title="title[0]" :data="data[0]" :selector="selector[0]" :columns="columns[0]">
+        <commonTable v-if="this.columns[0]" :title="title" :data="data" :selector="selector" :columns="columns[0]">
                 
                 <template v-slot:actions="{ row }">
                 <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
@@ -41,6 +41,7 @@ const searchA = {
                         </div>
                     </div>
                 </div>
+
     </div>
     `,
     data() {
@@ -49,16 +50,35 @@ const searchA = {
             selectedType:'',
             queryy:'',
             data:[],
-            selector:[],
-            title:[],
+            selector:'',
+            title:'',
             columns:[],
             viewRow: {}
         }
     },
 
     methods:{
-        eachkey(){
+        async eachkey(){
+            if(this.selectedType==''){
+                alert("Please select a search type");
+                return; 
+            }
             console.log(this.queryy);
+            const exp = await fetch(window.location.origin + `/api/search/${this.selectedType}/${this.queryy}`, {
+                method: 'GET',
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authentication-token": sessionStorage.getItem("token"),
+                }
+            });
+            if (exp.ok) {
+                const data = await exp.json();
+                console.log(data);
+                if (this.selectedType === "service") {
+                    this.data=[data];
+                }
+
+            }
         },
         async cat(){
             $("#query").val("");    
@@ -77,21 +97,36 @@ const searchA = {
                     console.log(data);
 
                     if (this.selectedType === "service") {
-                        this.data.push(data);
-                        this.selector.push("table1");
-                        this.title.push("Services");
-                        this.columns.push([
+                        this.data=[data];
+                        this.selector="table1";
+                        this.title="Services";
+                        this.columns=[
                             { "data": "name", "title": "Name" },
                             { "data": "description", "title": "Description" },
                             { "data": "price", "title": "Price" },
-                        ]);
+                        ];
                     }
-                } else {
+                    else if(this.selectedType === "service Request"){
+                        this.data= [data];
+                        this.selector="table2";
+                        this.title="Requests";
+                        this.columns=[
+                            { "data": "custemail", "title": "Customer Email" },
+                            { "data": "proemail", "title": "Professional Email" },
+                            { "data": "serviceName", "title": "Service" },
+                            { "data": "dateofrequest", "title": "Date of Request" },
+                            { "data": "dateofcompletion", "title": "date of Completion" },
+                            { "data": "serviceStatus", "title": "Service Status" },
+                            { "data": "feedback", "title": "FeedBack" },
+                        ];
+                    }
+                }else {
                     console.error("Failed to fetch data: ", res.statusText);
                 }
             } catch (error) {
                 console.error("Error fetching data: ", error);
             }
+            
 
         },
         fetchs(){
@@ -140,7 +175,7 @@ const searchA = {
                 .then(data => {
                     console.log(data);
                     // Find the index of the row in the relevant data array and remove it
-                    const tableIndex = 3; // Adjust this according to which table you're modifying
+                    const tableIndex = 0; // Adjust this according to which table you're modifying
                     const index = this.data[tableIndex].findIndex(item => item.id === row.id);
                     if (index !== -1) {
                         this.data[tableIndex].splice(index, 1); // Remove the row from the array
@@ -173,7 +208,7 @@ const searchA = {
             .then(data => {
                 console.log(data);
                 // Find the index of the row in the relevant data array and remove it
-                const tableIndex = 2; // Adjust this according to which table you're modifying
+                const tableIndex = 0; // Adjust this according to which table you're modifying
                 const index = this.data[tableIndex].findIndex(item => item.id === row.id);
                 if (index !== -1) {
                     this.data[tableIndex].splice(index, 1); // Remove the row from the array
@@ -268,7 +303,7 @@ const searchA = {
                 console.log(data);
                 
                 // Find the index of the row in the relevant data array and remove it
-                const tableIndex = 1; // Adjust this according to which table you're modifying
+                const tableIndex = 0; // Adjust this according to which table you're modifying
                 const index = this.data[tableIndex].findIndex(item => item.id === row.id);
                 if (index !== -1) {
                      this.data[tableIndex][index].active = false; // Remove the row from the array
@@ -299,7 +334,7 @@ const searchA = {
             .then(data => {
                 console.log(data);
                 // Find the index of the row in the relevant data array and remove it
-                const tableIndex = 1; // Adjust this according to which table you're modifying
+                const tableIndex = 0; // Adjust this according to which table you're modifying
                 const index = this.data[tableIndex].findIndex(item => item.id === row.id);
                 if (index !== -1) {
                      this.data[tableIndex][index].active = true; // Remove the row from the array

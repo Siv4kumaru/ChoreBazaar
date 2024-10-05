@@ -77,7 +77,7 @@ const EditService = {
         if (response.ok) {
           this.message = 'Service updated successfully.';
           console.log(this.message);
-          this.$router.push("/Dashboard-Admin");
+          this.$router.push("/search");
         }
 
         if (!response.ok) {

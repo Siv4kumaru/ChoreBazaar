@@ -335,7 +335,24 @@ class searchall(Resource):
             for ser in service:
                 list.append({"id":ser.id,"name":ser.name,"description":ser.description,"price":ser.price})
             return list,200
-
+        if searchType=="request":
+            requests=ServiceRequest.query.all()
+            for req in requests:
+                id=req.id
+                customeruserid=Customer.query.filter_by(id=req.customerId).first().userId
+                prouserid=Professional.query.filter_by(id=req.professionalId).first().userId
+                custemail=User.query.filter_by(id=customeruserid).first().email
+                proemail=User.query.filter_by(id=prouserid).first().email
+                service=Service.query.filter_by(id=req.serviceId).first()
+                if service is None:
+                    serviceName="Service Not Found"
+                else:
+                    serviceName=service.name
+                requ={"id":req.id,"custemail":custemail,"proemail":proemail,"serviceName":serviceName,"dateofrequest":req.dateofrequest,"dateofcompletion":req.dateofcompletion,"serviceStatus":req.serviceStatus,"feedback":req.feedback}
+                list.append(requ)
+            return list,200
+        
+        
 
 api.add_resource(searchall,'/search/<string:searchType>/')
 api.add_resource(search,'/search/<string:searchType>/<string:queryy>')
