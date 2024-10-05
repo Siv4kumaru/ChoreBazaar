@@ -9,16 +9,22 @@ const searchA = {
         </select>
         <input v-model="queryy" type="text" placeholder="Search.." id="query" name="query" @keyup="eachkey()">
         <button><i class="fa-solid fa-magnifying-glass"></i></button>
-        
         <br>
         <br>
-        <commonTable v-if="this.columns" :title="title" :data="data" :selector="selector" :columns="columns">
-                
+        <commonTable v-if="this.title=='Services'" :title="title" :data="data" :selector="selector" :columns="columns">
                 <template v-slot:actions="{ row }">
                 <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
                 <button class="btn btn-success btn-sm" @click="edit(row)">Edit</button>
                 <button class="btn btn-danger btn-sm" @click="deleteServ(row)">Delete</button>
                 </template>
+        </commonTable>
+
+        <commonTable v-if="this.title=='Requests'" :title="title" :data="data" :selector="selector" :columns="columns">
+            <template v-slot:actions="{ row }">
+            <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
+            <button class="btn btn-success btn-sm" @click="editR(row)">Edit</button>
+            <button class="btn btn-danger btn-sm" @click="deleteRequest(row)">Delete</button>
+            </template>
         </commonTable>
 
                     <!-- view Modal -->
@@ -90,7 +96,7 @@ const searchA = {
                         "Authentication-token": sessionStorage.getItem("token"),
                     }
                 });
-
+                
                 if (res.ok) {
                     const data = await res.json();
                     console.log(data);
@@ -106,7 +112,7 @@ const searchA = {
                         ];
                     }
                     else if(this.selectedType === "service Request"){
-                        this.data= data;
+                        this.data=data;
                         this.selector="table2";
                         this.title="Requests";
                         this.columns=[
@@ -174,10 +180,9 @@ const searchA = {
                 .then(data => {
                     console.log(data);
                     // Find the index of the row in the relevant data array and remove it
-                    const tableIndex = 0; // Adjust this according to which table you're modifying
-                    const index = this.data[tableIndex].findIndex(item => item.id === row.id);
+                    const index = this.data.findIndex(item => item.id === row.id);
                     if (index !== -1) {
-                        this.data[tableIndex].splice(index, 1); // Remove the row from the array
+                        this.data.splice(index, 1); // Remove the row from the array
                     }
 
                 })
@@ -207,10 +212,9 @@ const searchA = {
             .then(data => {
                 console.log(data);
                 // Find the index of the row in the relevant data array and remove it
-                const tableIndex = 0; // Adjust this according to which table you're modifying
-                const index = this.data[tableIndex].findIndex(item => item.id === row.id);
+                const index = this.data.findIndex(item => item.id === row.id);
                 if (index !== -1) {
-                    this.data[tableIndex].splice(index, 1); // Remove the row from the array
+                    this.data.splice(index, 1); // Remove the row from the array
                 }
             })
             .catch(error => {
@@ -237,11 +241,9 @@ const searchA = {
             .then(data => {
                 console.log(data);
                 
-                // Find the index of the row in the relevant data array and remove it
-                const tableIndex = 0; // Adjust this according to which table you're modifying
-                const index = this.data[tableIndex].findIndex(item => item.id === row.id);
+                const index = this.data.findIndex(item => item.id === row.id);
                 if (index !== -1) {
-                     this.data[tableIndex][index].active = false; // Remove the row from the array
+                     this.data[index].active = false; // Remove the row from the array
                 }
             })
             .catch(error => {
@@ -270,10 +272,9 @@ const searchA = {
                 console.log(data);
                 
                 // Find the index of the row in the relevant data array and remove it
-                const tableIndex = 0; // Adjust this according to which table you're modifying
-                const index = this.data[tableIndex].findIndex(item => item.id === row.id);
+                const index = this.data.findIndex(item => item.id === row.id);
                 if (index !== -1) {
-                     this.data[tableIndex][index].active = true; // Remove the row from the array
+                     this.data[index].active = true; // Remove the row from the array
                 }
             })
             .catch(error => {
@@ -302,10 +303,8 @@ const searchA = {
                 console.log(data);
                 
                 // Find the index of the row in the relevant data array and remove it
-                const tableIndex = 0; // Adjust this according to which table you're modifying
-                const index = this.data[tableIndex].findIndex(item => item.id === row.id);
                 if (index !== -1) {
-                     this.data[tableIndex][index].active = false; // Remove the row from the array
+                     this.data[index].active = false; // Remove the row from the array
                 }
             })
             .catch(error => {
@@ -332,11 +331,9 @@ const searchA = {
             })
             .then(data => {
                 console.log(data);
-                // Find the index of the row in the relevant data array and remove it
-                const tableIndex = 0; // Adjust this according to which table you're modifying
-                const index = this.data[tableIndex].findIndex(item => item.id === row.id);
+                const index = this.data.findIndex(item => item.id === row.id);
                 if (index !== -1) {
-                     this.data[tableIndex][index].active = true; // Remove the row from the array
+                     this.data[index].active = true; // Remove the row from the array
                 }
             })
             .catch(error => {

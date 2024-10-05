@@ -335,7 +335,7 @@ class searchall(Resource):
             for ser in service:
                 list.append({"id":ser.id,"name":ser.name,"description":ser.description,"price":ser.price})
             return list,200
-        if searchType=="request":
+        if searchType=="service Request":
             requests=ServiceRequest.query.all()
             for req in requests:
                 id=req.id
