@@ -1,5 +1,4 @@
 import commonTable from "../../components/commonTable.js";
-import * as admin from "./adminDashboard.js";
 
 const searchA = {
     template:`
@@ -10,10 +9,10 @@ const searchA = {
         </select>
         <input v-model="queryy" type="text" placeholder="Search.." id="query" name="query" @keyup="eachkey()">
         <button><i class="fa-solid fa-magnifying-glass"></i></button>
-
+        
         <br>
         <br>
-        <commonTable v-if="this.columns[0]" :title="title" :data="data" :selector="selector" :columns="columns[0]">
+        <commonTable v-if="this.columns" :title="title" :data="data" :selector="selector" :columns="columns">
                 
                 <template v-slot:actions="{ row }">
                 <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
@@ -49,10 +48,10 @@ const searchA = {
             searchType: ['customer', 'professional', 'service','service Request'],
             selectedType:'',
             queryy:'',
-            data:[],
+            data:null,
             selector:'',
             title:'',
-            columns:[],
+            columns:null,
             viewRow: {}
         }
     },
@@ -97,7 +96,7 @@ const searchA = {
                     console.log(data);
 
                     if (this.selectedType === "service") {
-                        this.data=[data];
+                        this.data=data;
                         this.selector="table1";
                         this.title="Services";
                         this.columns=[
@@ -107,7 +106,7 @@ const searchA = {
                         ];
                     }
                     else if(this.selectedType === "service Request"){
-                        this.data= [data];
+                        this.data= data;
                         this.selector="table2";
                         this.title="Requests";
                         this.columns=[
