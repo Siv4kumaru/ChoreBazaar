@@ -80,25 +80,14 @@ const searchA = {
 
     methods:{
         async eachkey(){
+            var query = $("#query").val().toLowerCase();
+            $("#table tbody tr").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(query) > -1)
+              });
+            console.log(query);
             if(this.selectedType==''){
                 alert("Please select a search type");
                 return; 
-            }
-            console.log(this.queryy);
-            const exp = await fetch(window.location.origin + `/api/search/${this.selectedType}/${this.queryy}`, {
-                method: 'GET',
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authentication-token": sessionStorage.getItem("token"),
-                }
-            });
-            if (exp.ok) {
-                const data = await exp.json();
-                console.log(data);
-                if (this.selectedType === "service") {
-                    this.data=[data];
-                }
-
             }
         },
         async cat(){
@@ -127,7 +116,7 @@ const searchA = {
                     }}
                     if (this.selectedType === "service") {
                         this.data=data;
-                        this.selector="table1";
+                        this.selector="table";
                         this.title="Services";
                         this.columns=[
                             { "data": "name", "title": "Name" },
@@ -137,7 +126,7 @@ const searchA = {
                     }
                     else if(this.selectedType === "service Request"){
                         this.data=data;
-                        this.selector="table2";
+                        this.selector="table";
                         this.title="Requests";
                         this.columns=[
                             { "data": "custemail", "title": "Customer Email" },
@@ -151,7 +140,7 @@ const searchA = {
                     }
                     else if(this.selectedType === "customer"){
                         this.data=data;
-                        this.selector="table3";
+                        this.selector="table";
                         this.title="Customers";     
                         this.columns=[
                             { "data": "email", "title": "Email" },
@@ -164,7 +153,7 @@ const searchA = {
                     }
                     else if(this.selectedType === "professional"){
                         this.data=data;
-                        this.selector="table4";
+                        this.selector="table";
                         this.title="Professionals";     
                         this.columns=[
                             { "data": "name", "title": "Name" },
