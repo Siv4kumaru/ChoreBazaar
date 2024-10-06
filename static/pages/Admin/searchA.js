@@ -12,11 +12,11 @@ const searchA = {
         <br>
         <br>
         <commonTable v-if="this.title=='Services'" :title="title" :data="data" :selector="selector" :columns="columns">
-                <template v-slot:actions="{ row }">
-                <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
-                <button class="btn btn-success btn-sm" @click="edit(row)">Edit</button>
-                <button class="btn btn-danger btn-sm" @click="deleteServ(row)">Delete</button>
-                </template>
+            <template v-slot:actions="{ row }">
+            <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
+            <button class="btn btn-success btn-sm" @click="edit(row)">Edit</button>
+            <button class="btn btn-danger btn-sm" @click="deleteServ(row)">Delete</button>
+            </template>
         </commonTable>
 
         <commonTable v-if="this.title=='Requests'" :title="title" :data="data" :selector="selector" :columns="columns">
@@ -24,6 +24,22 @@ const searchA = {
             <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
             <button class="btn btn-success btn-sm" @click="editR(row)">Edit</button>
             <button class="btn btn-danger btn-sm" @click="deleteRequest(row)">Delete</button>
+            </template>
+        </commonTable>
+
+        <commonTable v-if="this.title=='Customers'" :title="title" :data="data" :selector="selector" :columns="columns">
+            <template v-slot:actions="{ row }">
+            <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
+            <button v-if="row.active=='Not Blocked'" class="btn btn-danger btn-sm" @click="blockCus(row)">Block</button>
+            <button v-else class="btn btn-warning btn-sm" @click="unblockCus(row)">Unblock</button>
+            </template>
+        </commonTable>
+
+        <commonTable v-if="this.title=='Professionals'" :title="title" :data="data" :selector="selector" :columns="columns">
+            <template v-slot:actions="{ row }">
+            <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
+            <button v-if="row.active=='Not Blocked'" class="btn btn-danger btn-sm" @click="blockPro(row)">Block</button>
+            <button v-else class="btn btn-warning btn-sm" @click="unblockPro(row)">Unblock</button>
             </template>
         </commonTable>
 
@@ -100,7 +116,15 @@ const searchA = {
                 if (res.ok) {
                     const data = await res.json();
                     console.log(data);
-
+                    if(data != null){
+                        if(data[0].active != undefined){
+                            if(data[0].active == true){
+                                data[0].active = "Blocked";
+                            }
+                            else{
+                                data[0].active = "Not Blocked";
+                            }
+                    }}
                     if (this.selectedType === "service") {
                         this.data=data;
                         this.selector="table1";
@@ -123,6 +147,36 @@ const searchA = {
                             { "data": "dateofcompletion", "title": "date of Completion" },
                             { "data": "serviceStatus", "title": "Service Status" },
                             { "data": "feedback", "title": "FeedBack" },
+                        ];
+                    }
+                    else if(this.selectedType === "customer"){
+                        this.data=data;
+                        this.selector="table3";
+                        this.title="Customers";     
+                        this.columns=[
+                            { "data": "email", "title": "Email" },
+                            { "data": "name", "title": "Name" },
+                            { "data": "phone", "title": "Phone" },
+                            { "data": "address", "title": "Address" },
+                            { "data": "pincode", "title": "Pincode" },
+                            { "data": "active", "title": "Active" },
+                        ];
+                    }
+                    else if(this.selectedType === "professional"){
+                        this.data=data;
+                        this.selector="table4";
+                        this.title="Professionals";     
+                        this.columns=[
+                            { "data": "name", "title": "Name" },
+                            { "data": "email", "title": "Email" },
+                            { "data": "phone", "title": "Phone" },
+                            { "data": "serviceName", "title": "Service Name" },
+                            { "data": "serviceId", "title": "Service Id" },
+                            { "data": "serviceId", "title": "Service Id" },
+                            { "data": "experience", "title": "Experience" },
+                            { "data": "address", "title": "Address" },
+                            { "data": "pincode", "title": "Pincode" },
+                            { "data": "active", "title": "Active" },
                         ];
                     }
                 }else {
@@ -243,7 +297,7 @@ const searchA = {
                 
                 const index = this.data.findIndex(item => item.id === row.id);
                 if (index !== -1) {
-                     this.data[index].active = false; // Remove the row from the array
+                     this.data[index].active = "Blocked"; // Remove the row from the array
                 }
             })
             .catch(error => {
@@ -274,7 +328,7 @@ const searchA = {
                 // Find the index of the row in the relevant data array and remove it
                 const index = this.data.findIndex(item => item.id === row.id);
                 if (index !== -1) {
-                     this.data[index].active = true; // Remove the row from the array
+                     this.data[index].active = "Not Blocked"; // Remove the row from the array
                 }
             })
             .catch(error => {
@@ -301,10 +355,10 @@ const searchA = {
             })
             .then(data => {
                 console.log(data);
-                
+                const index = this.data.findIndex(item => item.id === row.id);
                 // Find the index of the row in the relevant data array and remove it
                 if (index !== -1) {
-                     this.data[index].active = false; // Remove the row from the array
+                     this.data[index].active = "Blocked"; // Remove the row from the array
                 }
             })
             .catch(error => {
@@ -333,7 +387,7 @@ const searchA = {
                 console.log(data);
                 const index = this.data.findIndex(item => item.id === row.id);
                 if (index !== -1) {
-                     this.data[index].active = true; // Remove the row from the array
+                     this.data[index].active = "Not Blocked"; // Remove the row from the array
                 }
             })
             .catch(error => {

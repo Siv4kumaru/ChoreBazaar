@@ -350,8 +350,18 @@ class searchall(Resource):
                     serviceName=service.name
                 requ={"id":req.id,"custemail":custemail,"proemail":proemail,"serviceName":serviceName,"dateofrequest":req.dateofrequest,"dateofcompletion":req.dateofcompletion,"serviceStatus":req.serviceStatus,"feedback":req.feedback}
                 list.append(requ)
+        if searchType=="customer":
+            customer=Customer.query.all()
+            for cus in customer:
+                user=User.query.filter_by(id=cus.userId).first()
+                list.append({"id":user.id,"name":cus.name,"email":user.email,"phone":cus.phone,"address":cus.address,"pincode":cus.pincode,"active":user.active})
             return list,200
-        
+        if searchType=="professional":
+            pro=Professional.query.all()
+            for p in pro:
+                user=User.query.filter_by(id=p.userId).first()
+                list.append({"id":user.id,"name":p.name,"email":user.email,"phone":p.phone,"address":p.address,"pincode":p.pincode,"serviceName":p.serviceName,"serviceId":p.serviceId,"experience":p.experience,"active":user.active})
+            return list,200
         
 
 api.add_resource(searchall,'/search/<string:searchType>/')
