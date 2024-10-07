@@ -352,7 +352,8 @@ class searchall(Resource):
                 user=User.query.filter_by(id=p.userId).first()
                 list.append({"id":user.id,"name":p.name,"email":user.email,"phone":p.phone,"address":p.address,"pincode":p.pincode,"serviceName":p.serviceName,"serviceId":p.serviceId,"experience":p.experience,"active":user.active})
             return list,200
-        
+
+
 
 api.add_resource(searchall,'/search/<string:searchType>/')
 api.add_resource(RequestIdsauce,'/requests/<int:id>')
