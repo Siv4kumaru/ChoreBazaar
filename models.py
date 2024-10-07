@@ -78,6 +78,7 @@ class ServiceRequest(db.Model):
     #if pro is deleted/blocked, it will be set to NULL and servicestatus will be set to "Profssional Blocked"
     serviceId=db.Column(db.Integer, db.ForeignKey('service.id', ondelete="SET NULL"))
     #if servieID is deleted /blocked, it will be set to NULL and servicestatus will be set to "cancelled request (by admin)"
+    approve=db.Column(db.String, default="Pending")
     dateofrequest=db.Column(db.String)
     dateofcompletion=db.Column(db.String)
     serviceStatus=db.Column(db.String)

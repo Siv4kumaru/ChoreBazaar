@@ -136,10 +136,20 @@ class ProfessionalSauce(Resource):
             list.append({"id":user.id,"name":p.name,"email":user.email,"phone":p.phone,"address":p.address,"pincode":p.pincode,"serviceName":p.serviceName,"serviceId":p.serviceId,"experience":p.experience,"active":user.active})
         return list,200
 
+class ProfessionalNameSauce(Resource):
+    @auth_required('token')
+    @roles_accepted('admin','customer')
+    def get(self,email):
+        user=User.query.filter_by(email=email).first()
+        if user is None:
+            return {"message":"User not found"},404
+        return {"name":Professional.query.filter_by(userId=user.id).first().name},200
 
+api.add_resource(ProfessionalNameSauce,'/professional/<string:email>')
+    
 class requestSauce(Resource):
     @auth_required('token')
-    @roles_accepted('admin')
+    @roles_accepted('admin','customer')
     def get(self):
         list=[]
         requests=ServiceRequest.query.all()
@@ -156,7 +166,7 @@ class requestSauce(Resource):
                 serviceName="Service Not Found"
             else:
                 serviceName=service.name
-            requ={"id":req.id,"custemail":custemail,"proemail":proemail,"serviceName":serviceName,"dateofrequest":req.dateofrequest,"dateofcompletion":req.dateofcompletion,"serviceStatus":req.serviceStatus,"feedback":req.feedback}
+            requ={"id":req.id,"custemail":custemail,"proemail":proemail,"serviceName":serviceName,"approve":req.approve,"dateofrequest":req.dateofrequest,"dateofcompletion":req.dateofcompletion,"serviceStatus":req.serviceStatus,"feedback":req.feedback}
             list.append(requ)
         return list,200
 

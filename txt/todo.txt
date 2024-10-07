@@ -1,5 +1,5 @@
 [ ] sign up has no email duplicate vaidation
-[ ] user userdatastore
+[ ] is service id deeleted in reques, service name should also be deleted
 [*] cust and pro must have active ban or unban status showing
 [*] service must have update
 [*] block and unblock only one should be there
