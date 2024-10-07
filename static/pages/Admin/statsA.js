@@ -5,8 +5,10 @@ const statsA = {
             <div class="col-8"><canvas id="myChart"></canvas></div>
             <div class="col-4"><canvas id="myChart2"></canvas></div>
             </div>
+        <br>
         <div class="row">
-            <div class="col-7"><canvas id="myChart3"></canvas></div>
+            <div class="col-8"><canvas id="myChart3"></canvas></div>
+
         </div>    
     </div>
     serviceName:{{serviceName}}
@@ -23,6 +25,11 @@ const statsA = {
             procount:0,
             custcount:0,
             servicecount:0,
+            bubbleData: [],
+            proexp:[],
+            proincome:[],
+            prorequestcount:[],
+            reqcount:[]
         };
     },
     async mounted(){
@@ -35,8 +42,11 @@ const statsA = {
         });
         if(req.ok){
             const reqdata=await req.json();
+            console.log(reqdata);
+
             var reqServCalled={};
             for (let i in reqdata){
+
                 if(reqServCalled[reqdata[i].serviceName]){
                     reqServCalled[reqdata[i].serviceName]+=1;
                 }
@@ -209,6 +219,14 @@ const statsA = {
           };
         new Chart($('#myChart3'), config2);
         //Polar area
+
+        //service price vs cust
+
+        
+
+        //service price vs cust
+
+ 
     }
 };
 
