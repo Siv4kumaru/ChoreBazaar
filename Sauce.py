@@ -21,6 +21,7 @@ patchParser.add_argument('id',type=int,required=True)
 patchParser.add_argument('name',type=str)
 patchParser.add_argument('description',type=str)
 patchParser.add_argument('price',type=float)
+patchParser.add_argument('approve',type=str)
 
 service_fields={
     'id':fields.Integer,
@@ -48,6 +49,7 @@ reqPostparser.add_argument('dateofcompletion', type=str)
 reqPostparser.add_argument('serviceStatus', type=str)
 reqPostparser.add_argument('feedback', type=str)
 
+
 reqPatchparser = reqparse.RequestParser()
 reqPatchparser.add_argument('id', type=int, required=True)
 reqPatchparser.add_argument('custEmail', type=str)
@@ -57,6 +59,7 @@ reqPatchparser.add_argument('serviceStatus', type=str)
 reqPatchparser.add_argument('dateofcompletion', type=str)
 reqPatchparser.add_argument('dateofrequest', type=str)
 reqPatchparser.add_argument('serviceStatus', type=str)
+reqPatchparser.add_argument('approve', type=str)
 
 custPatch = reqparse.RequestParser()
 custPatch.add_argument('id',type=int,required=True)
@@ -156,7 +159,6 @@ class requestSauce(Resource):
         if requests is None:
             return {"message":"No Requests"},404
         for req in requests:
-            id=req.id
             customeruserid=Customer.query.filter_by(id=req.customerId).first().userId
             prouserid=Professional.query.filter_by(id=req.professionalId).first().userId
             custemail=User.query.filter_by(id=customeruserid).first().email
@@ -166,7 +168,7 @@ class requestSauce(Resource):
                 serviceName="Service Not Found"
             else:
                 serviceName=service.name
-            requ={"id":req.id,"custemail":custemail,"proemail":proemail,"serviceName":serviceName,"approve":req.approve,"dateofrequest":req.dateofrequest,"dateofcompletion":req.dateofcompletion,"serviceStatus":req.serviceStatus,"feedback":req.feedback}
+            requ={"id":req.id,"custemail":custemail,"proemail":proemail,"serviceName":serviceName,"approve":req.approve,"dateofrequest":req.dateofrequest,"dateofcompletion":req.dateofcompletion,"serviceStatus":req.serviceStatus,"feedback":req.feedback,"approve":req.approve}  
             list.append(requ)
         return list,200
 
@@ -201,7 +203,7 @@ class requestSauce(Resource):
         return {"message":"Request Deleted"},200
     
     @auth_required('token')
-    @roles_accepted('admin')
+    @roles_accepted('admin','customer')
     def patch(self):
         args=reqPatchparser.parse_args()
         request=ServiceRequest.query.filter_by(id=args['id']).first()
@@ -241,6 +243,9 @@ class requestSauce(Resource):
         
         if args.get('dateofcompletion'):
             request.dateofcompletion = args['dateofcompletion']
+            
+        if args.get('approve'):
+            request.approve = args['approve']
 
         db.session.commit()
         return {"message":f"Request Updated"},200

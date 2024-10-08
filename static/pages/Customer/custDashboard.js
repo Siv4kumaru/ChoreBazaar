@@ -12,8 +12,7 @@ const custDashboard = {
       <commonTable v-if="this.columns[0]" :title="title[0]" :data="data[0]" :selector="selector[0]" :columns="columns[0]" >
           <template v-slot:actions="{ row }">
           <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
-          <button class="btn btn-danger btn-sm" @click="blockCus(row)" v-if="row.active">Block</button>
-          <button class="btn btn-warning btn-sm" @click="unblockCus(row)" v-if="!row.active">Unblock</button>
+          <button v-if="row.approve!='Customer Cancellation'" class="btn btn-danger btn-sm" @click="cancel(row)">Cancel</button>
           </template>
       </commonTable>
     </div>
@@ -28,55 +27,89 @@ const custDashboard = {
       columns:[]
     };
   },
-  async mounted() {
-    const res=await fetch(window.location.origin+"/api/services",{
-      headers:{
-        "Authentication-token":sessionStorage.getItem("token")
-      }
-    });
-    const res2=await fetch(window.location.origin+"/api/requests",{
-      headers:{
-        "Authentication-token":sessionStorage.getItem("token")
-        //name,email,phone,address,pincode, 
-      } 
-    });
-    if (res.ok) {
-    const data = await res.json();
-    this.allServices = data;
-    console.log(this.allServices);  
-    }
-    if (res2.ok) {
-      const data2 = await res2.json();
-      for(let i in data2){
-      if(data2[i]['custemail']==sessionStorage.getItem("email")){
-          console.log(data2);
-          const proName=await fetch(window.location.origin+"/api/professional/"+data2[i]['proemail'],{
-            headers:{
-              "Authentication-token":sessionStorage.getItem("token")
-            }
+  methods:{
+      async cancel(row){
+          const res = await fetch(window.location.origin + "/api/requests", {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              "Authentication-token": sessionStorage.getItem("token"),
+            },
+            body: JSON.stringify({
+              id: row.id,
+              approve: "Customer Cancellation",
+            })
           });
-          if(proName.ok){
-            const proData=await proName.json();
-            data2[i]['proName']=proData['name'];
+          if (res.ok) {
+            console.log("Request cancelled");
+            var ponse= await res.json();
+            console.log(ponse);
+            const tableIndex = 0; // Adjust this according to which table you're modifying
+            const index = this.data[tableIndex].findIndex(item => item.id === row.id);
+            if (index !== -1) {
+                this.data[tableIndex][index].approve="Customer Cancellation"; // Remove the row from the array
+            }
+          } else {
+            console.error("Error cancelling request", res.status);
           }
-          else{
-            data2[i]['proName']="Not Available";
-          } 
-          
-          this.columns.push([
-            {"data":"proemail","title":"Professional Email"},
-            {"data":"proName","title":"proName"},
-            {"data":"serviceName","title":"ServiceName"},
-            {"data":"dateofrequest","title":"Date of Request"},
-            {"data":"approve","title":"Approved"}
-            ]);
-          this.title.push("Requests");
-          this.data.push(data2);  
-          this.selector.push("professional");
-        }}
-
-    }
+      }
   },
+  async mounted() {
+    try {
+      const res = await fetch(window.location.origin + "/api/services", {
+        headers: {
+          "Authentication-token": sessionStorage.getItem("token"),
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        this.allServices = data;
+      } else {
+        console.error("Error fetching services", res.status);
+      }
+   
+      const res2 = await fetch(window.location.origin + "/api/requests", {
+        headers: {
+          "Authentication-token": sessionStorage.getItem("token"),
+        },
+      });
+      if (res2.ok) {
+        const data2 = await res2.json();
+        for (let i in data2) {
+          if (data2[i]["custemail"] == sessionStorage.getItem("email")) {
+            const proName = await fetch(window.location.origin + "/api/professional/" + data2[i]["proemail"], {
+              headers: {
+                "Authentication-token": sessionStorage.getItem("token"),
+              },
+            });
+            if (proName.ok) {
+              const proData = await proName.json();
+              data2[i]["proName"] = proData["name"];
+            } else {
+              data2[i]["proName"] = "Not Available";
+            }
+   
+            this.columns.push([
+              { data: "proemail", title: "Professional Email" },
+              { data: "proName", title: "Professional Name" },
+              { data: "serviceName", title: "Service Name" },
+              { data: "dateofrequest", title: "Date of Request" },
+              { data: "approve", title: "Approved" },
+            ]);
+   
+            this.title.push("Ongoing  Requests");
+            this.data.push(data2);
+            this.selector.push("Ongoing Requests");
+          }
+        }
+      } else {
+        console.error("Error fetching requests", res2.status);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+   },
+   
   components: { services, commonTable },
 };
 export default custDashboard;
