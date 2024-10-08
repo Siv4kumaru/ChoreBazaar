@@ -9,12 +9,23 @@ const custDashboard = {
         <services :name="service.name" :description="service.description" :price="service.price"></services>
       </div>
       </div>
-      <commonTable v-if="this.columns[0]" :title="title[0]" :data="data[0]" :selector="selector[0]" :columns="columns[0]" >
-          <template v-slot:actions="{ row }">
-          <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
-          <button v-if="row.approve!='Customer Cancellation'" class="btn btn-danger btn-sm" @click="cancel(row)">Cancel</button>
-          </template>
-      </commonTable>
+  
+<div v-if="data[0] && data[0][0]">
+
+  <commonTable :title="title[0]" :data="data[0]" :selector="selector[0]" :columns="columns[0]">
+        <template v-slot:actions="{ row }">
+        <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
+        <button v-if="row.approve!='Customer Cancellation'" class="btn btn-danger btn-sm" @click="cancel(row)">Cancel</button>
+        </template>
+  </commonTable>
+  <commonTable title='Rejected/Cancelled' :data="data[0]" :selector="selector[0]" :columns="columns[0]">
+        <template v-slot:actions="{ row }">
+        <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
+        <button v-if="row.approve!='Customer Cancellation'" class="btn btn-danger btn-sm" @click="cancel(row)">Cancel</button>
+        </template>
+  </commonTable>
+
+</div>
     </div>
   `,  
   data() {
