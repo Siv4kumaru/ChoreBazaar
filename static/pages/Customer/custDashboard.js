@@ -1,9 +1,10 @@
 import services from "../../components/services.js";
-import commonTable from "../../components/commonTable.js"; 
+import changedCommonTable from "../../components/changedCommonTable.js"; 
 
 const custDashboard = {
   template:`<div>
     <h1>Customer Dashboard</h1>
+    <button class="btn btn-primary" @click='history'>history</button>
       <div class="d-flex flex-row justify-content-center">
          <div v-for="service in allServices"  >
         <services :name="service.name" :description="service.description" :price="service.price"></services>
@@ -11,19 +12,19 @@ const custDashboard = {
       </div>
   
 <div v-if="data[0] && data[0][0]">
-
-  <commonTable :title="title[0]" :data="data[0]" :selector="selector[0]" :columns="columns[0]">
+  <!-- can also use (row) => row.approve === 'PendingOrAccepted' arrow function in condition , here in condition isPending without paranthesis is just passing a reference the function rather than actually invoking with paranthesis and all, no paranthesis function means reference being passed-->
+  <changedCommonTable  :condition="PendingOrAccepted"  :title="title[0]" :data="data[0]" :selector="selector[0]" :columns="columns[0]">
         <template v-slot:actions="{ row }">
         <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
         <button v-if="row.approve!='Customer Cancellation'" class="btn btn-danger btn-sm" @click="cancel(row)">Cancel</button>
         </template>
-  </commonTable>
-  <commonTable title='Rejected/Cancelled' :data="data[0]" :selector="selector[0]" :columns="columns[0]">
+  </changedCommonTable>
+  <changedCommonTable  :condition="Rejected"  title='Rejected/Cancelled' :data="data[0]" :selector="selector[0]" :columns="columns[0]">
         <template v-slot:actions="{ row }">
         <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
         <button v-if="row.approve!='Customer Cancellation'" class="btn btn-danger btn-sm" @click="cancel(row)">Cancel</button>
         </template>
-  </commonTable>
+  </changedCommonTable>
 
 </div>
     </div>
@@ -39,6 +40,15 @@ const custDashboard = {
     };
   },
   methods:{
+    history(){
+      this.$router.push({ name: 'historyC', query:{ data:JSON.stringify(this.data),columns:JSON.stringify(this.columns)}});
+    },
+    PendingOrAccepted(row) {
+      return row.approve === 'accepted' || row.approve === 'Pending';
+    },
+    Rejected(row) {
+      return row.approve === 'Customer Cancellation' || row.approve === 'Rejected';
+    },
       async cancel(row){
           const res = await fetch(window.location.origin + "/api/requests", {
             method: "PATCH",
@@ -121,6 +131,6 @@ const custDashboard = {
     }
    },
    
-  components: { services, commonTable },
+  components: { services, changedCommonTable },
 };
 export default custDashboard;

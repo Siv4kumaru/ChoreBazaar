@@ -7,7 +7,7 @@ import Logout from '../pages/logout.js'
 import store from '../utils/store.js' 
 import proDashboard from '../pages/Professional/proDashboard.js'
 import adminDashboard from '../pages/Admin/adminDashboard.js'
-import custDashboard from '../pages/Customer/custDashboard.js'
+import history from '../pages/Customer/history.js'
 import statsA from '../pages/Admin/statsA.js'
 import statsC from '../pages/Customer/statsC.js'
 import statsP from '../pages/Professional/statsP.js'
@@ -17,6 +17,7 @@ import searchP from '../pages/Professional/searchP.js'
 import EditService from '../pages/Admin/EditService.js'
 import addService from '../pages/Admin/addService.js'
 import EditRequest from '../pages/Admin/EditRequest.js'
+import custDashboard from '../pages/Customer/CustDashboard.js'
 
 const routes = [
     {path : '/', component: Home},
@@ -36,7 +37,8 @@ const routes = [
     {path : '/logout', component: Logout},
     {path: '/editService/:id',name:"editService",component: EditService, meta: { requiresLogin: true, role: "admin" }},
     {path: '/addService',name:"addService",component: addService, meta: { requiresLogin: true, role: "admin" }},
-    {path: '/editRequest/:id',name:"editRequest",component: EditRequest, meta: { requiresLogin: true, role: "admin" }}
+    {path: '/editRequest/:id',name:"editRequest",component: EditRequest, meta: { requiresLogin: true, role: "admin" }},
+    {path: '/Dashboard-Customer/history', name:"historyC",component: history , meta: { requiresLogin: true, role: "customer" }}
     ,
 
 ]
