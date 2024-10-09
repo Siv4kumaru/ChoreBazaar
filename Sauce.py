@@ -1,6 +1,7 @@
 from flask_restful import marshal_with,Resource,Api,fields,reqparse
 from flask_security import auth_required,roles_accepted
 from models import User,UserRoles,Service,ServiceRequest,Customer,Professional
+import logging
 from extensions import db
 
 
@@ -41,7 +42,7 @@ request_fields={
 }
 
 reqPostparser = reqparse.RequestParser()
-reqPostparser.add_argument('customerId', type=int, required=True)
+reqPostparser.add_argument('customerEmail', type=str, required=True)
 reqPostparser.add_argument('professionalId', type=int, required=True)
 reqPostparser.add_argument('serviceId', type=int, required=True)
 reqPostparser.add_argument('dateofrequest', type=str, required=True)
@@ -54,7 +55,6 @@ reqPatchparser = reqparse.RequestParser()
 reqPatchparser.add_argument('id', type=int, required=True)
 reqPatchparser.add_argument('custEmail', type=str)
 reqPatchparser.add_argument('proEmail', type=str)
-reqPatchparser.add_argument('serviceName', type=str)
 reqPatchparser.add_argument('serviceStatus', type=str)
 reqPatchparser.add_argument('dateofcompletion', type=str)
 reqPatchparser.add_argument('dateofrequest', type=str)
@@ -159,6 +159,7 @@ class requestSauce(Resource):
         if requests is None:
             return {"message":"No Requests"},404
         for req in requests:
+            
             customeruserid=Customer.query.filter_by(id=req.customerId).first().userId
             prouserid=Professional.query.filter_by(id=req.professionalId).first().userId
             custemail=User.query.filter_by(id=customeruserid).first().email
@@ -173,20 +174,26 @@ class requestSauce(Resource):
         return list,200
 
     @auth_required('token')
-    #@roles_accepted('customer')
+    @roles_accepted('customer')
     def post(self):
         args=reqPostparser.parse_args()
-        if ServiceRequest.query.filter_by(customerId=args['customerId']).first() is not None and ServiceRequest.query.filter_by(professionalId=args['professionalId']).first() is not None and ServiceRequest.query.filter_by(serviceId=args['serviceId']).first() is not None:
-            return {"message":"Request Already exists"},400
-        if args.get('customerId') and Customer.query.filter_by(id=args['customerId']).first() is None:
+        if args.get('customerEmail') and User.query.filter_by(email=args['customerEmail']).first() is None:
+            logging.error("customer does not exist")
             return {"message": "Customer does not exist"}, 400
 
-        if args.get('professionalId') and Professional.query.filter_by(id=args.get('professionalId')).first() is None:
+        proId=Professional.query.filter_by(userId=args['professionalId']).first().id
+        if args.get('professionalId') and User.query.filter_by(id=args.get('professionalId')).first() is None:
+            logging.error("professional does not exist")
             return {"message": "Professional does not exist"}, 400
 
         if args.get('serviceId') and Service.query.filter_by(id=args.get('serviceId')).first() is None:
-            return {"message": "Service does not exist"}, 400
-        request=ServiceRequest(**args)
+            logging.error("service does not exist")
+            return {"message": "Service does not exist"}, 407
+        custId=Customer.query.filter_by(userId=User.query.filter_by(email=args['customerEmail']).first().id).first().id
+        if ServiceRequest.query.filter_by(customerId=custId).first() is not None and ServiceRequest.query.filter_by(professionalId=proId).first() is not None and ServiceRequest.query.filter_by(serviceId=args['serviceId']).first() is not None:
+            logging.error("Request Already exists")
+            return {"message":"Request Already exists"},400
+        request=ServiceRequest(customerId=custId,professionalId=proId,serviceId=args['serviceId'],dateofrequest=args['dateofrequest'],dateofcompletion=args['dateofcompletion'],serviceStatus=args['serviceStatus'],feedback=args['feedback'])
         db.session.add(request)
         db.session.commit()
         return {"message":"Request Created"},200

@@ -20,13 +20,15 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
         if not password:
             return jsonify({"message":"Password is required"}),404
         
+        
         user=userdatastore.find_user(email=email)
-        print(user.get_auth_token())
-
+        if not user.active:
+            
+            return jsonify({"message":"user is flagged, kindly contact the admin"}),403
+    
         if not user:
             return jsonify({"message":"User not found"}),404
-        if not user.active:
-            return jsonify({"message":"user is flagged, kindly contact the admin"}),404
+
 
         if verify_password(password,user.password):
             return jsonify({"token": user.get_auth_token(),"role":user.roles[0].name,"id":user.id,email:user.email}),200
