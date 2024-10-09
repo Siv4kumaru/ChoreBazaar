@@ -1,6 +1,6 @@
 const services = {
     template: `
-      <div >
+      <div @click="goToSearch()">
         <div class="card shadow-sm p-4 mb-4 services-card " >
           <div class="card-body ">
             <h3 class="card-title text-center mb-3 text-primary text">{{ name }}</h3>
@@ -32,7 +32,9 @@ const services = {
       };
     },
     methods: {
-      
+      goToSearch(){
+        this.$router.push("/searchC");
+      }
     },
     mounted() {
       const style = document.createElement("style");

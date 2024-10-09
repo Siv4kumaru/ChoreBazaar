@@ -95,13 +95,12 @@ const searchA = {
             var type = this.selectedType;
             try {
                 const res = await fetch(window.location.origin + `/api/search/${type}/`, {
-                    method: 'GET',
                     headers: {
                         "Content-Type": "application/json",
                         "Authentication-token": sessionStorage.getItem("token"),
                     }
                 });
-                
+                console.log(res);
                 if (res.ok) {
                     const data = await res.json();
                     console.log(data);
@@ -169,7 +168,7 @@ const searchA = {
                         ];
                     }
                 }else {
-                    console.error("Failed to fetch data: ", res.statusText);
+                    console.error("Failed to fetch data : ", res.statusText);
                 }
             } catch (error) {
                 console.error("Error fetching data: ", error);

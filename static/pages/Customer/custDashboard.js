@@ -7,7 +7,7 @@ const custDashboard = {
     <button class="btn btn-primary" @click='history'>history</button>
       <div class="d-flex flex-row justify-content-center">
          <div v-for="service in allServices"  >
-        <services :name="service.name" :description="service.description" :price="service.price"></services>
+        <services :name="service.name" :description="service.description" :price="service.price" ></services>
       </div>
       </div>
   
@@ -40,6 +40,9 @@ const custDashboard = {
     };
   },
   methods:{
+    hi(){
+      console.log("hi");
+    },
     history(){
       this.$router.push({ name: 'historyC', params:{ data:JSON.stringify(this.data),columns:JSON.stringify(this.columns)}});
     },

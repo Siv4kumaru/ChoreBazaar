@@ -17,6 +17,11 @@ const history = {
         // Check local storage for existing values
         const savedColumns = localStorage.getItem('historyColumns');
         const savedData = localStorage.getItem('historyData');
+        if(savedColumns==[]){
+        if (savedColumns.some(col => col.data === "dateofcompletion" && col.title === "Date of Completion")) {
+            // Add the column if it does not exist
+            savedColumns.splice(4, 0, { data: "dateofcompletion", title: "Date of Completion" });
+        }}  
 
         if (savedColumns) {
             this.columns = JSON.parse(savedColumns);
@@ -32,12 +37,10 @@ const history = {
     },
 
     mounted() {
-        console.log(this.columns);
-        this.columns.splice(4, 0, { data: "dateofcompletion", title: "Date of Completion" });
-
         // Save columns and data to local storage
         localStorage.setItem('historyColumns', JSON.stringify(this.columns));
         localStorage.setItem('historyData', JSON.stringify(this.data));
+
     },
 
     beforeRouteLeave(to, from, next) {
