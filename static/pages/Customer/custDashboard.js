@@ -41,7 +41,7 @@ const custDashboard = {
   },
   methods:{
     history(){
-      this.$router.push({ name: 'historyC', query:{ data:JSON.stringify(this.data),columns:JSON.stringify(this.columns)}});
+      this.$router.push({ name: 'historyC', params:{ data:JSON.stringify(this.data),columns:JSON.stringify(this.columns)}});
     },
     PendingOrAccepted(row) {
       return row.approve === 'accepted' || row.approve === 'Pending';
