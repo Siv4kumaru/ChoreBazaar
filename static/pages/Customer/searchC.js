@@ -3,8 +3,8 @@ const searchC = {
     template:`
     <div>
     <h1>Search</h1>
-    <br>    
-        <select class="form-select" aria-label="Disabled select example" disabled>
+    <br>  
+        <select  disabled>
         <option selected>professional</option>
         </select>
         <input v-model="queryy" type="text" placeholder="Search.." id="query" name="query" @keyup="eachkey()">
@@ -48,6 +48,22 @@ const searchC = {
         }
     },
     methods:{
+        async custId(){
+            console.log(sessionStorage.getItem("email"));
+            const res = await fetch(window.location.origin +`/api/customer/${sessionStorage.getItem("email")}`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authentication-token": sessionStorage.getItem("token"),
+                }
+            });
+            if(res.ok){
+                const data = await res.json();
+                console.log(data);
+                return data;}
+            else{
+                console.error("Failed to fetch data: ", res.statusText);
+            }
+        },
         async eachkey(){
             var query = $("#query").val().toLowerCase();
             $("#table tbody tr").filter(function() {
@@ -81,8 +97,11 @@ const searchC = {
                                 data[0].active = "Not Blocked";
                             }
                     }}
-
+                        var cust= await this.custId();
                         this.data=data;
+                        for(var i in this.data){
+                            this.data[i] = {...this.data[i], ...cust};      
+                      }
                         this.selector="table";
                         this.title="Professionals";     
                         this.columns=[
@@ -95,7 +114,6 @@ const searchC = {
                             { "data": "pincode", "title": "Pincode" },
 
                         ];
-                        console.log(this.data);
                     
                 }else {
                     console.error("Failed to fetch data: ", res.statusText);
@@ -125,8 +143,8 @@ const searchC = {
                     "Authentication-token": sessionStorage.getItem("token"),
                 },
                 body: JSON.stringify({
-                    "customerEmail": sessionStorage.getItem("email"),
-                    "professionalId": row.id,
+                    "customerId": row.custId,
+                    "proUserId": row.id,
                     "dateofrequest": new Date().toISOString(),
                     "dateofcompletion": null,
                     "serviceId": row.serviceId
