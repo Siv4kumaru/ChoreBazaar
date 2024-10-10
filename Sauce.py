@@ -42,7 +42,7 @@ request_fields={
 }
 
 reqPostparser = reqparse.RequestParser()
-reqPostparser.add_argument('customerId', type=int, required=True)
+reqPostparser.add_argument('customerEmail', type=str, required=True)
 reqPostparser.add_argument('proUserId', type=int, required=True)
 reqPostparser.add_argument('serviceId', type=int, required=True)
 reqPostparser.add_argument('dateofrequest', type=str, required=True)
@@ -177,7 +177,7 @@ class requestSauce(Resource):
     @roles_accepted('customer')
     def post(self):
         args=reqPostparser.parse_args()
-        if args.get('customerId') and Customer.query.filter_by(id=args['customerId']).first() is None:
+        if args.get('customerEmail') and User.query.filter_by(email=args['customerEmail']).first() is None:
             logging.error("customer does not exist")
             return {"message": "Customer does not exist"}, 400
 
@@ -189,10 +189,11 @@ class requestSauce(Resource):
         if args.get('serviceId') and Service.query.filter_by(id=args.get('serviceId')).first() is None:
             logging.error("service does not exist")
             return {"message": "Service does not exist"}, 407
-        if ServiceRequest.query.filter_by(customerId=args.get('customerId')).first() is not None and ServiceRequest.query.filter_by(professionalId=proId).first() is not None and ServiceRequest.query.filter_by(serviceId=args['serviceId']).first() is not None:
+        custId=Customer.query.filter_by(userId=User.query.filter_by(email=args['customerEmail']).first().id).first().id
+        if ServiceRequest.query.filter_by(customerId=custId).first() is not None and ServiceRequest.query.filter_by(professionalId=proId).first() is not None and ServiceRequest.query.filter_by(serviceId=args['serviceId']).first() is not None :
             logging.error("Request Already exists")
             return {"message":"Request Already exists"},400
-        request=ServiceRequest(customerId=args.get('customerId'),professionalId=proId,serviceId=args['serviceId'],dateofrequest=args['dateofrequest'],dateofcompletion=args['dateofcompletion'],serviceStatus=args['serviceStatus'],feedback=args['feedback'])
+        request=ServiceRequest(customerId=custId,professionalId=proId,serviceId=args['serviceId'],dateofrequest=args['dateofrequest'],dateofcompletion=args['dateofcompletion'],serviceStatus=args['serviceStatus'],feedback=args['feedback'])
         db.session.add(request)
         db.session.commit()
         return {"message":"Request Created"},200

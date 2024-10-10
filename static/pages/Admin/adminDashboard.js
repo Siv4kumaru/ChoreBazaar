@@ -288,6 +288,7 @@
             const res=await fetch(window.location.origin+`/api/customer`,{
                 method: "GET", 
                 headers:{
+                    
                     "Authentication-token":sessionStorage.getItem("token")
                 }, 
             });

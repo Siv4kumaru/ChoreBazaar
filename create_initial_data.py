@@ -32,9 +32,9 @@ def create_data(user_datastore:SQLAlchemyUserDatastore):
         ac_mechanic=Service(name="AC Mechanic",description="AC Mechanic",price=1000)
         db.session.add(ac_mechanic)
 
-    if not ServiceRequest.query.filter_by(customerId=1).first():
-        service_request=ServiceRequest(customerId=1,professionalId=1,serviceId=1,dateofrequest="2024-02-02",dateofcompletion="2024-02-02",serviceStatus="ongoing",feedback="good")
-        db.session.add(service_request)
+    # if not ServiceRequest.query.filter_by(customerId=1).first():
+    #     service_request=ServiceRequest(customerId=1,professionalId=1,serviceId=1,dateofrequest="2024-02-02",dateofcompletion="2024-02-02",serviceStatus="ongoing",feedback="good")
+    #     db.session.add(service_request)
         
 
 
