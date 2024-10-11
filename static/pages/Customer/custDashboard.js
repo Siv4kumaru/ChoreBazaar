@@ -6,9 +6,9 @@ const custDashboard = {
     <h1>Customer Dashboard</h1>
     <button class="btn btn-primary" @click='history'>history</button>
       <div class="d-flex flex-row justify-content-center">
-         <div v-for="service in allServices"  >
+        <div v-for="service in allServices">
         <services :name="service.name" :description="service.description" :price="service.price" ></services>
-      </div>
+        </div>
       </div>
   
 <div v-if="data[0] && data[0][0]">
@@ -79,6 +79,7 @@ const custDashboard = {
       }
   },
   async mounted() {
+    var clean=[];
     try {
       const res = await fetch(window.location.origin + "/api/services", {
         headers: {
@@ -98,34 +99,41 @@ const custDashboard = {
         },
       });
       if (res2.ok) {
-        const data2 = await res2.json();
+        var data2 = await res2.json();
+        console.log(data2); 
         for (let i in data2) {
+
           if (data2[i]["custemail"] == sessionStorage.getItem("email")) {
             const proName = await fetch(window.location.origin + "/api/professional/" + data2[i]["proemail"], {
               headers: {
                 "Authentication-token": sessionStorage.getItem("token"),
-              },
+              },  
             });
             if (proName.ok) {
+              clean.push(data2[i]);
               const proData = await proName.json();
               data2[i]["proName"] = proData["name"];
             } else {
               data2[i]["proName"] = "Not Available";
             }
-   
-            this.columns.push([
-              { data: "proemail", title: "Professional Email" },
-              { data: "proName", title: "Professional Name" },
-              { data: "serviceName", title: "Service Name" },
-              { data: "dateofrequest", title: "Date of Request" },
-              { data: "approve", title: "Approved" },
-            ]);
-   
-            this.title.push("Ongoing  Requests");
-            this.data.push(data2);
-            this.selector.push("Ongoing Requests");
+            
+            
           }
+
         }
+        this.columns.push([
+          { data: "proemail", title: "Professional Email" },
+          { data: "proName", title: "Professional Name" },
+          { data: "serviceName", title: "Service Name" },
+          { data: "dateofrequest", title: "Date of Request" },
+          { data: "approve", title: "Approved" },
+        ]);
+
+
+        this.data.push(clean);   
+         
+        this.title.push("Ongoing  Requests");
+        this.selector.push("Ongoing Requests");
       } else {
         console.error("Error fetching requests", res2.status);
       }

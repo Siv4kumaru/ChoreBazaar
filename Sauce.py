@@ -192,7 +192,6 @@ class requestSauce(Resource):
         pro=Professional.query.filter_by(userId=args['proUserId']).first()
         if pro:
             proId=pro.id
-            print(proId)
         else:
             return {"message":"Professional does not exist"},400
         if args.get('proUserId') and proId is None:
@@ -208,7 +207,6 @@ class requestSauce(Resource):
         request=ServiceRequest(customerId=args['customerId'],professionalId=proId,serviceId=args['serviceId'],dateofrequest=args['dateofrequest'],dateofcompletion=args['dateofcompletion'],serviceStatus=args['serviceStatus'],feedback=args['feedback'])
         db.session.add(request)
         db.session.commit()
-        print("commited")
         return {"message":"Request Created"},200
     
     @auth_required('token')
@@ -397,7 +395,22 @@ class custEmail(Resource):
             return {"message":"User not found"},404
         cust=Customer.query.filter_by(userId=user.id).first()
         return {"custId":cust.id,"custUserID":cust.userId},200
+    
+class proReqCustDate(Resource):
+    @auth_required('token')
+    @roles_accepted('admin','customer')
+    def get(self):
+        req=ServiceRequest.query.all()
 
+class req(Resource):
+    @auth_required('token')
+    @roles_accepted('admin','customer')
+    @marshal_with(request_fields)
+    def get(self):
+        req=ServiceRequest.query.all()
+        return req,200
+    
+api.add_resource(req,'/requests_proper')
 api.add_resource(custEmail,'/customer/<string:email>')
 api.add_resource(searchall,'/search/<string:searchType>/')
 api.add_resource(RequestIdsauce,'/requests/<int:id>')
