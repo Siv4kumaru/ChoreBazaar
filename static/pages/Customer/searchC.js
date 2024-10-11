@@ -50,6 +50,7 @@ const searchC = {
     },
     methods:{
         async custId(){
+            console.log(sessionStorage.getItem("email"));
             const res = await fetch(window.location.origin +`/api/customer/${sessionStorage.getItem("email")}`, {
                 headers: {
                     "Content-Type": "application/json",
@@ -58,6 +59,7 @@ const searchC = {
             });
             if(res.ok){
                 const data = await res.json();
+                console.log(data);
                 return data;}
             else{
                 console.error("Failed to fetch data: ", res.statusText);
@@ -71,28 +73,19 @@ const searchC = {
             console.log(query);
 
         },
-        async req2(){
-            const req2 = await fetch(window.location.origin + `/api/requests` , {
-                method: 'GET',
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authentication-token": sessionStorage.getItem("token"),
-                },
-                
-            });
-            if (req2.ok) {
-                const data = await req2.json();
-                return data;
-            } else {
-                console.error("Failed to fetch data: ", req2.statusText);
-            }
-        },
         async cat(){
 
             $("#query").val("");    
             
             try {
-                const res = await fetch(window.location.origin + `/api/professional` , {
+                const res = await fetch(window.location.origin + `/api/professional`, {
+                    method: 'GET',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authentication-token": sessionStorage.getItem("token"),
+                    }
+                });
+                const req2= await fetch(window.location.origin + `/api/requests`, {
                     method: 'GET',
                     headers: {
                         "Content-Type": "application/json",
@@ -102,25 +95,23 @@ const searchC = {
                 
                 if (res.ok) {
                     const data = await res.json();
-                    var req2=await this.req2();
+                    
                     if(data != null){
-                        for(let i in data){
-                            if(data[i].active==false){
-                                data.splice(i,1);}
-                        }
-                    }
-                        console.log(data);
-                        //remove the alredy booked professionals
-                        for(let i in data){
-                            for (let j in req2){
-                                if(data[i]){
-                                if((data[i].email==req2[j].proemail) && (req2[j].custemail==sessionStorage.getItem("email"))){
-                                    data.splice(i,1);
-                                    console.log("removed");
-                                }}
+                        if(data[0].active != undefined){
+                            if(data[0].active == true){
+                                data[0].active = "Blocked";
                             }
-                  }
+                            else{
+                                data[0].active = "Not Blocked";
+                            }
+                    }}
+
+                        var cust= await this.custId();
                         this.data=data;
+                        for(var i in this.data){
+                            this.data[i] = {...this.data[i], ...cust};      
+                      }
+
                         this.selector="table";
                         this.title="Professionals";     
                         this.columns=[
@@ -154,29 +145,37 @@ const searchC = {
             const modal = new bootstrap.Modal(document.getElementById('viewModal'));
             modal.show();
         },
-        async bookPro(row){   
+        async bookPro(row){  
             console.log(row);
-            this.req = await fetch(window.location.origin + "/api/requests", {
+            var currentdate = new Date(); 
+            var datetime = currentdate.getDate() + "/"
+                + (currentdate.getMonth()+1)  + "/" 
+                + currentdate.getFullYear() + " @ "  
+                + currentdate.getHours() + ":"  
+                + currentdate.getMinutes() + ":" 
+                + currentdate.getSeconds(); 
+            const req = await fetch(window.location.origin + "/api/requests", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Authentication-token": sessionStorage.getItem("token"),
                 },
                 body: JSON.stringify({
-                    "customerEmail": sessionStorage.getItem("email"),
-                    "proUserId": row.proid,
-                    "dateofrequest": new Date().toISOString(),
-                    "dateofcompletion": null,
-                    "serviceId": row.serviceId
+                    "customerId": row.custId,
+                    "proUserId": row.proUserId,
+                    "serviceId": row.serviceId,
+                    "dateofrequest": datetime,
+                    "dateofcompletion": "35682",
+                    
                 })
             });
-            if (this.req.ok) {
+            if (req.ok) {
                 console.log("Request added");
                 const response = await req.json();
                 console.log(response);
                 this.$router.push("/Dashboard-Customer");
             } else {
-                const errorData = await this.req.json(); // Parse the JSON error response
+                const errorData = await req.json(); // Parse the JSON error response
                 console.error("Error:", errorData.message);
             }
         }

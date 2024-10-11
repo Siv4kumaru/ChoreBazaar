@@ -42,7 +42,7 @@ request_fields={
 }
 
 reqPostparser = reqparse.RequestParser()
-reqPostparser.add_argument('customerEmail', type=str, required=True)
+reqPostparser.add_argument('customerId', type=int, required=True)
 reqPostparser.add_argument('proUserId', type=int, required=True)
 reqPostparser.add_argument('serviceId', type=int, required=True)
 reqPostparser.add_argument('dateofrequest', type=str, required=True)
@@ -156,12 +156,20 @@ class requestSauce(Resource):
     def get(self):
         list=[]
         requests=ServiceRequest.query.all()
+        
         if requests is None:
             return {"message":"No Requests"},404
         for req in requests:
-            
-            customeruserid=Customer.query.filter_by(id=req.customerId).first().userId
-            prouserid=Professional.query.filter_by(id=req.professionalId).first().userId
+            customeruser=Customer.query.filter_by(id=req.customerId).first()
+            if customeruser is None:
+                logging.error("Customer does not exist")
+                return {"message": "Customer does not exist"}, 400
+            customeruserid=customeruser.userId
+            prouser=Professional.query.filter_by(id=req.professionalId).first().userId
+            if prouser is None:
+                logging.error("Professional does not exist")
+                return {"message": "Professional does not exist"}, 400
+            prouserid=prouser
             custemail=User.query.filter_by(id=customeruserid).first().email
             proemail=User.query.filter_by(id=prouserid).first().email
             service=Service.query.filter_by(id=req.serviceId).first()
@@ -177,11 +185,16 @@ class requestSauce(Resource):
     @roles_accepted('customer')
     def post(self):
         args=reqPostparser.parse_args()
-        if args.get('customerEmail') and User.query.filter_by(email=args['customerEmail']).first() is None:
+        if args.get('customerId') and User.query.filter_by(id=args['customerId']).first() is None:
             logging.error("customer does not exist")
             return {"message": "Customer does not exist"}, 400
 
-        proId=Professional.query.filter_by(userId=args['proUserId']).first().id
+        pro=Professional.query.filter_by(userId=args['proUserId']).first()
+        if pro:
+            proId=pro.id
+            print(proId)
+        else:
+            return {"message":"Professional does not exist"},400
         if args.get('proUserId') and proId is None:
             logging.error("professional does not exist")
             return {"message": "Professional does not exist"}, 400
@@ -189,13 +202,13 @@ class requestSauce(Resource):
         if args.get('serviceId') and Service.query.filter_by(id=args.get('serviceId')).first() is None:
             logging.error("service does not exist")
             return {"message": "Service does not exist"}, 407
-        custId=Customer.query.filter_by(userId=User.query.filter_by(email=args['customerEmail']).first().id).first().id
-        if ServiceRequest.query.filter_by(customerId=custId).first() is not None and ServiceRequest.query.filter_by(professionalId=proId).first() is not None and ServiceRequest.query.filter_by(serviceId=args['serviceId']).first() is not None :
+        if ServiceRequest.query.filter_by(customerId=args['customerId']).first() is not None and ServiceRequest.query.filter_by(professionalId=proId).first() is not None and ServiceRequest.query.filter_by(serviceId=args['serviceId']).first() is not None :
             logging.error("Request Already exists")
             return {"message":"Request Already exists"},400
-        request=ServiceRequest(customerId=custId,professionalId=proId,serviceId=args['serviceId'],dateofrequest=args['dateofrequest'],dateofcompletion=args['dateofcompletion'],serviceStatus=args['serviceStatus'],feedback=args['feedback'])
+        request=ServiceRequest(customerId=args['customerId'],professionalId=proId,serviceId=args['serviceId'],dateofrequest=args['dateofrequest'],dateofcompletion=args['dateofcompletion'],serviceStatus=args['serviceStatus'],feedback=args['feedback'])
         db.session.add(request)
         db.session.commit()
+        print("commited")
         return {"message":"Request Created"},200
     
     @auth_required('token')
