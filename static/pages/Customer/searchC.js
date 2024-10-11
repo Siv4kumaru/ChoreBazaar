@@ -51,7 +51,6 @@
         },
         methods:{
             async custId(){
-                console.log(sessionStorage.getItem("email"));
                 const res = await fetch(window.location.origin +`/api/customer/${sessionStorage.getItem("email")}`, {
                     headers: {
                         "Content-Type": "application/json",
@@ -201,23 +200,25 @@
                         "Authentication-token": sessionStorage.getItem("token"),
                     }
                 });
-                const res4 = await fetch(window.location.origin + `/api/services`, {
-                    method: 'GET',
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authentication-token": sessionStorage.getItem("token"),
-                    }
-                });
+
                 
                 if(res1.ok && res2.ok && res3.ok){
                     const pro = await res1.json();
                     const req = await res2.json();
                     const cust = await res3.json();
-                    const serv = await res4.json();
-                    console.log(pro,req,cust,serv);
+                    var custId=await this.custId();
                     for(let i in req){
-                        console.log(req[i]);
+                        if((req[i].customerId==custId.custId)){
+                            //owner specific 
+                            for(let j in pro){
+                                if(pro[j].proid==req[i].professionalId){
+                                    console.log(pro[j]);
+                                }
+                            }
+                            
+                        }
                     }
+
                     //dsa time, if pro and cust and service
                     //time next
                 }
