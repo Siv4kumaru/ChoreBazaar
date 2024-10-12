@@ -126,6 +126,7 @@ const custDashboard = {
           { data: "proName", title: "Professional Name" },
           { data: "serviceName", title: "Service Name" },
           { data: "dateofrequest", title: "Date of Request" },
+          { data: "servicePrice", title: "Service Price" },
           { data: "approve", title: "Approved" },
         ]);
 

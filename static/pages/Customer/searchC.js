@@ -83,24 +83,20 @@
                             "Authentication-token": sessionStorage.getItem("token"),
                         }
                     });
-
-                    
                     if (res.ok) {
                         const DATA=[];
                         const data = await res.json();
                         await this.prodisplay();
                         for(var i in data){
-
                             if(!(this.noProId.includes(data[i].proid)) && data[i].active==1){
                                 DATA.push(data[i]);
                             }
                         }   
                             var cust= await this.custId();
-                            this.data=DATA;
+                            this.data=data;
                             for(var i in this.data){
                                 this.data[i] = {...this.data[i], ...cust};      
                         }
-
                             this.selector="table";
                             this.title="Professionals";     
                             this.columns=[
@@ -109,6 +105,7 @@
                                 { "data": "phone", "title": "Phone" },
                                 { "data": "serviceName", "title": "Service Name" },
                                 { "data": "experience", "title": "Experience" },
+                                { "data": "servicePrice","title":"Service Price"},
                                 { "data": "address", "title": "Address" },
                                 { "data": "pincode", "title": "Pincode" },
 
@@ -136,13 +133,7 @@
             },  
                 async bookPro(row){  
                     try {
-                        var currentdate = new Date(); 
-                        var datetime = currentdate.getDate() + "/"
-                            + (currentdate.getMonth()+1)  + "/" 
-                            + currentdate.getFullYear() + " @ "  
-                            + currentdate.getHours() + ":"  
-                            + currentdate.getMinutes() + ":" 
-                            + currentdate.getSeconds(); 
+
                 
                         const req = await fetch(window.location.origin + "/api/requests", {
                             method: "POST",
@@ -154,8 +145,6 @@
                                 "customerId": row.custId,
                                 "proUserId": row.proUserId,
                                 "serviceId": row.serviceId,
-                                "dateofrequest": datetime,
-                                "dateofcompletion": "35682",
                             })
                         });
                 
@@ -207,7 +196,7 @@
                         if((req[i].customerId==custId.custId)){
                             //owner specific 
                             for(let j in pro){
-                                if(pro[j].proid==req[i].professionalId){
+                                if((pro[j].proid==req[i].professionalId)){
                                 this.noProId.push(pro[j].proid);
                                 }
                             }

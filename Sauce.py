@@ -3,6 +3,7 @@ from flask_security import auth_required,roles_accepted
 from models import User,UserRoles,Service,ServiceRequest,Customer,Professional
 import logging
 from extensions import db
+from datetime import datetime,timedelta
 
 
 api=Api(prefix='/api')
@@ -45,7 +46,7 @@ reqPostparser = reqparse.RequestParser()
 reqPostparser.add_argument('customerId', type=int, required=True)
 reqPostparser.add_argument('proUserId', type=int, required=True)
 reqPostparser.add_argument('serviceId', type=int, required=True)
-reqPostparser.add_argument('dateofrequest', type=str, required=True)
+reqPostparser.add_argument('dateofrequest', type=str)
 reqPostparser.add_argument('dateofcompletion', type=str)
 reqPostparser.add_argument('serviceStatus', type=str)
 reqPostparser.add_argument('feedback', type=str)
@@ -133,10 +134,15 @@ class ProfessionalSauce(Resource):
         list=[]
         pro=Professional.query.all()
         if pro is None :
-            return {"message":"No Customer Left"},404
+            return {"message":"No Pro Left"},404
         for p in pro:
             user=User.query.filter_by(id=p.userId).first()
-            list.append({"proid":p.id,"proUserId":user.id,"name":p.name,"email":user.email,"phone":p.phone,"address":p.address,"pincode":p.pincode,"serviceName":p.serviceName,"serviceId":p.serviceId,"experience":p.experience,"active":user.active})
+            serv=Service.query.filter_by(id=p.serviceId).first()
+            if serv is None:
+                servicePrice="Service Not Found"
+            else:
+                servicePrice=serv.price
+            list.append({"proid":p.id,"proUserId":user.id,"name":p.name,"servicePrice":servicePrice,"email":user.email,"phone":p.phone,"address":p.address,"pincode":p.pincode,"serviceName":p.serviceName,"serviceId":p.serviceId,"experience":p.experience,"active":user.active})
         return list,200
 
 class ProfessionalNameSauce(Resource):
@@ -175,39 +181,67 @@ class requestSauce(Resource):
             service=Service.query.filter_by(id=req.serviceId).first()
             if service is None:
                 serviceName="Service Not Found"
+                servicePrice=-1
             else:
                 serviceName=service.name
-            requ={"id":req.id,"custemail":custemail,"proemail":proemail,"serviceName":serviceName,"approve":req.approve,"dateofrequest":req.dateofrequest,"dateofcompletion":req.dateofcompletion,"serviceStatus":req.serviceStatus,"feedback":req.feedback,"approve":req.approve}  
+                servicePrice=service.price
+            requ={"id":req.id,"custemail":custemail,"proemail":proemail,"serviceName":serviceName,"servicePrice":servicePrice,"approve":req.approve,"dateofrequest":req.dateofrequest,"dateofcompletion":req.dateofcompletion,"serviceStatus":req.serviceStatus,"feedback":req.feedback,"approve":req.approve}  
             list.append(requ)
         return list,200
 
     @auth_required('token')
-    @roles_accepted('customer')
+    @roles_accepted('customer') 
     def post(self):
-        args=reqPostparser.parse_args()
-        if args.get('customerId') and User.query.filter_by(id=args['customerId']).first() is None:
-            logging.error("customer does not exist")
+        args = reqPostparser.parse_args()
+
+        # Check if customer exists
+        customer = User.query.filter_by(id=args['customerId']).first()
+        if not customer:
+            logging.error(f"Customer with ID {args['customerId']} does not exist.")
             return {"message": "Customer does not exist"}, 400
 
-        pro=Professional.query.filter_by(userId=args['proUserId']).first()
-        if pro:
-            proId=pro.id
-        else:
-            return {"message":"Professional does not exist"},400
-        if args.get('proUserId') and proId is None:
-            logging.error("professional does not exist")
+        # Check if professional exists
+        pro = Professional.query.filter_by(userId=args['proUserId']).first()
+        if not pro:
+            logging.error(f"Professional with User ID {args['proUserId']} does not exist.")
             return {"message": "Professional does not exist"}, 400
 
-        if args.get('serviceId') and Service.query.filter_by(id=args.get('serviceId')).first() is None:
-            logging.error("service does not exist")
+        # Check if service exists
+        service = Service.query.filter_by(id=args.get('serviceId')).first()
+        if not service:
+            logging.error(f"Service with ID {args['serviceId']} does not exist.")
             return {"message": "Service does not exist"}, 407
-        if ServiceRequest.query.filter_by(customerId=args['customerId']).first() is not None and ServiceRequest.query.filter_by(professionalId=proId).first() is not None and ServiceRequest.query.filter_by(serviceId=args['serviceId']).first() is not None :
-            logging.error("Request Already exists")
-            return {"message":"Request Already exists"},400
-        request=ServiceRequest(customerId=args['customerId'],professionalId=proId,serviceId=args['serviceId'],dateofrequest=args['dateofrequest'],dateofcompletion=args['dateofcompletion'],serviceStatus=args['serviceStatus'],feedback=args['feedback'])
-        db.session.add(request)
+
+        # Check if there's an existing request
+        existing_request = ServiceRequest.query.filter_by(
+            customerId=args['customerId'],
+            professionalId=pro.id,
+            serviceId=args['serviceId']
+        ).all()
+
+        for request in existing_request:
+            if request.approve == "Pending":
+                return {"message": "Request approval by pro is pending."}, 400
+            if request.approve == "customer Cancellation":
+                return {"message": "Wait"}, 400     
+
+        # Create a new request
+        new_request = ServiceRequest(
+            customerId=args['customerId'],
+            professionalId=pro.id,
+            serviceId=args['serviceId'],
+            dateofrequest=datetime.now(),
+            dateofcompletion=args['dateofcompletion'],
+            serviceStatus=args['serviceStatus'],
+            feedback=args['feedback']
+        )
+        
+        db.session.add(new_request)
         db.session.commit()
-        return {"message":"Request Created"},200
+
+        logging.info(f"Service request created successfully for customer ID {args['customerId']}.")
+        return {"message": "Request created"}, 200
+
     
     @auth_required('token')
     @roles_accepted('admin')
