@@ -86,25 +86,12 @@
 
                     
                     if (res.ok) {
-                        const data = await res.json();
-
-                        if(data != null){
-                            if(data[0].active != undefined){
-                                if(data[0].active == true){
-                                    data[0].active = "Blocked";
-                                }
-                                else{
-                                    data[0].active = "Not Blocked";
-                                }
-                        }}
-                        
-                        await this.prodisplay();
                         const DATA=[];
+                        const data = await res.json();
+                        await this.prodisplay();
                         for(var i in data){
-                            console.log(data[i].proid);
-                            console.log(this.noProId);
-                            if(!(this.noProId.includes(data[i].proid))){
-                                console.log("Already not Booked:"+data[i].proid);
+
+                            if(!(this.noProId.includes(data[i].proid)) && data[i].active==1){
                                 DATA.push(data[i]);
                             }
                         }   
