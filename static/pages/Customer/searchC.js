@@ -1,4 +1,5 @@
     import changedCommonTable  from "../../components/changedCommonTable.js";
+import services from "../../components/services.js";
     const searchC = {
         template:`
         <div>
@@ -7,7 +8,14 @@
             <select  disabled>
             <option selected>professional</option>
             </select>
-            <input v-model="queryy" type="text" placeholder="Search.." id="query" name="query" @keyup="eachkey()">
+          <select v-model="service" @change="filterTable()">
+            <option value="" disabled selected>Service Type</option>
+            <option v-for="service in services" :key="service.id" :value="service.name">
+              {{ service.name }}
+            </option>
+          </select>
+
+            <input v-model="queryy" type="text" placeholder="Search.." id="query" name="query" @keyup="filterTable()">
             <button><i class="fa-solid fa-magnifying-glass"></i></button>
             <br>
             <br>
@@ -40,16 +48,35 @@
         data() {
             return {
                 req:null,
+                services: [],
                 queryy:'',
                 data:null,
                 selector:'',
                 title:'',
+                service:'',
                 columns:null,
                 viewRow: {},
                 noProId:[],
             }
-        },
+        },  
         methods:{
+            filterTable() {
+                const selectedService = this.service.toLowerCase(); // Get the selected service
+                const query = $("#query").val().toLowerCase(); // Get the search query
+            
+                // Use jQuery to filter the table rows based on both conditions
+                $("#table tbody tr").filter(function() {
+                    const serviceName = $(this).find("td").eq(3).text().toLowerCase(); // Assuming service name is in the 4th column (index 3)
+                    const rowText = $(this).text().toLowerCase(); // Text content of the row
+            
+                    // Toggle row visibility based on both service dropdown and search query
+                    const matchesService = selectedService === '' || serviceName.includes(selectedService);
+                    const matchesQuery = query === '' || rowText.indexOf(query) > -1;
+            
+                    $(this).toggle(matchesService && matchesQuery); // Only show rows that match both conditions
+                });
+            },
+
             async custId(){
                 const res = await fetch(window.location.origin +`/api/customer/${sessionStorage.getItem("email")}`, {
                     headers: {
@@ -64,14 +91,7 @@
                     console.error("Failed to fetch data: ", res.statusText);
                 }
             },
-            async eachkey(){
-                var query = $("#query").val().toLowerCase();
-                $("#table tbody tr").filter(function() {
-                    $(this).toggle($(this).text().toLowerCase().indexOf(query) > -1)
-                });
-                console.log(query);
 
-            },
             async cat(){
                 $("#query").val("");    
                 
@@ -88,6 +108,7 @@
                         const data = await res.json();
                         await this.prodisplay();
                         for(var i in data){
+                            
                             if(!(this.noProId.includes(data[i].proid)) && data[i].active==1){
                                 DATA.push(data[i]);
                             }
@@ -214,8 +235,14 @@
 
 
         },
-        mounted(){
-
+        async mounted(){
+            const service = await fetch('/dropdownService');
+            if (service.ok) {
+                this.services = await service.json();
+            } else {
+                this.services = [];
+                console.error('Failed to fetch services');
+            }
             this.cat()
             },
  
