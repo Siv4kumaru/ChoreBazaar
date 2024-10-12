@@ -46,7 +46,7 @@
                 title:'',
                 columns:null,
                 viewRow: {},
-                pro:null,
+                noProId:[],
             }
         },
         methods:{
@@ -87,8 +87,6 @@
                     
                     if (res.ok) {
                         const data = await res.json();
-                        this.pro=data;
-                        
 
                         if(data != null){
                             if(data[0].active != undefined){
@@ -99,9 +97,19 @@
                                     data[0].active = "Not Blocked";
                                 }
                         }}
-
+                        
+                        await this.prodisplay();
+                        const DATA=[];
+                        for(var i in data){
+                            console.log(data[i].proid);
+                            console.log(this.noProId);
+                            if(!(this.noProId.includes(data[i].proid))){
+                                console.log("Already not Booked:"+data[i].proid);
+                                DATA.push(data[i]);
+                            }
+                        }   
                             var cust= await this.custId();
-                            this.data=data;
+                            this.data=DATA;
                             for(var i in this.data){
                                 this.data[i] = {...this.data[i], ...cust};      
                         }
@@ -178,6 +186,7 @@
                   
             },
             async prodisplay(){
+
                 const res1 = await fetch(window.location.origin + `/api/professional`, {
                     method: 'GET',
                     headers: {
@@ -212,7 +221,7 @@
                             //owner specific 
                             for(let j in pro){
                                 if(pro[j].proid==req[i].professionalId){
-                                    console.log(pro[j]);
+                                this.noProId.push(pro[j].proid);
                                 }
                             }
                             
@@ -230,11 +239,10 @@
 
         },
         mounted(){
+
             this.cat()
             },
-            created(){
-                this.prodisplay()
-            },
+ 
         components: {changedCommonTable}
     }
 
