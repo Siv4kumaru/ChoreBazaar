@@ -18,6 +18,7 @@ import EditService from '../pages/Admin/EditService.js'
 import addService from '../pages/Admin/addService.js'
 import EditRequest from '../pages/Admin/EditRequest.js'
 import custDashboard from '../pages/Customer/CustDashboard.js'
+import historyP from '../pages/Professional/historyP.js'
 
 const routes = [
     {path : '/', component: Home},
@@ -32,14 +33,14 @@ const routes = [
     {path: '/statsC', component: statsC, meta: { requiresLogin: true, role: "customer" }},
     {path: '/statsP', component: statsP, meta: { requiresLogin: true, role: "professional" }},
     {path: '/searchA', component: searchA, meta: { requiresLogin: true, role: "admin" }},
-    {path: '/searchC', component: searchC, meta: { requiresLogin: true, role: "customer" }},
+    {path: '/searchC', component: searchC,name:"searchC", meta: { requiresLogin: true, role: "customer" }},
     {path: '/searchP', component: searchP, meta: { requiresLogin: true, role: "professional" }},    
     {path : '/logout', component: Logout},
     {path: '/editService/:id',name:"editService",component: EditService, meta: { requiresLogin: true, role: "admin" }},
     {path: '/addService',name:"addService",component: addService, meta: { requiresLogin: true, role: "admin" }},
     {path: '/editRequest/:id',name:"editRequest",component: EditRequest, meta: { requiresLogin: true, role: "admin" }},
-    {path: '/Dashboard-Customer/history', name:"historyC",component: history , meta: { requiresLogin: true, role: "customer" }}
-    ,
+    {path: '/Dashboard-Customer/history', name:"historyC",component: history , meta: { requiresLogin: true, role: "customer" }},
+    {path: '/Dashboard-Professional/history', name:"historyP",component: historyP , meta: { requiresLogin: true, role: "professional" }},
 
 ]
 

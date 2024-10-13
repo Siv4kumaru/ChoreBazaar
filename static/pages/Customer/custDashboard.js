@@ -3,6 +3,7 @@ import changedCommonTable from "../../components/changedCommonTable.js";
 
 const custDashboard = {
   template:`<div>
+  {{columns[0]}}
     <h1>Customer Dashboard</h1>
     <button class="btn btn-primary" @click='history'>history</button>
       <div class="d-flex flex-row justify-content-center">

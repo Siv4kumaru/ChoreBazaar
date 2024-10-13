@@ -81,7 +81,7 @@ class ServiceRequest(db.Model):
     approve=db.Column(db.String, default="Pending")
     dateofrequest=db.Column(db.String)
     dateofcompletion=db.Column(db.String)
-    serviceStatus=db.Column(db.String)
+    serviceStatus=db.Column(db.String,default="Pending")
     feedback=db.Column(db.String)
 
     customer=db.relationship('Customer', back_populates='servicerequests')

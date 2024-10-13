@@ -158,7 +158,7 @@ api.add_resource(ProfessionalNameSauce,'/professional/<string:email>')
     
 class requestSauce(Resource):
     @auth_required('token')
-    @roles_accepted('admin','customer')
+    @roles_accepted('admin','customer','professional')
     def get(self):
         list=[]
         requests=ServiceRequest.query.all()
@@ -171,6 +171,7 @@ class requestSauce(Resource):
                 logging.error("Customer does not exist")
                 return {"message": "Customer does not exist"}, 400
             customeruserid=customeruser.userId
+            customername=customeruser.name
             prouser=Professional.query.filter_by(id=req.professionalId).first().userId
             if prouser is None:
                 logging.error("Professional does not exist")
@@ -185,7 +186,7 @@ class requestSauce(Resource):
             else:
                 serviceName=service.name
                 servicePrice=service.price
-            requ={"id":req.id,"custemail":custemail,"proemail":proemail,"serviceName":serviceName,"servicePrice":servicePrice,"approve":req.approve,"dateofrequest":req.dateofrequest,"dateofcompletion":req.dateofcompletion,"serviceStatus":req.serviceStatus,"feedback":req.feedback,"approve":req.approve}  
+            requ={"id":req.id,"customerName":customername,"custemail":custemail,"proemail":proemail,"serviceName":serviceName,"servicePrice":servicePrice,"approve":req.approve,"dateofrequest":req.dateofrequest,"dateofcompletion":req.dateofcompletion,"serviceStatus":req.serviceStatus,"feedback":req.feedback,"approve":req.approve}  
             list.append(requ)
         return list,200
 
@@ -232,7 +233,7 @@ class requestSauce(Resource):
             serviceId=args['serviceId'],
             dateofrequest=datetime.now(),
             dateofcompletion=args['dateofcompletion'],
-            serviceStatus=args['serviceStatus'],
+            serviceStatus="Pending",
             feedback=args['feedback']
         )
         
@@ -255,7 +256,7 @@ class requestSauce(Resource):
         return {"message":"Request Deleted"},200
     
     @auth_required('token')
-    @roles_accepted('admin','customer')
+    @roles_accepted('admin','customer','professional')
     def patch(self):
         args=reqPatchparser.parse_args()
         request=ServiceRequest.query.filter_by(id=args['id']).first()

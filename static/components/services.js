@@ -33,7 +33,7 @@ const services = {
     },
     methods: {
       goToSearch(){
-        this.$router.push("/searchC");
+        this.$router.push({name:'searchC',params:{name:this.name}});
       }
     },
     mounted() {

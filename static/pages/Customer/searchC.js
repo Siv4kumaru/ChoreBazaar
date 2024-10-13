@@ -61,6 +61,7 @@ import services from "../../components/services.js";
         },  
         methods:{
             filterTable() {
+                console.log("Filtering table..."+this.service);
                 const selectedService = this.service.toLowerCase(); // Get the selected service
                 const query = $("#query").val().toLowerCase(); // Get the search query
             
@@ -244,7 +245,16 @@ import services from "../../components/services.js";
                 console.error('Failed to fetch services');
             }
             this.cat()
-            },
+            if(this.$route.params.name){
+                this.service=this.$route.params.name;
+            }
+    // Wait for the table to be fully rendered, then apply the filter
+    this.$nextTick(() => {
+        setTimeout(() => {
+            this.filterTable(); // Call the filter after a slight delay to ensure DOM is ready
+        }, 300); // Delay to ensure table is rendered
+    });
+        },
  
         components: {changedCommonTable}
     }
