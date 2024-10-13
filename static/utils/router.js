@@ -13,7 +13,6 @@ import statsC from '../pages/Customer/statsC.js'
 import statsP from '../pages/Professional/statsP.js'
 import searchA from '../pages/Admin/searchA.js'
 import searchC from '../pages/Customer/searchC.js'
-import searchP from '../pages/Professional/searchP.js'
 import EditService from '../pages/Admin/EditService.js'
 import addService from '../pages/Admin/addService.js'
 import EditRequest from '../pages/Admin/EditRequest.js'
@@ -34,7 +33,6 @@ const routes = [
     {path: '/statsP', component: statsP, meta: { requiresLogin: true, role: "professional" }},
     {path: '/searchA', component: searchA, meta: { requiresLogin: true, role: "admin" }},
     {path: '/searchC', component: searchC,name:"searchC", meta: { requiresLogin: true, role: "customer" }},
-    {path: '/searchP', component: searchP, meta: { requiresLogin: true, role: "professional" }},    
     {path : '/logout', component: Logout},
     {path: '/editService/:id',name:"editService",component: EditService, meta: { requiresLogin: true, role: "admin" }},
     {path: '/addService',name:"addService",component: addService, meta: { requiresLogin: true, role: "admin" }},

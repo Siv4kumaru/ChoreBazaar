@@ -2,6 +2,8 @@ import changedCommonTable from '../../components/changedCommonTable.js'
 
 const historyP = {
     template: `<div>
+        <input v-model="query" type="text" placeholder="Search.." id="query" name="query" @keyup="eachkey()">
+        <button><i class="fa-solid fa-magnifying-glass" @click="eachhkey()"></i></button>
         <changedCommonTable title="History" :data="[data]" :columns="columns" selector="history" :condition="(row) => true"></changedCommonTable>
         <button class="btn btn-primary" @click="back">Back</button>
     </div>`,
@@ -9,7 +11,8 @@ const historyP = {
     data() {
         return {
             columns: [],
-            data: []
+            data: [],
+            query: ""
         };
     },
 
@@ -37,6 +40,7 @@ const historyP = {
 
     mounted() {
         // Save columns and data to local storage
+        
         localStorage.setItem('historyColumns', JSON.stringify(this.columns));
         localStorage.setItem('historyData', JSON.stringify(this.data));
 
@@ -51,6 +55,13 @@ const historyP = {
     },
 
     methods: {
+        async eachkey(){
+            var query = $("#query").val().toLowerCase();
+            $("#history tbody tr").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(query) > -1)
+              });
+            console.log(query);
+        },
         back() {
             this.$router.push("/Dashboard-Professional");
         }

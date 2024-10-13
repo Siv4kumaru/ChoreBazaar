@@ -11,7 +11,6 @@ const Navbar ={
         <router-link v-if="state.loggedIn" to="/Profile">Profile</router-link>
         <router-link v-if="state.loggedIn && state.role === 'admin'" to="/searchA">Search</router-link>
         <router-link v-if="state.loggedIn && state.role === 'customer'" to="/searchC">Search</router-link>
-        <router-link v-if="state.loggedIn && state.role === 'professional'" to="/searchP">Search</router-link>
         <router-link v-if="state.loggedIn && state.role === 'admin'" to="/statsA">Stats</router-link>
         <router-link v-if="state.loggedIn && state.role === 'customer'" to="/statsC">Stats</router-link>
         <router-link v-if="state.loggedIn && state.role === 'professional'" to="/statsP">Stats</router-link>        
