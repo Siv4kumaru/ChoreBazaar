@@ -47,11 +47,11 @@ const custDashboard = {
             <div class="modal-body">
               <form @submit.prevent="submitFeedback">
                 <label for="star" class="form-label">Rating</label>
-                <star v-model="feedback.rating" />
+                <star></star>
 
                 <div class="mb-3">
                   <label for="remark" class="form-label">Remark</label>
-                  <textarea class="form-control" v-model="feedback.remark" rows="3" required></textarea>
+                  <textarea class="form-control" v-model="remark" rows="3" required></textarea>
                 </div>
               </form>
             </div>
@@ -72,10 +72,8 @@ const custDashboard = {
       data:[],
       selector:[],
       columns:[],
-      feedback: {
-        rating: "",
-        remark: "",
-      },
+      rating: null,
+      remark: "",
       currentRow: null,
     };
   },
@@ -87,8 +85,7 @@ const custDashboard = {
       this.$router.push({ name: 'historyC', params:{ data:JSON.stringify(this.data),columns:JSON.stringify(this.columns)}});
     },
     Pending(row) {
-      return true;
-      //return row.approve === 'Pending' && row.serviceStatus != 'Customer Cancellation' ;
+      return row.approve === 'Pending' && row.serviceStatus != 'Customer Cancellation' ;
     },
     Accepted(row) {
       return row.approve === 'accepted' && row.serviceStatus != 'Completed';
@@ -126,11 +123,13 @@ const custDashboard = {
       openFeedbackModal(row) {
         this.currentRow = row;
         $("#feedbackModal").modal("show");
-      },    
+      }, 
       async submitFeedback() {
+        console.log(this.rating);
+        if (!this.rating) {
+          alert("Please select a rating");
+          return;}
         if (!this.currentRow) return;
-        console.log("Submitting feedback");
-  
         const res = await fetch(window.location.origin + "/api/requests", {
           method: "PATCH",
           headers: {
@@ -140,10 +139,11 @@ const custDashboard = {
           body: JSON.stringify({
             id: this.currentRow.id,
             serviceStatus: "Completed",
-            rating: this.feedback.rating,
-            feedback: this.feedback.remark,
+            rating: this.rating,
+            feedback: this.remark,
           }),
         });
+        console.log(this.rating);
         if (res.ok) {
           console.log("Request completed successfully");
           const response = await res.json();
@@ -153,9 +153,9 @@ const custDashboard = {
           if (index !== -1) {
             this.data[tableIndex][index].serviceStatus = "Completed";
           }
-          console.log(this.feedback.rating);
           // Reset feedback form
-          this.feedback = { rating: null, remark: "" };
+          this.rating= null;
+          this.remark= "" ;
           $("#feedbackModal").modal("hide");
         } else {
           console.error("Error completing request", res.status);
@@ -190,12 +190,14 @@ const custDashboard = {
 
   async mounted() {
     const ratingGroup = document.querySelector('.rating-group');
+    const self = this; // store reference to Vue component instance
     ratingGroup.addEventListener('change', function(event) {
         if (event.target.classList.contains('rating__input')) {
-            console.log(event.target.value);
-            this.feedback.rating = event.target.value;   
+            self.rating = event.target.value; // use self instead of this
+            console.log(self.rating);
         }
     });
+    
     var clean=[];
     try {
       const res = await fetch(window.location.origin + "/api/services", {

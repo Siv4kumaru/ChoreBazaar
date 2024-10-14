@@ -453,6 +453,61 @@ class req(Resource):
         req=ServiceRequest.query.all()
         return req,200
     
+class proEarning(Resource):
+    @auth_required('token')
+    @roles_accepted('admin','professional')
+    def get(self,email):
+        pro=Professional.query.filter_by(userId=User.query.filter_by(email=email).first().id).first()
+        if pro is None:
+            return {"message":"Professional not found"},404
+        proId=pro.id
+        requests=ServiceRequest.query.filter_by(professionalId=proId).all()
+        proEarning=0
+        for req in requests:
+            if req.serviceStatus=="Completed":
+                service=Service.query.filter_by(id=req.serviceId).first()
+                if service is None:
+                    return {"message":"Service not found"},404
+                proEarning+=service.price
+        return {"Earning":proEarning},200
+    
+class custspending(Resource):
+    @auth_required('token')
+    @roles_accepted('admin','customer')
+    def get(self,email):
+        cust=Customer.query.filter_by(userId=User.query.filter_by(email=email).first().id).first()
+        if cust is None:
+            return {"message":"Customer not found"},404
+        custId=cust.id
+        requests=ServiceRequest.query.filter_by(customerId=custId).all()
+        custSpending=0
+        for req in requests:
+            if req.serviceStatus=="Completed":
+                service=Service.query.filter_by(id=req.serviceId).first()
+                if service is None:
+                    return {"message":"Service not found"},404
+                custSpending+=service.price
+        return {"Spending":custSpending},200
+    
+class servearning(Resource):
+    @auth_required('token')
+    @roles_accepted('admin')
+    def get(self):
+        services=Service.query.all()
+        earning=0
+        serv={}
+        for s in services:
+            serv[s.name]=0
+        for ser in services:
+            requests=ServiceRequest.query.filter_by(serviceId=ser.id).all()
+            for req in requests:
+                if req.serviceStatus=="Completed":
+                    serv[ser.name]+=ser.price
+        return serv,200
+
+api.add_resource(servearning,'/earning')
+api.add_resource(custspending,'/customer/<string:email>/spending')
+api.add_resource(proEarning,'/professional/<string:email>/earning')            
 api.add_resource(req,'/requests_proper')
 api.add_resource(custEmail,'/customer/<string:email>')
 api.add_resource(searchall,'/search/<string:searchType>/')

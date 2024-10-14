@@ -43,7 +43,7 @@ const statsA = {
         if(req.ok){
             const reqdata=await req.json();
             console.log(reqdata);
-
+            
             var reqServCalled={};
             for (let i in reqdata){
 
@@ -57,33 +57,24 @@ const statsA = {
 
         }
 
-
-        const servu= await fetch(window.location.origin+'/api/services',{
+        var servicePrice=null;
+        const servprice= await fetch(window.location.origin+'/api/earning', {
             headers:{
                 "Content-Type": "application/json",
                 "Authentication-token":sessionStorage.getItem("token")
             }
-        });
-        if(servu.ok){
-            const services=await servu.json();
-            console.log(services);
-            var servicePrice={};
-            for (let i in services){
-                this.serviceName.push(services[i].name);
-                this.servicecount+=1;
-                if(servicePrice[services[i].name]){
-                    servicePrice[services[i].name]+=services[i].price;
-                }
-                else{
-                    servicePrice[services[i].name]=services[i].price;
-                }
+        });  
+        if(servprice.ok){
 
+            var servicePriceData=[];
+            servicePrice=await servprice.json();
+            console.log(servicePrice);
+            for(let i in servicePrice){
+                servicePriceData.push(servicePrice[i]);
             }
-            console.log(`servicePrice:${JSON.stringify(servicePrice)}`);
-    }
-        else{
-            console.error("Error fetching services");
         }
+
+
         const proserv= await fetch(window.location.origin+'/api/professional',{
             headers:{
                 "Content-Type": "application/json",
@@ -132,18 +123,7 @@ const statsA = {
         console.log(reqServCalled);  
         console.log(servicePrice);
         console.log('*********');
-        for (let i in servicePrice){
-            console.log(i);
-            if(i in reqServCalled){
-                console.log(reqServCalled[i]);
-                servicePrice[i]=servicePrice[i]*reqServCalled[i];
-            }
-            else{
-                console.log(0);
-                servicePrice[i]=0;
-            }
-        }
-        console.log(servicePrice);
+
 
         //cust api
         const cust= await fetch(window.location.origin+'/api/customer',{
@@ -202,14 +182,8 @@ const statsA = {
             labels:this.serviceName,
             datasets: [{
               label: 'Earnings',
-              data:  this.serviceName.map(I => servicePrice[I]),
-              backgroundColor: [
-                'rgb(255, 99, 132)',
-                'rgb(75, 192, 192)',
-                'rgb(255, 205, 86)',
-                'rgb(201, 203, 207)',
-                'rgb(54, 162, 235)'
-              ]
+              data:  servicePriceData,
+
             }]
           };
           const config2 = {
