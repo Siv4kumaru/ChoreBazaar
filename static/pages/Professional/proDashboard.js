@@ -4,10 +4,9 @@ const proDashboard = {
   template:`<div>
     <h1>Professional Dashboard</h1>
     <button class="btn btn-primary" @click='history'>history</button>
-
 <div v-if="data[0]">
   <!-- can also use (row) => row.approve === 'PendingOrAccepted' arrow function in condition , here in condition isPending without paranthesis is just passing a reference the function rather than actually invoking with paranthesis and all, no paranthesis function means reference being passed-->
-  <changedCommonTable  :condition="Pending"  :title="title[0]" :data="data" :selector="selector[0]" :columns="columns[0]">
+  <changedCommonTable  :condition="Pending"  title="Pending" :data="data" :selector="selector[0]" :columns="columns[0]">
         <template v-slot:actions="{ row }">
         <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
         <button class="btn btn-success btn-sm" @click="accept(row)">Accept</button>
@@ -25,7 +24,7 @@ const proDashboard = {
   <changedCommonTable  :condition="Rejected"  title='Rejected/Cancelled' :data="data" :selector="selector[0]" :columns="columns[0]">
         <template v-slot:actions="{ row }">
         <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
-        <button class="btn btn-success btn-sm" @click="accept(row)">Accept</button>
+        <button v-if="row.serviceStatus!='Customer Cancellation'" class="btn btn-success btn-sm" @click="accept(row)">Accept</button>
         </template>
   </changedCommonTable>
 
@@ -68,18 +67,19 @@ const proDashboard = {
     hi(){
       console.log("hi");
     },
+    
     history(){
-      console.log(this.columns);
-      this.$router.push({ name: 'historyP', params:{ data:JSON.stringify(this.data),columns:JSON.stringify(this.columns)}});
+    console.log(this.data);
+      this.$router.push({ name: 'historyP', params:{ data:JSON.stringify( this.data),columns:JSON.stringify(this.columns)}});
     },
     Pending(row) {
-      return row.approve === 'Pending';
+      return row.approve === 'Pending' && row.serviceStatus != 'Customer Cancellation' ;
     },
     Accepted(row) {
-      return row.approve === 'accepted';
+      return row.approve === 'accepted' && row.serviceStatus != 'Completed';
     },
     Rejected(row) {
-      return row.approve === 'Customer Cancellation' || row.approve === 'Rejected';
+      return row.serviceStatus === 'Customer Cancellation' || row.approve === 'Rejected';
     },
     async accept(row) {
       // Show the modal directly
@@ -105,6 +105,7 @@ const proDashboard = {
               body: JSON.stringify({
                   id: row.id,
                   approve: "accepted",
+                  serviceStatus: "Ongoing",
                   dateofcompletion: formattedDateTime  // Include the formatted date and time in the request
               })
           });
@@ -152,6 +153,7 @@ const proDashboard = {
             body: JSON.stringify({
               id: row.id,
               approve: "Rejected",
+              serviceStatus: "Professional Rejection",
             })
           });
           if (res.ok) {
@@ -180,18 +182,15 @@ const proDashboard = {
         var data2 = await res2.json();
         console.log(data2); 
         for (let i in data2) {
-
-
           if (data2[i]["proemail"] == sessionStorage.getItem("email")) {
 
             this.data.push(data2[i]);
-            console.log(data2[i]);
+
             
           }
 
 
         }
-        console.log(this.data);
         this.columns.push([
           { data: "custemail", title: "Customer Email" },
           { data: "customerName", title: "Customer Name" },

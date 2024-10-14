@@ -10,10 +10,8 @@
                 <button class="btn btn-warning btn-sm" @click="unblockCus(row)" v-if="!row.active">Unblock</button>
                 </template>
             </commonTable>
-
             <commonTable v-if="this.columns[1]" :title="title[1]" :data="data[1]" :selector="selector[1]" :columns="columns[1]">
                 <template v-slot:actions="{ row }">
-                
                 <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
                 <button class="btn btn-danger btn-sm" @click="blockPro(row)" v-if="row.active">Block</button>
                 <button class="btn btn-warning btn-sm" @click="unblockPro(row)" v-if="!row.active">Unblock</button>
@@ -217,7 +215,7 @@
               
             },
             async blockPro(row) {       
-                fetch(`api/block/${row.id}`, {
+                fetch(`api/block/${row.proUserId}`, {
                     method: 'get',
                     headers:{
                         "Content-Type": "application/json",
@@ -249,7 +247,7 @@
               
             },
             async unblockPro(row) {
-                fetch(`api/unblock/${row.id}`, {
+                fetch(`api/unblock/${row.proUserId}`, {
                     method: 'get',
                     headers:{
                         "Content-Type": "application/json",

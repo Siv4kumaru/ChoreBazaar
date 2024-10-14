@@ -3,7 +3,6 @@ import changedCommonTable from "../../components/changedCommonTable.js";
 
 const custDashboard = {
   template:`<div>
-  {{columns[0]}}
     <h1>Customer Dashboard</h1>
     <button class="btn btn-primary" @click='history'>history</button>
       <div class="d-flex flex-row justify-content-center">
@@ -13,17 +12,24 @@ const custDashboard = {
       </div>
   
 <div v-if="data[0] && data[0][0]">
-  <!-- can also use (row) => row.approve === 'PendingOrAccepted' arrow function in condition , here in condition isPending without paranthesis is just passing a reference the function rather than actually invoking with paranthesis and all, no paranthesis function means reference being passed-->
-  <changedCommonTable  :condition="PendingOrAccepted"  :title="title[0]" :data="data[0]" :selector="selector[0]" :columns="columns[0]">
+  <!-- can also use (row) => row.approve === 'Pending' arrow function in condition , here in condition isPending without paranthesis is just passing a reference the function rather than actually invoking with paranthesis and all, no paranthesis function means reference being passed-->
+  <changedCommonTable  :condition="Pending"  :title="title[0]" :data="data[0]" :selector="selector[0]" :columns="columns[0]">
         <template v-slot:actions="{ row }">
         <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
-        <button v-if="row.approve!='Customer Cancellation'" class="btn btn-danger btn-sm" @click="cancel(row)">Cancel</button>
+        <button v-if="row.serviceStatus!='Customer Cancellation'" class="btn btn-danger btn-sm" @click="cancel(row)">Cancel</button>
+        </template>
+  </changedCommonTable>
+    <changedCommonTable  :condition="Accepted"  title='Accepted/Ongoing' :data="data[0]" :selector="selector[0]" :columns="columns[1]">
+        <template v-slot:actions="{ row }">
+        <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
+        <button  class="btn btn-success btn-sm" @click="completed(row)">Completed</button>
+        <button  class="btn btn-danger btn-sm" @click="completed(row)">Not Completed</button>
         </template>
   </changedCommonTable>
   <changedCommonTable  :condition="Rejected"  title='Rejected/Cancelled' :data="data[0]" :selector="selector[0]" :columns="columns[0]">
         <template v-slot:actions="{ row }">
         <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
-        <button v-if="row.approve!='Customer Cancellation'" class="btn btn-danger btn-sm" @click="cancel(row)">Cancel</button>
+        <button v-if="row.serviceStatus!='Customer Cancellation'" class="btn btn-danger btn-sm" @click="cancel(row)">Cancel</button>
         </template>
   </changedCommonTable>
 
@@ -47,11 +53,14 @@ const custDashboard = {
     history(){
       this.$router.push({ name: 'historyC', params:{ data:JSON.stringify(this.data),columns:JSON.stringify(this.columns)}});
     },
-    PendingOrAccepted(row) {
-      return row.approve === 'accepted' || row.approve === 'Pending';
+    Pending(row) {
+      return row.approve === 'Pending' && row.serviceStatus != 'Customer Cancellation' ;
+    },
+    Accepted(row) {
+      return row.approve === 'accepted' && row.serviceStatus != 'Completed';
     },
     Rejected(row) {
-      return row.approve === 'Customer Cancellation' || row.approve === 'Rejected';
+      return row.serviceStatus === 'Customer Cancellation' || row.approve === 'Rejected';
     },
       async cancel(row){
           const res = await fetch(window.location.origin + "/api/requests", {
@@ -62,7 +71,8 @@ const custDashboard = {
             },
             body: JSON.stringify({
               id: row.id,
-              approve: "Customer Cancellation",
+              appprove: "Customer Cancellation",
+              serviceStatus: "Customer Cancellation",
             })
           });
           if (res.ok) {
@@ -72,13 +82,39 @@ const custDashboard = {
             const tableIndex = 0; // Adjust this according to which table you're modifying
             const index = this.data[tableIndex].findIndex(item => item.id === row.id);
             if (index !== -1) {
-                this.data[tableIndex][index].approve="Customer Cancellation"; // Remove the row from the array
+                this.data[tableIndex][index].serviceStatus="Customer Cancellation"; // Remove the row from the array
             }
           } else {
             console.error("Error cancelling request", res.status);
           }
-      }
-  },
+      },
+        async completed(row){
+        const res = await fetch(window.location.origin + "/api/requests", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "Authentication-token": sessionStorage.getItem("token"),
+          },
+          body: JSON.stringify({
+            id: row.id,
+            serviceStatus: "Completed",
+          })
+        });
+        if (res.ok) {
+          console.log("Request completed");
+          var ponse= await res.json();
+          console.log(ponse);
+          const tableIndex = 0; // Adjust this according to which table you're modifying
+          const index = this.data[tableIndex].findIndex(item => item.id === row.id);
+          if (index !== -1) {
+              this.data[tableIndex][index].serviceStatus="Customer Cancellation"; // Remove the row from the array
+          }
+        } else {
+          console.error("Error cancelling request", res.status);
+        }
+    },
+  },      
+
   async mounted() {
     var clean=[];
     try {
@@ -130,11 +166,20 @@ const custDashboard = {
           { data: "servicePrice", title: "Service Price" },
           { data: "approve", title: "Approved" },
         ]);
+        this.columns.push([
+          { data: "proemail", title: "Professional Email" },
+          { data: "proName", title: "Professional Name" },
+          { data: "serviceName", title: "Service Name" },
+          { data: "dateofrequest", title: "Date of Request" },
+          {data: "dateofcompletion", title: "Date of Completion"},
+          { data: "servicePrice", title: "Service Price" },
+          { data: "approve", title: "Approved" },
+        ]);
 
 
         this.data.push(clean);   
          
-        this.title.push("Ongoing  Requests");
+        this.title.push("Pending Requests");
         this.selector.push("Ongoing Requests");
       } else {
         console.error("Error fetching requests", res2.status);

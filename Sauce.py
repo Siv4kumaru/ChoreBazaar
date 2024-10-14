@@ -225,13 +225,16 @@ class requestSauce(Resource):
                 return {"message": "Request approval by pro is pending."}, 400
             if request.approve == "customer Cancellation":
                 return {"message": "Wait"}, 400     
+        now = datetime.now()
 
+# Format the date, hour, and minutes
+        formatted_time = now.strftime("%Y-%m-%d %H:%M")
         # Create a new request
         new_request = ServiceRequest(
             customerId=args['customerId'],
             professionalId=pro.id,
             serviceId=args['serviceId'],
-            dateofrequest=datetime.now(),
+            dateofrequest=formatted_time,
             dateofcompletion=args['dateofcompletion'],
             serviceStatus="Pending",
             feedback=args['feedback']

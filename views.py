@@ -22,12 +22,12 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore):
         
         
         user=userdatastore.find_user(email=email)
-        if not user.active:
-            
-            return jsonify({"message":"user is flagged, kindly contact the admin"}),403
     
         if not user:
             return jsonify({"message":"User not found"}),404
+        if not user.active:
+            
+            return jsonify({"message":"user is flagged, kindly contact the admin"}),403
 
 
         if verify_password(password,user.password):

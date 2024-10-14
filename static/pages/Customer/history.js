@@ -34,6 +34,9 @@ const history = {
         } else {
             this.data = JSON.parse(this.$route.params.data)[0];
         }
+
+        this.columns.push({ data: "dateofcompletion", title: "Date of Completion" });
+        this.columns.push({ data: "serviceStatus", title: "Service Status" });
     },
 
     mounted() {

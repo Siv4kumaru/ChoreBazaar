@@ -2,9 +2,10 @@ import changedCommonTable from '../../components/changedCommonTable.js'
 
 const historyP = {
     template: `<div>
+    {{data}}
         <input v-model="query" type="text" placeholder="Search.." id="query" name="query" @keyup="eachkey()">
         <button><i class="fa-solid fa-magnifying-glass" @click="eachhkey()"></i></button>
-        <changedCommonTable title="History" :data="[data]" :columns="columns" selector="history" :condition="(row) => true"></changedCommonTable>
+        <changedCommonTable title="History" :data="data" :columns="columns" selector="history" :condition="(row) => true"></changedCommonTable>
         <button class="btn btn-primary" @click="back">Back</button>
     </div>`,
     
@@ -17,7 +18,6 @@ const historyP = {
     },
 
     created() {
-
         // Check local storage for existing values
         const savedColumns = localStorage.getItem('historyColumns');
         const savedData = localStorage.getItem('historyData');
@@ -27,15 +27,17 @@ const historyP = {
             this.columns = JSON.parse(savedColumns);
         } else {
             this.columns = JSON.parse(this.$route.params.columns)[0];
+            this.columns.push({data:"dateofcompletion",title:"Date of Completion"});
         }
         
         if (savedData) {
             this.data = JSON.parse(savedData);
         } else {
-            this.data = JSON.parse(this.$route.params.data)[0];
+            this.data = JSON.parse(this.$route.params.data);
+            for(let i in JSON.parse(this.$route.params.data)){
+                console.log(i);
+            }
         }
-        this.columns.push({data:"dateofcompletion",title:"Date of Completion"});
-        console.log(this.columns);
     },
 
     mounted() {
@@ -43,6 +45,7 @@ const historyP = {
         
         localStorage.setItem('historyColumns', JSON.stringify(this.columns));
         localStorage.setItem('historyData', JSON.stringify(this.data));
+        console.log(this.data);
 
     },
 
