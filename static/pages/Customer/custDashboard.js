@@ -14,6 +14,8 @@ const custDashboard = {
   <!-- can also use (row) => row.approve === 'Pending' arrow function in condition , here in condition isPending without paranthesis is just passing a reference the function rather than actually invoking with paranthesis and all, no paranthesis function means reference being passed-->
   <changedCommonTable  :condition="Pending"  :title="title[0]" :data="data[0]" :selector="selector[0]" :columns="columns[0]">
         <template v-slot:actions="{ row }">
+                <button  class="btn btn-success btn-sm" @click="openFeedbackModal(row)">Completed</button>
+
         <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
         <button v-if="row.serviceStatus!='Customer Cancellation'" class="btn btn-danger btn-sm" @click="cancel(row)">Cancel</button>
         </template>
@@ -21,7 +23,7 @@ const custDashboard = {
     <changedCommonTable  :condition="Accepted"  title='Accepted/Ongoing' :data="data[0]" :selector="selector[0]" :columns="columns[1]">
         <template v-slot:actions="{ row }">
         <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
-        <button  class="btn btn-success btn-sm" @click="completed(row)">Completed</button>
+        <button  class="btn btn-success btn-sm" @click="openFeedbackModal(row)">Completed</button>
         <button  class="btn btn-danger btn-sm" @click="notCompleted(row)">Not Completed</button>
         </template>
   </changedCommonTable>
@@ -34,32 +36,32 @@ const custDashboard = {
 
 </div>
 
-<!-- feedback Modal -->
-    <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+      <!-- Feedback Modal -->
+      <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="feedbackModalLabel">Feedback</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="feedbackForm">
-                    <label for="star" class="form-label">Rating</label>
-                      <star></star> 
-                        <div class="mb-3">
-                            <label for="remark" class="form-label">Remark</label>
-                            <textarea class="form-control" id="remark" rows="3" required></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="submitFeedback">Submit</button>
-                </div>
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="feedbackModalLabel">Feedback</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-        </div>
-    </div>
+            <div class="modal-body">
+              <form @submit.prevent="submitFeedback">
+                <label for="star" class="form-label">Rating</label>
+                <star v-model="feedback.rating" />
 
+                <div class="mb-3">
+                  <label for="remark" class="form-label">Remark</label>
+                  <textarea class="form-control" v-model="feedback.remark" rows="3" required></textarea>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" @click="submitFeedback">Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   `,  
   data() {
@@ -69,7 +71,12 @@ const custDashboard = {
       title:[],
       data:[],
       selector:[],
-      columns:[]
+      columns:[],
+      feedback: {
+        rating: "",
+        remark: "",
+      },
+      currentRow: null,
     };
   },
   methods:{
@@ -80,7 +87,8 @@ const custDashboard = {
       this.$router.push({ name: 'historyC', params:{ data:JSON.stringify(this.data),columns:JSON.stringify(this.columns)}});
     },
     Pending(row) {
-      return row.approve === 'Pending' && row.serviceStatus != 'Customer Cancellation' ;
+      return true;
+      //return row.approve === 'Pending' && row.serviceStatus != 'Customer Cancellation' ;
     },
     Accepted(row) {
       return row.approve === 'accepted' && row.serviceStatus != 'Completed';
@@ -114,18 +122,15 @@ const custDashboard = {
             console.error("Error cancelling request", res.status);
           }
       },
-        async completed(row){
-        //modal
-        $('#feedbackModal').modal('show');
-        
-        $('#feedbackModal').off('submit').on('submit', async (e) => {
-          e.preventDefault();
-          const rating = document.querySelector('.rating__input:checked').value;
-          const remark = document.querySelector('#remark').value;
-          console.log(rating, remark);
 
-
-        $('#feedbackModal').modal('hide');
+      openFeedbackModal(row) {
+        this.currentRow = row;
+        $("#feedbackModal").modal("show");
+      },    
+      async submitFeedback() {
+        if (!this.currentRow) return;
+        console.log("Submitting feedback");
+  
         const res = await fetch(window.location.origin + "/api/requests", {
           method: "PATCH",
           headers: {
@@ -133,30 +138,29 @@ const custDashboard = {
             "Authentication-token": sessionStorage.getItem("token"),
           },
           body: JSON.stringify({
-            id: row.id,
+            id: this.currentRow.id,
             serviceStatus: "Completed",
-            rating: rating,
-            feedback: remark,
-          })
+            rating: this.feedback.rating,
+            feedback: this.feedback.remark,
+          }),
         });
         if (res.ok) {
-          console.log("Request status:completed");
-          var ponse= await res.json();
-          console.log(ponse);
-          const tableIndex = 0; // Adjust this according to which table you're modifying
-          const index = this.data[tableIndex].findIndex(item => item.id === row.id);
+          console.log("Request completed successfully");
+          const response = await res.json();
+          console.log(response);
+          const tableIndex = 0;
+          const index = this.data[tableIndex].findIndex((item) => item.id === this.currentRow.id);
           if (index !== -1) {
-              this.data[tableIndex][index].serviceStatus="Customer Cancellation"; // Remove the row from the array
+            this.data[tableIndex][index].serviceStatus = "Completed";
           }
+          console.log(this.feedback.rating);
+          // Reset feedback form
+          this.feedback = { rating: null, remark: "" };
+          $("#feedbackModal").modal("hide");
         } else {
-          console.error("Error cancelling request", res.status);
+          console.error("Error completing request", res.status);
         }
-
-        });
-          
-        //modal
-
-    },
+      },
     async  notCompleted(row){
       const res = await fetch(window.location.origin + "/api/requests", {
         method: "PATCH",
@@ -189,6 +193,7 @@ const custDashboard = {
     ratingGroup.addEventListener('change', function(event) {
         if (event.target.classList.contains('rating__input')) {
             console.log(event.target.value);
+            this.feedback.rating = event.target.value;   
         }
     });
     var clean=[];

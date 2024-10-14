@@ -61,6 +61,8 @@ reqPatchparser.add_argument('dateofcompletion', type=str)
 reqPatchparser.add_argument('dateofrequest', type=str)
 reqPatchparser.add_argument('serviceStatus', type=str)
 reqPatchparser.add_argument('approve', type=str)
+reqPatchparser.add_argument('feedback', type=str)
+reqPatchparser.add_argument('rating', type=int)
 
 custPatch = reqparse.RequestParser()
 custPatch.add_argument('id',type=int,required=True)
@@ -293,6 +295,9 @@ class requestSauce(Resource):
 
         if args.get('feedback'):
             request.feedback = args['feedback']
+
+        if args.get('rating'):
+            request.rating = args['rating']
 
         if args.get('dateofrequest'):
             request.dateofrequest = args['dateofrequest']
