@@ -1,6 +1,6 @@
 import services from "../../components/services.js";
 import changedCommonTable from "../../components/changedCommonTable.js"; 
-
+import star from "../../components/star.js";
 const custDashboard = {
   template:`<div>
     <h1>Customer Dashboard</h1>
@@ -10,7 +10,6 @@ const custDashboard = {
         <services :name="service.name" :description="service.description" :price="service.price" ></services>
         </div>
       </div>
-  
 <div v-if="data[0] && data[0][0]">
   <!-- can also use (row) => row.approve === 'Pending' arrow function in condition , here in condition isPending without paranthesis is just passing a reference the function rather than actually invoking with paranthesis and all, no paranthesis function means reference being passed-->
   <changedCommonTable  :condition="Pending"  :title="title[0]" :data="data[0]" :selector="selector[0]" :columns="columns[0]">
@@ -23,7 +22,7 @@ const custDashboard = {
         <template v-slot:actions="{ row }">
         <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
         <button  class="btn btn-success btn-sm" @click="completed(row)">Completed</button>
-        <button  class="btn btn-danger btn-sm" @click="completed(row)">Not Completed</button>
+        <button  class="btn btn-danger btn-sm" @click="notCompleted(row)">Not Completed</button>
         </template>
   </changedCommonTable>
   <changedCommonTable  :condition="Rejected"  title='Rejected/Cancelled' :data="data[0]" :selector="selector[0]" :columns="columns[0]">
@@ -34,6 +33,33 @@ const custDashboard = {
   </changedCommonTable>
 
 </div>
+
+<!-- feedback Modal -->
+    <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="feedbackModalLabel">Feedback</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="feedbackForm">
+                    <label for="star" class="form-label">Rating</label>
+                      <star></star> 
+                        <div class="mb-3">
+                            <label for="remark" class="form-label">Remark</label>
+                            <textarea class="form-control" id="remark" rows="3" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="submitFeedback">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     </div>
   `,  
   data() {
@@ -89,6 +115,17 @@ const custDashboard = {
           }
       },
         async completed(row){
+        //modal
+        $('#feedbackModal').modal('show');
+        
+        $('#feedbackModal').off('submit').on('submit', async (e) => {
+          e.preventDefault();
+          const rating = document.querySelector('.rating__input:checked').value;
+          const remark = document.querySelector('#remark').value;
+          console.log(rating, remark);
+
+
+        $('#feedbackModal').modal('hide');
         const res = await fetch(window.location.origin + "/api/requests", {
           method: "PATCH",
           headers: {
@@ -98,10 +135,12 @@ const custDashboard = {
           body: JSON.stringify({
             id: row.id,
             serviceStatus: "Completed",
+            rating: rating,
+            feedback: remark,
           })
         });
         if (res.ok) {
-          console.log("Request completed");
+          console.log("Request status:completed");
           var ponse= await res.json();
           console.log(ponse);
           const tableIndex = 0; // Adjust this according to which table you're modifying
@@ -112,10 +151,46 @@ const custDashboard = {
         } else {
           console.error("Error cancelling request", res.status);
         }
+
+        });
+          
+        //modal
+
     },
+    async  notCompleted(row){
+      const res = await fetch(window.location.origin + "/api/requests", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Authentication-token": sessionStorage.getItem("token"),
+        },
+        body: JSON.stringify({
+          id: row.id,
+          serviceStatus: "Not Completed",
+        })
+      });
+      if (res.ok) {
+        console.log("Request status: Not completed");
+        var ponse= await res.json();
+        console.log(ponse);
+        const tableIndex = 0; // Adjust this according to which table you're modifying
+        const index = this.data[tableIndex].findIndex(item => item.id === row.id);
+        if (index !== -1) {
+            this.data[tableIndex][index].serviceStatus="Customer Cancellation"; // Remove the row from the array
+        }
+      } else {
+        console.error("Error cancelling request", res.status);
+      }
+  },
   },      
 
   async mounted() {
+    const ratingGroup = document.querySelector('.rating-group');
+    ratingGroup.addEventListener('change', function(event) {
+        if (event.target.classList.contains('rating__input')) {
+            console.log(event.target.value);
+        }
+    });
     var clean=[];
     try {
       const res = await fetch(window.location.origin + "/api/services", {
@@ -189,6 +264,6 @@ const custDashboard = {
     }
    },
    
-  components: { services, changedCommonTable },
+  components: { services, changedCommonTable,star },
 };
 export default custDashboard;

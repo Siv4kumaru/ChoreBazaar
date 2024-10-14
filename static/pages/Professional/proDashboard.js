@@ -41,7 +41,8 @@ const proDashboard = {
                 <form id="dateForm">
                     <div class="mb-3">
                         <label for="dateTimeInput" class="form-label">Date and Time</label>
-                        <input type="datetime-local" class="form-control" id="dateTimeInput" required>
+                        <input type="datetime-local" class="form-control" id="dateTimeInput" required
+                               min="1900-01-01T00:00" max="2099-12-31T23:59">
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
@@ -49,6 +50,7 @@ const proDashboard = {
         </div>
     </div>
 </div>
+
 
 
     </div>
@@ -89,9 +91,11 @@ const proDashboard = {
       $('#dateForm').off('submit').on('submit', async function (event) {
           event.preventDefault(); // Prevent traditional form submission
   
-          const dateTimeValue = $('#dateTimeInput').val(); // Get date and time input value in format YYYY-MM-DDTHH:MM
-          const formattedDateTime = this.formatDateTime(dateTimeValue); // Format it to YYYY-MM-DD HH:MM:SS
-          console.log('Selected Date and Time:', formattedDateTime);  // Log the formatted date and time
+          const dateTimeValue = $('#dateTimeInput').val();
+           // Get date and time input value in format YYYY-MM-DDTHH:MM
+          console.log('Selected Date and Time:', dateTimeValue);  // Log the selected date and time
+           const formattedDateTime = this.formatDateTime(dateTimeValue); // Format it to YYYY-MM-DD HH:MM:SS
+          console.log('Selected formatted Date and Time:', formattedDateTime);  // Log the formatted date and time
   
           $('#dateModal').modal('hide');  // Hide the modal after submission
   
@@ -129,17 +133,17 @@ const proDashboard = {
   // Function to format date and time
   formatDateTime(dateTimeValue) {
       const date = new Date(dateTimeValue);
-  
       // Extract date and time components
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0'); // Add leading zero to month
       const day = String(date.getDate()).padStart(2, '0');        // Add leading zero to day
       const hours = String(date.getHours()).padStart(2, '0');      // Add leading zero to hours
-      const minutes = String(date.getMinutes()).padStart(2, '0');  // Add leading zero to minutes
-      const seconds = String(date.getSeconds()).padStart(2, '0');  // Add leading zero to seconds
+      const minutes = String(date.getMinutes()).padStart(2, '0');  
+      // Add leading zero to minutes
+
   
       // Combine into the desired format
-      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+      return `${year}-${month}-${day} ${hours}:${minutes}`;
   },
   
   

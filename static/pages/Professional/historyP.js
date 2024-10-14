@@ -2,7 +2,6 @@ import changedCommonTable from '../../components/changedCommonTable.js'
 
 const historyP = {
     template: `<div>
-    {{data}}
         <input v-model="query" type="text" placeholder="Search.." id="query" name="query" @keyup="eachkey()">
         <button><i class="fa-solid fa-magnifying-glass" @click="eachhkey()"></i></button>
         <changedCommonTable title="History" :data="data" :columns="columns" selector="history" :condition="(row) => true"></changedCommonTable>
@@ -34,9 +33,7 @@ const historyP = {
             this.data = JSON.parse(savedData);
         } else {
             this.data = JSON.parse(this.$route.params.data);
-            for(let i in JSON.parse(this.$route.params.data)){
-                console.log(i);
-            }
+
         }
     },
 

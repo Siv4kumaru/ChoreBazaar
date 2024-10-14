@@ -83,6 +83,7 @@ class ServiceRequest(db.Model):
     dateofcompletion=db.Column(db.String)
     serviceStatus=db.Column(db.String,default="Pending")
     feedback=db.Column(db.String)
+    rating=db.Column(db.Integer)
 
     customer=db.relationship('Customer', back_populates='servicerequests')
     professional=db.relationship('Professional', back_populates='servicerequests')
