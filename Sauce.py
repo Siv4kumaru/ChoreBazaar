@@ -1,9 +1,10 @@
 from flask_restful import marshal_with,Resource,Api,fields,reqparse
 from flask_security import auth_required,roles_accepted
 from models import User,UserRoles,Service,ServiceRequest,Customer,Professional
+from flask_security.utils import hash_password,verify_password
 import logging
 from extensions import db
-from datetime import datetime,timedelta
+from datetime import datetime
 
 
 api=Api(prefix='/api')
@@ -104,9 +105,16 @@ class UnBlockUserResource(Resource):
 
 api.add_resource(UnBlockUserResource, '/unblock/<int:id>')
 
+custpatch=reqparse.RequestParser()
+custpatch.add_argument('email',type=str)
+custpatch.add_argument('name',type=str)
+custpatch.add_argument('phone',type=str)
+custpatch.add_argument('address',type=str)
+custpatch.add_argument('pincode',type=int)
+
 class CustomerSauce(Resource):
     @auth_required('token')
-    @roles_accepted('admin')
+    @roles_accepted('admin','customer')
     def get(self):
         list=[]
         customer=Customer.query.all()
@@ -116,22 +124,34 @@ class CustomerSauce(Resource):
             user=User.query.filter_by(id=cus.userId).first()
             list.append({"id":user.id,"name":cus.name,"email":user.email,"phone":cus.phone,"address":cus.address,"pincode":cus.pincode,"active":user.active})
         return list,200
-    
-    # def patch(self):
-    #     args=custPatch.parse_args()
-    #     customer=User.query.filter_by(id=args['id']).first()
-    #     if customer is None:
-    #         return {"message":"Customer not Found"}, 404
-    #     if 'active' in args:
-    #         customer.active=args['active']
-    #         db.session.commit()
-    #         return {"message": "Customer updated successfully"}, 200
-            
+    def patch(self):
+        args=custpatch.parse_args()
+        userId=User.query.filter_by(email=args['email']).first().id
+        customer=Customer.query.filter_by(userId=userId).first()
+        if customer is None:
+            return {"message":"Customer not found"},404
+        if args.get('name'):
+            customer.name=args['name']
+        if args.get('phone'):
+            customer.phone=args['phone']
+        if args.get('address'):
+            customer.address=args['address']
+        if args.get('pincode'):
+            customer.pincode=args['pincode']
+        db.session.commit()
+        return {"message":"Customer Updated"},200
 
+propatch=reqparse.RequestParser()
+propatch.add_argument('email',type=str)
+propatch.add_argument('name',type=str)
+propatch.add_argument('phone',type=str)
+propatch.add_argument('address',type=str)
+propatch.add_argument('pincode',type=int)
+propatch.add_argument('experience',type=str)
 
 class ProfessionalSauce(Resource):
     @auth_required('token')
-    @roles_accepted('admin','customer')
+    @roles_accepted('admin','customer','professional')
     def get(self):
         list=[]
         pro=Professional.query.all()
@@ -146,6 +166,27 @@ class ProfessionalSauce(Resource):
                 servicePrice=serv.price
             list.append({"proid":p.id,"proUserId":user.id,"name":p.name,"servicePrice":servicePrice,"email":user.email,"phone":p.phone,"address":p.address,"pincode":p.pincode,"serviceName":p.serviceName,"serviceId":p.serviceId,"experience":p.experience,"active":user.active})
         return list,200
+    
+    @auth_required('token')
+    @roles_accepted('admin','customer','professional')
+    def patch(self):
+        args=propatch.parse_args()
+        userId=User.query.filter_by(email=args['email']).first().id
+        pro=Professional.query.filter_by(userId=userId).first()
+        if pro is None:
+            return {"message":"Professional not found"},404
+        if args.get('name'):
+            pro.name=args['name']
+        if args.get('phone'):
+            pro.phone=args['phone']
+        if args.get('address'):
+            pro.address=args['address']
+        if args.get('pincode'):
+            pro.pincode=args['pincode']
+        if args.get('experience'):
+            pro.experience=args['experience']
+        db.session.commit()
+        return {"message":"Professional Updated"},200   
 
 class ProfessionalNameSauce(Resource):
     @auth_required('token')
@@ -459,17 +500,27 @@ class proEarning(Resource):
     def get(self,email):
         pro=Professional.query.filter_by(userId=User.query.filter_by(email=email).first().id).first()
         if pro is None:
-            return {"message":"Professional not found"},404
+            return {"message":"Customer not found"},404
         proId=pro.id
+        earningPerService={}
+        tot=0
+        proStatus={"Customer Cancellation":0,"Pending":0,"accepeted":0,"Professional Rejection":0,"Completed":0,"Rejected":0,"Ongoing":0,"Not Completed":0}
         requests=ServiceRequest.query.filter_by(professionalId=proId).all()
-        proEarning=0
         for req in requests:
+            for j in proStatus:
+                if req.serviceStatus==j or req.approve==j:
+                    proStatus[j]+=1
+            
             if req.serviceStatus=="Completed":
                 service=Service.query.filter_by(id=req.serviceId).first()
                 if service is None:
                     return {"message":"Service not found"},404
-                proEarning+=service.price
-        return {"Earning":proEarning},200
+                if service.name in earningPerService:
+                    earningPerService[req.dateofcompletion]+=service.price
+                else:
+                    earningPerService[req.dateofcompletion]=service.price
+                    tot+=service.price
+        return {"status":proStatus,"Earningperdate":earningPerService,"total":tot},200
     
 class custspending(Resource):
     @auth_required('token')
@@ -480,11 +531,11 @@ class custspending(Resource):
             return {"message":"Customer not found"},404
         custId=cust.id
         spendingperservice={}
-        custstatus={"Customer Cancellation":0,"Pending":0,"Professional Rejection":0,"Completed":0,"Rejected":0,"Ongoing":0,"Not Completed":0}
+        custstatus={"Customer Cancellation":0,"Pending":0,"accepted":0,"Professional Rejection":0,"Completed":0,"Rejected":0,"Ongoing":0,"Not Completed":0}
         requests=ServiceRequest.query.filter_by(customerId=custId).all()
         for req in requests:
             for j in custstatus:
-                if req.serviceStatus==j:
+                if req.serviceStatus==j or req.approve==j:
                     custstatus[j]+=1
             
             service=Service.query.filter_by(id=req.serviceId).first()
@@ -529,6 +580,24 @@ class allproearning(Resource):
                     proEarning[pro.name]+=service.price
         return proEarning,200
 
+adminparser=reqparse.RequestParser()
+adminparser.add_argument('email',type=str,required=True)
+adminparser.add_argument('currentPassword',type=str,required=True)
+adminparser.add_argument('newPassword',type=str,required=True) 
+class adminupdate(Resource):
+    @auth_required('token')
+    def patch(self):
+        args= adminparser.parse_args()
+        user=User.query.filter_by(email=args['email']).first()
+        if user is None:
+            return {"message":"User not found"},404
+        if not verify_password(args['currentPassword'],user.password):
+            return {"message":"Incorrect Password"},400
+        user.password=hash_password(args['newPassword'])
+        db.session.commit()
+        return {"message":"Password Updated Sucessfully"},200
+        
+api.add_resource(adminupdate,'/adminUpdate')
 api.add_resource(allproearning,'/proEarning')
 api.add_resource(servearning,'/earning')
 api.add_resource(custspending,'/customer/<string:email>/spending')

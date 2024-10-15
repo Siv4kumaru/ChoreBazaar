@@ -8,12 +8,14 @@ const Navbar ={
         <router-link v-if="!state.loggedIn" to="/customerSignup">Customer Signup</router-link>
         <router-link v-if="!state.loggedIn" to="/proSignup">Professional Signup</router-link>
         <router-link v-if="!state.loggedIn" to="/login">Login</router-link>
-        <router-link v-if="state.loggedIn" to="/Profile">Profile</router-link>
         <router-link v-if="state.loggedIn && state.role === 'admin'" to="/searchA">Search</router-link>
         <router-link v-if="state.loggedIn && state.role === 'customer'" to="/searchC">Search</router-link>
+        <router-link v-if="state.loggedIn && state.role === 'admin'" to="/ProfileA">Profile</router-link>       
+        <router-link v-if="state.loggedIn && state.role === 'customer'" to="/ProfileC">Profile</router-link>       
+        <router-link v-if="state.loggedIn && state.role === 'professional'" to="/ProfileP">Profile</router-link>       
         <router-link v-if="state.loggedIn && state.role === 'admin'" to="/statsA">Stats</router-link>
         <router-link v-if="state.loggedIn && state.role === 'customer'" to="/statsC">Stats</router-link>
-        <router-link v-if="state.loggedIn && state.role === 'professional'" to="/statsP">Stats</router-link>        
+        <router-link v-if="state.loggedIn && state.role === 'professional'" to="/statsP">Stats</router-link> 
         <button class="btn btn-warning text-xl" v-if="state.loggedIn" @click="logout">Logout</button>
         </nav>`,
         methods:{

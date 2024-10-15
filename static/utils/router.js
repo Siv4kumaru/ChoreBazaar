@@ -1,4 +1,3 @@
-import Profile from '../pages/Profile.js'
 import Home from '../pages/Home.js'
 import CustomerSignup from '../pages/CustomerSignup.js'
 import ProSignup from '../pages/ProSignup.js'
@@ -16,15 +15,17 @@ import searchC from '../pages/Customer/searchC.js'
 import EditService from '../pages/Admin/EditService.js'
 import addService from '../pages/Admin/addService.js'
 import EditRequest from '../pages/Admin/EditRequest.js'
-import custDashboard from '../pages/Customer/CustDashboard.js'
 import historyP from '../pages/Professional/historyP.js'
+import custDashboard from '../pages/Customer/custDashboard.js'
+import ProfileP from '../pages/Professional/ProfileP.js'
+import ProfileC from '../pages/Customer/ProfileC.js'
+import ProfileA from '../pages/Admin/ProfileA.js'
 
 const routes = [
     {path : '/', component: Home},
     {path : '/customerSignup', component: CustomerSignup},
     {path : '/proSignup', component: ProSignup},
     {path : '/login', component: Login},
-    {path: '/Profile', component: Profile, meta: { requiresLogin: true }},
     {path: '/Dashboard-Customer', component: custDashboard , meta: { requiresLogin: true, role: "customer" }},
     {path: '/Dashboard-Professional', component: proDashboard , meta: { requiresLogin: true, role: "professional" }},
     {path: '/Dashboard-Admin', component: adminDashboard , meta: { requiresLogin: true, role: "admin" }},
@@ -39,7 +40,9 @@ const routes = [
     {path: '/editRequest/:id',name:"editRequest",component: EditRequest, meta: { requiresLogin: true, role: "admin" }},
     {path: '/Dashboard-Customer/history', name:"historyC",component: history , meta: { requiresLogin: true, role: "customer" }},
     {path: '/Dashboard-Professional/history', name:"historyP",component: historyP , meta: { requiresLogin: true, role: "professional" }},
-
+    {path: '/ProfileP', component: ProfileP, meta: { requiresLogin: true, role: "professional" }},
+    {path: '/ProfileC', component: ProfileC, meta: { requiresLogin: true, role: "customer" }},
+    {path: '/ProfileA', component: ProfileA, meta: { requiresLogin: true, role: "admin" }},
 ]
 
 const router = new VueRouter({
