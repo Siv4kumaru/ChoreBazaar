@@ -10,6 +10,9 @@ const statsA = {
             <div class="col-8"><canvas id="myChart3"></canvas></div>
 
         </div>    
+        <div class="row">
+            <div class="col-8"><canvas id="myChart4"></canvas></div>
+        </div>  
     </div>
     serviceName:{{serviceName}}
     proservcount:{{proservcount}}
@@ -194,11 +197,82 @@ const statsA = {
         new Chart($('#myChart3'), config2);
         //Polar area
 
-        //service price vs cust
+        //pro vs pro
 
         
 
-        //service price vs cust
+// Function to generate random RGBA colors
+function getRandomColor() {
+    const r = Math.floor(Math.random() * 255);
+    const g = Math.floor(Math.random() * 255);
+    const b = Math.floor(Math.random() * 255);
+    return `rgba(${r}, ${g}, ${b}, 0.2)`; // Adjust alpha (0.2) for background
+  }
+  
+  // Function to generate random RGB colors for border
+  function getRandomBorderColor() {
+    const r = Math.floor(Math.random() * 255);
+    const g = Math.floor(Math.random() * 255);
+    const b = Math.floor(Math.random() * 255);
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+  
+  // Fetch dynamic data from API
+  const proEarningall = await fetch(window.location.origin + '/api/proEarning', {
+    headers: {
+      "Content-Type": "application/json",
+      "Authentication-token": sessionStorage.getItem("token")
+    }
+  });
+  
+  let proEarningData = [];
+  let proLabels = [];
+  
+  if (proEarningall.ok) {
+    const proEarning = await proEarningall.json();
+    console.log(proEarning);
+    
+    // Extract labels (pro names) and data (income)
+    proLabels = Object.keys(proEarning); // ['pro', 'new pro']
+    proEarningData = Object.values(proEarning); // [20000.0, 20000.0]
+  }
+  
+  // Dynamically generate random colors based on the length of the data array
+  const backgroundColors = proEarningData.map(() => getRandomColor());
+  const borderColors = proEarningData.map(() => getRandomBorderColor());
+  
+  const data4 = {
+    labels: proLabels, // Use pro names as labels
+    datasets: [{
+      label: 'Pro Earnings',
+      data: proEarningData, // Use dynamic data array from API
+      backgroundColor: backgroundColors, // Use dynamically generated background colors
+      borderColor: borderColors, // Use dynamically generated border colors
+      borderWidth: 1
+    }]
+  };
+  
+  const config4 = {
+    type: 'bar',
+    data: data4,
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  };
+  
+  // Create and render the chart
+  const myChart = new Chart(
+    document.getElementById('myChart4'),
+    config4
+  );
+  
+        
+
+        //earning vs pro
 
  
     }

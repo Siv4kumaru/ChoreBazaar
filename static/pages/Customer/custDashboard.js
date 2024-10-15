@@ -14,8 +14,6 @@ const custDashboard = {
   <!-- can also use (row) => row.approve === 'Pending' arrow function in condition , here in condition isPending without paranthesis is just passing a reference the function rather than actually invoking with paranthesis and all, no paranthesis function means reference being passed-->
   <changedCommonTable  :condition="Pending"  :title="title[0]" :data="data[0]" :selector="selector[0]" :columns="columns[0]">
         <template v-slot:actions="{ row }">
-                <button  class="btn btn-success btn-sm" @click="openFeedbackModal(row)">Completed</button>
-
         <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
         <button v-if="row.serviceStatus!='Customer Cancellation'" class="btn btn-danger btn-sm" @click="cancel(row)">Cancel</button>
         </template>
@@ -23,8 +21,8 @@ const custDashboard = {
     <changedCommonTable  :condition="Accepted"  title='Accepted/Ongoing' :data="data[0]" :selector="selector[0]" :columns="columns[1]">
         <template v-slot:actions="{ row }">
         <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
-        <button  class="btn btn-success btn-sm" @click="openFeedbackModal(row)">Completed</button>
-        <button  class="btn btn-danger btn-sm" @click="notCompleted(row)">Not Completed</button>
+        <button  class="btn btn-success btn-sm" @click="openFeedbackModal(row,'Completed')">Completed</button>
+        <button  class="btn btn-danger btn-sm" @click="openFeedbackModal(row,'Not Completed')">Not Completed</button>
         </template>
   </changedCommonTable>
   <changedCommonTable  :condition="Rejected"  title='Rejected/Cancelled' :data="data[0]" :selector="selector[0]" :columns="columns[0]">
@@ -41,7 +39,8 @@ const custDashboard = {
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="feedbackModalLabel">Feedback</h5>
+              <h5 v-if="comp=='Completed'" class="modal-title" id="feedbackModalLabel">Feedback</h5>
+              <h5 v-if="comp=='Not Completed'" class="modal-title" id="feedbackModalLabel">Non Completion Feedback</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -50,8 +49,9 @@ const custDashboard = {
                 <star></star>
 
                 <div class="mb-3">
-                  <label for="remark" class="form-label">Remark</label>
-                  <textarea class="form-control" v-model="remark" rows="3" required></textarea>
+                  <label v-if="comp=='Completed'" for="remark" class="form-label">Remark</label>
+                  <label v-if="comp=='Not Completed'" for="remark" class="form-label">We are Sorry! for your Inconvinience! kindly give your remarks</label>
+                  <textarea class="form-control" v-model="remark" rows="3" placeholder="Remarks!" required></textarea>
                 </div>
               </form>
             </div>
@@ -66,6 +66,7 @@ const custDashboard = {
   `,  
   data() {
     return {
+      comp: "",
       allServices: [],
       columns:[],
       title:[],
@@ -120,7 +121,8 @@ const custDashboard = {
           }
       },
 
-      openFeedbackModal(row) {
+      openFeedbackModal(row,str) {
+        this.comp=str;
         this.currentRow = row;
         $("#feedbackModal").modal("show");
       }, 
@@ -138,7 +140,7 @@ const custDashboard = {
           },
           body: JSON.stringify({
             id: this.currentRow.id,
-            serviceStatus: "Completed",
+            serviceStatus: this.comp,
             rating: this.rating,
             feedback: this.remark,
           }),

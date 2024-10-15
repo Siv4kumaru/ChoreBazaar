@@ -479,15 +479,22 @@ class custspending(Resource):
         if cust is None:
             return {"message":"Customer not found"},404
         custId=cust.id
+        spendingperservice={}
+        custstatus={"Customer Cancellation":0,"Pending":0,"Professional Rejection":0,"Completed":0,"Rejected":0,"Ongoing":0,"Not Completed":0}
         requests=ServiceRequest.query.filter_by(customerId=custId).all()
-        custSpending=0
         for req in requests:
-            if req.serviceStatus=="Completed":
-                service=Service.query.filter_by(id=req.serviceId).first()
-                if service is None:
-                    return {"message":"Service not found"},404
-                custSpending+=service.price
-        return {"Spending":custSpending},200
+            for j in custstatus:
+                if req.serviceStatus==j:
+                    custstatus[j]+=1
+            
+            service=Service.query.filter_by(id=req.serviceId).first()
+            if service is None:
+                return {"message":"Service not found"},404
+            if service.name in spendingperservice:
+                spendingperservice[service.name]+=service.price
+            else:
+                spendingperservice[service.name]=service.price
+        return {"status":custstatus,"spend":spendingperservice},200
     
 class servearning(Resource):
     @auth_required('token')
@@ -505,6 +512,24 @@ class servearning(Resource):
                     serv[ser.name]+=ser.price
         return serv,200
 
+class allproearning(Resource):
+    def get(self):
+        pros=Professional.query.all()
+        earning=0
+        proEarning={}
+        for p in pros:
+            proEarning[p.name]=0
+        for pro in pros:
+            requests=ServiceRequest.query.filter_by(professionalId=pro.id).all()
+            for req in requests:
+                if req.serviceStatus=="Completed":
+                    service=Service.query.filter_by(id=req.serviceId).first()
+                    if service is None:
+                        return {"message":"Service not found"},404
+                    proEarning[pro.name]+=service.price
+        return proEarning,200
+
+api.add_resource(allproearning,'/proEarning')
 api.add_resource(servearning,'/earning')
 api.add_resource(custspending,'/customer/<string:email>/spending')
 api.add_resource(proEarning,'/professional/<string:email>/earning')            
