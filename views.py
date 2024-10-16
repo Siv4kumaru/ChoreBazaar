@@ -2,9 +2,16 @@ from flask import jsonify, render_template_string,render_template, request
 from flask_security import auth_required,current_user,roles_accepted,SQLAlchemyUserDatastore
 from flask_security.utils import hash_password,verify_password
 from extensions import db
+from datetime import datetime
 from models import Professional,User,Customer,Service,ServiceRequest
 
-def create_view(app,userdatastore:SQLAlchemyUserDatastore):
+def create_view(app,userdatastore:SQLAlchemyUserDatastore,cache):
+    
+    @app.route('/cacheDemo')   
+    @cache.cached(timeout=10)
+    def cacheDemo():
+        return {"time":datetime.now()}
+    
     @app.route('/')
     def home():
         return render_template("index.html")

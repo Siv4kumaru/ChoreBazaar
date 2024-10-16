@@ -1,9 +1,9 @@
 from flask import Flask
 import views
 import Sauce as Sauce
-from extensions import db,security
+from extensions import db,security,cache
+from flask_caching import Cache
 from create_initial_data import create_data
-
 
 def create_app():
     app = Flask(__name__)
@@ -17,6 +17,14 @@ def create_app():
     app.config['SECURITY_TOKEN_MAX_AGE'] = 3600
     app.config['SECURITY_LOGIN_WITHOUT_CONFIRMATION'] = True #diff token evrytime 
     
+    #cache
+    app.config["CACHE_DEFAULT_TIMEOUT"] = 300 #after 300 ms the cache will be deleted
+    app.config["DEBUG"] = True
+    app.config["CACHE_TYPE"] = "RedisCache"
+    app.config["CACHE_REDIS_PORT"] = 6379 
+    #app.config['CACHE_REDIS_HOST'] = 'localhost'
+    
+    cache.init_app(app)
     db.init_app(app)
 
     with app.app_context():
@@ -34,7 +42,7 @@ def create_app():
     
 
 
-    views.create_view(app,user_datastore)
+    views.create_view(app,user_datastore,cache)
     
     #resouces
     Sauce.api.init_app(app)

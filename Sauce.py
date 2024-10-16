@@ -3,7 +3,7 @@ from flask_security import auth_required,roles_accepted
 from models import User,UserRoles,Service,ServiceRequest,Customer,Professional
 from flask_security.utils import hash_password,verify_password
 import logging
-from extensions import db
+from extensions import db,cache
 from datetime import datetime
 
 
@@ -70,6 +70,7 @@ custPatch.add_argument('id',type=int,required=True)
 custPatch.add_argument('active',type=bool)
 
 class BlockUserResource(Resource):
+    @auth_required('token')
     @roles_accepted('admin')
     def get(self, id):
         user = User.query.filter_by(id=id).first()
@@ -115,6 +116,7 @@ custpatch.add_argument('pincode',type=int)
 class CustomerSauce(Resource):
     @auth_required('token')
     @roles_accepted('admin','customer')
+    @cache.cached(timeout=60, key_prefix='cust')
     def get(self):
         list=[]
         customer=Customer.query.all()
@@ -139,6 +141,7 @@ class CustomerSauce(Resource):
         if args.get('pincode'):
             customer.pincode=args['pincode']
         db.session.commit()
+        cache.delete('cust')
         return {"message":"Customer Updated"},200
 
 propatch=reqparse.RequestParser()
@@ -152,6 +155,7 @@ propatch.add_argument('experience',type=str)
 class ProfessionalSauce(Resource):
     @auth_required('token')
     @roles_accepted('admin','customer','professional')
+    @cache.cached(timeout=60, key_prefix='pro')
     def get(self):
         list=[]
         pro=Professional.query.all()
@@ -186,6 +190,7 @@ class ProfessionalSauce(Resource):
         if args.get('experience'):
             pro.experience=args['experience']
         db.session.commit()
+        cache.delete('pro')
         return {"message":"Professional Updated"},200   
 
 class ProfessionalNameSauce(Resource):
@@ -202,6 +207,7 @@ api.add_resource(ProfessionalNameSauce,'/professional/<string:email>')
 class requestSauce(Resource):
     @auth_required('token')
     @roles_accepted('admin','customer','professional')
+    @cache.cached(timeout=5, key_prefix='requests')
     def get(self):
         list=[]
         requests=ServiceRequest.query.all()
@@ -285,6 +291,7 @@ class requestSauce(Resource):
         
         db.session.add(new_request)
         db.session.commit()
+        cache.delete('requests')
 
         logging.info(f"Service request created successfully for customer ID {args['customerId']}.")
         return {"message": "Request created"}, 200
@@ -350,6 +357,7 @@ class requestSauce(Resource):
             request.approve = args['approve']
 
         db.session.commit()
+        cache.delete('requests')
         return {"message":f"Request Updated"},200
     
 
@@ -358,6 +366,7 @@ class ServiceSauce(Resource):
     # @auth_required()
     # @roles_accepted('admin')
     @marshal_with(service_fields)
+    @cache.cached(timeout=60, key_prefix='service')
     def get(self):
         allServices=Service.query.all()
         return allServices
@@ -372,6 +381,7 @@ class ServiceSauce(Resource):
         service=Service(**args)
         db.session.add(service)
         db.session.commit()
+        cache.delete('service')
         return {"message":"Service Created"},200
     
     @auth_required('token')
@@ -383,6 +393,7 @@ class ServiceSauce(Resource):
             return {"message":"Service not found"},404
         db.session.delete(service)
         db.session.commit()
+        cache.delete('service')
         return {"message":"Service Deleted"},200
     
     @auth_required('token')
@@ -403,6 +414,7 @@ class ServiceSauce(Resource):
         if args.get('price') is not None:
             service.price = args['price']
         db.session.commit()
+        cache.delete('service')
         return {"message":"Service Updated"},200
     
 class ServiceIdSauce(Resource):
