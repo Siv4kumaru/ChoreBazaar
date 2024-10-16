@@ -4,6 +4,9 @@ import Sauce as Sauce
 from extensions import db,security,cache
 from flask_caching import Cache
 from create_initial_data import create_data
+from worker import celery_init_app  
+
+celery_app = None
 
 def create_app():
     app = Flask(__name__)
@@ -26,6 +29,7 @@ def create_app():
     
     cache.init_app(app)
     db.init_app(app)
+    celery_app = celery_init_app(app)
 
     with app.app_context():
         from models import User, Role

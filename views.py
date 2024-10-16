@@ -4,9 +4,17 @@ from flask_security.utils import hash_password,verify_password
 from extensions import db
 from datetime import datetime
 from models import Professional,User,Customer,Service,ServiceRequest
+from tasks import lemon
 
 def create_view(app,userdatastore:SQLAlchemyUserDatastore,cache):
     
+    #celery
+    @app.route('/celery')
+    def celery():
+        lemon.delay(1,2)
+        return "Celery task added"
+    
+    #wanna see changes in cache ctrl+c in cmd and flask run again
     @app.route('/cacheDemo')   
     @cache.cached(timeout=10)
     def cacheDemo():
