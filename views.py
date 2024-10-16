@@ -5,14 +5,23 @@ from extensions import db
 from datetime import datetime
 from models import Professional,User,Customer,Service,ServiceRequest
 from tasks import lemon
+from celery.result import AsyncResult
 
 def create_view(app,userdatastore:SQLAlchemyUserDatastore,cache):
     
     #celery
     @app.route('/celery')
     def celery():
-        lemon.delay(1,2)
-        return "Celery task added"
+        task=lemon.delay(1,2)
+        return jsonify({"task_id":task.id})
+    
+    @app.route('/get_task/<task_id>')
+    def get_task(task_id):
+        result=AsyncResult(task_id)
+        if result.ready():
+            return jsonify({"task_status":result.status,"result":result.get()})
+        else:
+            return jsonify({"task_status":result.status})
     
     #wanna see changes in cache ctrl+c in cmd and flask run again
     @app.route('/cacheDemo')   
