@@ -4,7 +4,8 @@ import Sauce as Sauce
 from extensions import db,security,cache
 from flask_caching import Cache
 from create_initial_data import create_data
-from worker import celery_init_app  
+from worker import celery_init_app 
+import flask_excel as excel  
 
 celery_app = None
 
@@ -48,6 +49,7 @@ def create_app():
 
     views.create_view(app,user_datastore,cache)
     
+    excel.init_excel(app)
     #resouces
     Sauce.api.init_app(app)
 

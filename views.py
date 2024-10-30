@@ -9,6 +9,11 @@ from celery.result import AsyncResult
 
 def create_view(app,userdatastore:SQLAlchemyUserDatastore,cache):
     
+    @app.route('/start-export')
+    def start_export():
+        task=createCsv.delay()
+        return jsonify({"task_id":task.id})
+    
     #celery
     @app.route('/celery')
     def celery():
