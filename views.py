@@ -4,16 +4,17 @@ from flask_security.utils import hash_password,verify_password
 from extensions import db
 from datetime import datetime
 from models import Professional,User,Customer,Service,ServiceRequest
-from tasks import lemon
+from tasks import csvtask
 from celery.result import AsyncResult
+import flask_excel as excel
 
 def create_view(app,userdatastore:SQLAlchemyUserDatastore,cache):
     
     #celery
-    @app.route('/celery')
-    def celery():
-        task=lemon.delay(1,2)
-        return jsonify({"task_id":task.id})
+    @app.get('/csv')
+    def csvDown():
+        res=csvtask.delay()
+        return jsonify({"task_id":res.id})
     
     @app.route('/get_task/<task_id>')
     def get_task(task_id):
