@@ -53,6 +53,7 @@ def create_app():
 
     return app
 
+
 app=create_app()
 celery_app = celery_init_app(app)
 

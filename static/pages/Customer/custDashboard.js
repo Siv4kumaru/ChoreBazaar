@@ -31,6 +31,7 @@ const custDashboard = {
         <button v-if="row.serviceStatus!='Customer Cancellation'" class="btn btn-danger btn-sm" @click="cancel(row)">Cancel</button>
         </template>
   </changedCommonTable>
+  <button @click="Report">Report</button>
 
 </div>
 
@@ -79,6 +80,22 @@ const custDashboard = {
     };
   },
   methods:{
+    async Report(){
+      const res= await fetch('/csv')
+      if(res.ok){
+        const data=await res.json();
+        if (res.ok){
+          const taskId = data['task_id'];
+          const intv= setInterval(async () => {
+            const csv_down= await fetch(`/get_csv/${taskId}`);
+            if(csv_down.ok){
+              clearInterval(intv);
+              const url= `/get_csv/${taskId}`;
+            }
+          }, 1000);
+        }
+      }
+          },
     hi(){
       console.log("hi");
     },

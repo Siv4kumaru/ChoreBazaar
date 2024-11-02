@@ -1,4 +1,4 @@
-from flask import jsonify, render_template_string,render_template, request
+from flask import jsonify, render_template_string,render_template, request,send_file
 from flask_security import auth_required,current_user,roles_accepted,SQLAlchemyUserDatastore
 from flask_security.utils import hash_password,verify_password
 from extensions import db
@@ -16,13 +16,22 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore,cache):
         res=csvtask.delay()
         return jsonify({"task_id":res.id})
     
+    @app.get('/get_csv/<task_id>')
+    def get_csv(task_id):
+        res=AsyncResult(task_id)
+        if res.ready():
+            filename=res.result
+            return send_file(filename,as_attachment=True)
+        else:
+            return jsonify({"task_status":res.status}),404
+    
     @app.route('/get_task/<task_id>')
     def get_task(task_id):
         result=AsyncResult(task_id)
         if result.ready():
             return jsonify({"task_status":result.status,"result":result.get()})
         else:
-            return jsonify({"task_status":result.status})
+            return jsonify({"task_status":result.status}),404
     
     #wanna see changes in cache ctrl+c in cmd and flask run again
     @app.route('/cacheDemo')   
