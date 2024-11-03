@@ -31,7 +31,7 @@ const custDashboard = {
         <button v-if="row.serviceStatus!='Customer Cancellation'" class="btn btn-danger btn-sm" @click="cancel(row)">Cancel</button>
         </template>
   </changedCommonTable>
-  <button @click="Report">Report</button>
+  <button @click="Report">Report</button><span v-if='iswaiting'> Waiting... </span>
 
 </div>
 
@@ -67,6 +67,7 @@ const custDashboard = {
   `,  
   data() {
     return {
+      iswaiting:false,
       comp: "",
       allServices: [],
       columns:[],
@@ -81,6 +82,7 @@ const custDashboard = {
   },
   methods:{
     async Report(){
+      this.iswaiting=true
       const res= await fetch('/csv')
       if(res.ok){
         const data=await res.json();
@@ -89,8 +91,20 @@ const custDashboard = {
           const intv= setInterval(async () => {
             const csv_down= await fetch(`/get_csv/${taskId}`);
             if(csv_down.ok){
+              this.iswaiting=false;
               clearInterval(intv);
-              const url= `/get_csv/${taskId}`;
+              const blob = await csv_down.blob();
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.style.display = 'none';
+              a.href = url;
+              a.download = 'test.csv';
+              document.body.appendChild(a);
+              a.click();
+              
+              // Cleanup
+              window.URL.revokeObjectURL(url);
+              document.body.removeChild(a);
             }
           }, 1000);
         }
