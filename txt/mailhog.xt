@@ -1,0 +1,9 @@
+installation:
+sudo apt-get -y install golang-go
+go install github.com/mailhog/MailHog@latest
+
+running the testing smtp server:
+~/go/bin/MailHog
+
+running on port:
+localhost:8025

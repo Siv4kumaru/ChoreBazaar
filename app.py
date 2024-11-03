@@ -5,6 +5,8 @@ from extensions import db,security,cache
 from flask_caching import Cache
 from create_initial_data import create_data
 from worker import celery_init_app  
+from celery.schedules import crontab
+from tasks import daily_reminder
 import flask_excel as excel
 
 
@@ -26,6 +28,7 @@ def create_app():
     app.config["CACHE_TYPE"] = "RedisCache"
     app.config["CACHE_REDIS_PORT"] = 6379 
     #app.config['CACHE_REDIS_HOST'] = 'localhost'
+
     
     cache.init_app(app)
     db.init_app(app)
@@ -56,6 +59,13 @@ def create_app():
 
 app=create_app()
 celery_app = celery_init_app(app)
+
+@celery_app.on_after_configure.connect
+def send_email(sender, **kwargs):
+    sender.add_periodic_task(
+        crontab(hour=14, minute=59,day_of_week='*'),
+        daily_reminder.s('dummyrecievetriple777@gmail.com', 'Daily Test'),
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)
