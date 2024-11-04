@@ -26,6 +26,7 @@ def create_app():
     app.config["CACHE_DEFAULT_TIMEOUT"] = 300 #after 300 ms the cache will be deleted
     app.config["DEBUG"] = True
     app.config["CACHE_TYPE"] = "RedisCache"
+    app.config["CACHE_REDIS_DB"] = 0 
     app.config["CACHE_REDIS_PORT"] = 6379 
     #app.config['CACHE_REDIS_HOST'] = 'localhost'
 
@@ -63,7 +64,7 @@ celery_app = celery_init_app(app)
 @celery_app.on_after_configure.connect
 def send_email(sender, **kwargs):
     sender.add_periodic_task(
-        crontab(hour=14, minute=59,day_of_week='*'),
+        crontab(hour=22, minute=2),
         daily_reminder.s('dummyrecievetriple777@gmail.com', 'Daily Test'),
     )
 
