@@ -29,7 +29,7 @@ tmux send-keys -t my_session:4 'source ./venv/bin/activate; flask run' C-m
 
 #kill tmux
 tmux new-window -t my_session -n 'End TMUX'
-tmux send-keys -t my_session:5 'tmux kill-server'
+tmux send-keys -t my_session:5 'killall redis-server; sleep 1;tmux kill-server'
 
 # Attach to the tmux session
 tmux attach-session -t my_session

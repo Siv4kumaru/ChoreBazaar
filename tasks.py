@@ -24,13 +24,11 @@ def csvtask():
 def daily_reminder(to, subject):
     send_message(to, subject, "This is a daily reminder")
     print("sent")
+    
     # roleuserID=UserRoles.query.filter_by(UserRoles.role_id==1).user_id.all()
     # users = User.query.filter_by(User.user_id==roleuserID).all()
-    # print(users.email)
-    # for user in users:
-    #     with open('test.html', 'r') as f:
-    #         template = Template(f.read())
-    #         send_message(user.email, subject,
-    #                      template.render(email=user.email))
-    return "OK"
-    
+
+    with open('email.html', 'r') as f:
+        template = Template(f.read())
+        send_message("dummy@gmail.com", subject,
+                        template.render(email="dummytriple777@gmail.com"))
