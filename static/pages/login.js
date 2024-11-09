@@ -38,6 +38,11 @@ const Login = {
       SuccessMessage:""
     };
   },
+  created(){
+    this.email = localStorage.getItem('email');
+    this.password = localStorage.getItem('password');
+    window.localStorage.clear();
+  },
   methods: {
     async submitInfo(event) {
       event.preventDefault(); // Prevent form submission
@@ -83,6 +88,7 @@ const Login = {
     }
   },
   computed: {
+
     state() {
       return this.$store.state;
     }

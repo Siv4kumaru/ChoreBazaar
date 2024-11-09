@@ -81,13 +81,13 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore,cache):
         role=data.get('role')
         
         if role=='admin':
-            return jsonify({"message":"Not today Hacker, I'm the only Admin"},400)
+            return jsonify({"message":"Not today Hacker, I'm the only Admin"}),404
         
         if not email or not password or role not in ['customer','professional']:
-            return jsonify({"message":"Invalid data"},400)
+            return jsonify({"message":"Invalid data"}),404
         
         if userdatastore.find_user(email=email):
-            return jsonify({"message":"User already exists"},400)
+            return jsonify({"message":"User already exists"}),404
 
         
         #professional must be kept inactive until admin approves it
@@ -121,7 +121,7 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore,cache):
         except:
             print('Error creating user')
             db.session.rollback()
-            return jsonify({"message":"Error creating user"}),408
+            return jsonify({"message":"Error creating user"}),404
         return jsonify({"message":"created user"}),200
             
 

@@ -75,17 +75,19 @@ const CustomerSignup = {
         credentials: "same-origin",
       });
 
-      const data = await res.json();
-      console.log(data);
-
-      if (data.status === 200) {
+      console.log("response",res);
+      if (res.status === 200 ) {
+        console.log("Sign up successful");
         this.SuccessMessage = "Signup Successful";
-        // Handle successful sign up, e.g., redirect or store token
+        window.localStorage.setItem('email', this.email);
+        window.localStorage.setItem('password',this.password);
         router.push("/login");
-      } else {
-        const errorData =  data;
+      } 
+      else {
+
+        const errorData =  await res.json();
         console.error("Sign up failed:", errorData);
-        this.ErrorMessage = errorData[0] || "An unexpected error occurred. Please try again.";
+        this.ErrorMessage = errorData["message"] || "An unexpected error occurred. Please try again.";
         setTimeout(() => {
           this.ErrorMessage = "";
         }, 3000);

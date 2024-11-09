@@ -6,6 +6,9 @@ const ProSignup = {
 <form>
   <div class="card shadow p-4">
     <h3 class="card-title text-center mb-4">Professional Registration</h3>
+    <div v-if="ErrorMessage" class="alert alert-danger" role="alert">
+      {{ ErrorMessage }}
+       </div>
     <div class="form-group mb-3">
       <input v-model="name" type="text" class="form-control" placeholder="Name" required/>
     </div>
@@ -53,7 +56,8 @@ const ProSignup = {
         experience: "",
         address: "",
         pincode: "",
-        services: []
+        services: [],
+        ErrorMessage: "",
     };
   },
   mounted() {
@@ -73,7 +77,7 @@ const ProSignup = {
       }
     },
     async submitInfo() {
-      if (this.email == "" || !this.password == "" || !this.role == "" || !this.phone == "" || !this.name == "" || !this.service == "" || !this.experience == "" || !this.address == "" || !this.pincode == "") {
+      if (this.email == "" || this.password == "" || this.role == "" || this.phone == "" || this.name == "" || this.service == "" || this.experience == "" || this.address == "" || this.pincode == "") {
         console.error("Fill All the Fields"), 404;
         return;
       }
@@ -98,14 +102,21 @@ const ProSignup = {
         credentials: "same-origin",
       });
 
-      const data = await res.json();
-      console.log(data);
+
       if (res.ok) {
+        console.log("Sign up successful");
+        this.SuccessMessage = "Signup Successful";
+        window.localStorage.setItem('email', this.email);
+        window.localStorage.setItem('password',this.password);
         // Handle successful sign up, e.g., redirect or store token
         router.push("/login");
       } else {
         const errorData = await res.json();
         console.error("Sign up failed:", errorData);
+        this.ErrorMessage = errorData["message"] || "An unexpected error occurred. Please try again.";
+        setTimeout(() => {
+          this.ErrorMessage = "";
+        }, 3000);
         // Handle sign up error
       }
     },
