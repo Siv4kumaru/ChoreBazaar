@@ -54,12 +54,24 @@
         color: #ddd;
       }
     }
-    
+
+
+  .slogan{
+        font-family: 'Shrikhand', sans-serif;
+        font-style:bold;
+        font-size: 4em;
+        color: #000000;
+    }
     
     body {
       padding: 1rem;
       text-align: center;
     }
+
+    #home{
+      margin: 1% 20%;
+    }
+
     
 
     
