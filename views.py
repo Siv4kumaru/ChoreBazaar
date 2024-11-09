@@ -41,7 +41,7 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore,cache):
     
     @app.route('/')
     def home():
-        return render_template("index.html")
+        return render_template('index.html')
     
     @app.route('/userLogin',methods=['POST'])
     def userLogin():
@@ -66,6 +66,8 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore,cache):
 
         if verify_password(password,user.password):
             return jsonify({"token": user.get_auth_token(),"role":user.roles[0].name,"id":user.id,email:user.email}),200
+        else:
+            return jsonify({"message":"Invalid password"}),404
         
 
 
@@ -82,10 +84,10 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore,cache):
             return jsonify({"message":"Not today Hacker, I'm the only Admin"},400)
         
         if not email or not password or role not in ['customer','professional']:
-            return jsonify({"message":"Invalid data"},404)
+            return jsonify({"message":"Invalid data"},400)
         
         if userdatastore.find_user(email=email):
-            return jsonify({"message":"User already exists"},404)
+            return jsonify({"message":"User already exists"},400)
 
         
         #professional must be kept inactive until admin approves it

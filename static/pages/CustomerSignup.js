@@ -4,6 +4,12 @@ const CustomerSignup = {
   template: `
     <div class="d-flex justify-content-center align-items-start vh-100 " style="margin-top: 40px" >
       <div class="card shadow p-4">
+      <div v-if="ErrorMessage" class="alert alert-danger" role="alert">
+        {{ ErrorMessage }}
+      </div>
+      <div v-if="SuccessMessage" class="alert alert-success" role="alert">
+        {{ SuccessMessage }}
+      </div>
 
         <h3 class="card-title text-center mb-4">Customer Registraion</h3>
         <form>
@@ -38,13 +44,15 @@ const CustomerSignup = {
       name:"",
       phone:"",
       address:"",
-      pincode:""
+      pincode:"",
+      ErrorMessage: "",
+      SuccessMessage:""
     };
   },
   methods: {
     async submitInfo() {
 
-      if (this.email == "" || !this.password == "" || !this.role == "" || !this.phone == "" || !this.name == "" || !this.address == "" || !this.pincode == "") {
+      if (this.email == "" || this.password == "" || this.role == "" || this.phone == "" || this.name == "" ||this.address == "" || this.pincode == "") {
         console.error("Fill All the Fields"),404;
         return;
       }
@@ -69,13 +77,18 @@ const CustomerSignup = {
 
       const data = await res.json();
       console.log(data);
-      if (res.status === 200) {
+
+      if (data.status === 200) {
+        this.SuccessMessage = "Signup Successful";
         // Handle successful sign up, e.g., redirect or store token
         router.push("/login");
       } else {
-        const errorData = await res.json();
+        const errorData =  data;
         console.error("Sign up failed:", errorData);
-        // Handle sign up error
+        this.ErrorMessage = errorData[0] || "An unexpected error occurred. Please try again.";
+        setTimeout(() => {
+          this.ErrorMessage = "";
+        }, 3000);
       }
     },
   },

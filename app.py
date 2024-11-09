@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask,flash,get_flashed_messages
 import views
 import Sauce as Sauce
 from extensions import db,security,cache
@@ -69,6 +69,8 @@ def send_email(sender, **kwargs):
         crontab(minute='*'),
         daily_reminder.s('dummyrecievetriple777@gmaiwl.com', 'Daily Test'),
     )
+    
+
 
 if __name__ == '__main__':
     app.run(debug=True)
