@@ -54,14 +54,32 @@
         color: #ddd;
       }
     }
-
+  #navbar{
+    font-family: "DM Serif Text", serif;
+    font-weight: 400;
+    color:black;
+    font-size: 1.3rem;
+    font-style: normal;
+  }
 
   .slogan{
-        font-family: 'Shrikhand', sans-serif;
-        font-style:bold;
-        font-size: 4em;
-        color: #000000;
+
+      font-family: "Climate Crisis", sans-serif;
+      font-weight: 200;
+      color:black;
+      font-style: bold;
+      font-size: 3.5rem;
+    
     }
+    .nav-pills .nav-link.active {
+      background-color: #FAC012;
+      color: white;
+    }
+
+  .btn:active{
+    background-color: #d5ef0b; /* Darken the button on hover */
+    transform: scale(1.05);
+  }
     
     body {
       padding: 1rem;
@@ -71,6 +89,8 @@
     #home{
       margin: 1% 20%;
     }
+
+
 
     
 

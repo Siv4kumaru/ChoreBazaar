@@ -2,43 +2,45 @@ import router from "../utils/router.js";
 
 const ProSignup = {
   template: `
-    <div class="d-flex justify-content-center align-items-center vh-100">
-      <div class="card shadow p-4">
-        <h3 class="card-title text-center mb-4">Professional Registraion</h3>
-        <div class="form-group mb-3">
-          <input v-model="name" type="text" class="form-control" placeholder="Name" required/>
-        </div>
-        <div class="form-group mb-3">
-          <input v-model="phone" type="number" class="form-control" placeholder="Phone" required/>
-        </div>
-        <div class="form-group mb-3">
-          <select v-model="service" class="form-control" required>
-            <option value="" disabled selected>Service Type</option>
-            <option v-for="service in services" :key="service.id" :value="service.name">
-              {{ service.name }}
-            </option>
-          </select>
-        </div>
-        
-        <div class="form-group mb-3">
-          <input v-model="experience" type="number" class="form-control" placeholder="Experience in number" required/>
-        </div>
-        <div class="form-group mb-3">
-          <input v-model="address" type="text" class="form-control" placeholder="Address" required/>
-        </div>
-        <div class="form-group mb-3">
-          <input v-model="pincode" type="number" class="form-control" placeholder="Pincode" required/>
-        </div>
-        <div class="form-group mb-3">
-          <input v-model="email" type="email" class="form-control" placeholder="Email" required/>
-        </div>
-        <div class="form-group mb-4">
-          <input v-model="password" type="password" class="form-control" placeholder="Password" required/>
-        </div>
-        <button class="btn btn-primary w-100" @click="submitInfo">Submit</button>
-        
-      </div>
+<div class="d-flex justify-content-center align-items-start vh-100">
+<form>
+  <div class="card shadow p-4">
+    <h3 class="card-title text-center mb-4">Professional Registration</h3>
+    <div class="form-group mb-3">
+      <input v-model="name" type="text" class="form-control" placeholder="Name" required/>
     </div>
+    <div class="form-group mb-3">
+      <input v-model="phone" type="number" class="form-control" placeholder="Phone" required/>
+    </div>
+    <div class="form-group mb-3">
+      <select v-model="service" class="form-control" required>
+        <option value="" disabled selected>Service Type</option>
+        <option v-for="service in services" :key="service.id" :value="service.name">
+          {{ service.name }}
+        </option>
+      </select>
+    </div>
+    
+    <div class="form-group mb-3">
+      <input v-model="experience" type="number" class="form-control" placeholder="Experience in number" required/>
+    </div>
+    <div class="form-group mb-3">
+      <input v-model="address" type="text" class="form-control" placeholder="Address" required/>
+    </div>
+    <div class="form-group mb-3">
+      <input v-model="pincode" type="number" class="form-control" placeholder="Pincode" required/>
+    </div>
+    <div class="form-group mb-3">
+      <input v-model="email" type="email" class="form-control" placeholder="Email" required/>
+    </div>
+    <div class="form-group mb-4">
+      <input v-model="password" type="password" class="form-control" placeholder="Password" required/>
+    </div>
+          <button class="btn w-100 py-2" type="submit" @click="submitInfo" style="background-color: #FAC012; border-color: #FAC012; color: black;">Login</button>
+          </div>
+        </form>
+</div>
+
   `,
   data() {
     return {
@@ -71,6 +73,10 @@ const ProSignup = {
       }
     },
     async submitInfo() {
+      if (this.email == "" || !this.password == "" || !this.role == "" || !this.phone == "" || !this.name == "" || !this.service == "" || !this.experience == "" || !this.address == "" || !this.pincode == "") {
+        console.error("Fill All the Fields"), 404;
+        return;
+      }
       const origin = window.location.origin;
       const url = `${origin}/register`;
       const res = await fetch(url, {

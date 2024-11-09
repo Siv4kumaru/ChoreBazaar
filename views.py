@@ -61,7 +61,7 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore,cache):
             return jsonify({"message":"User not found"}),404
         if not user.active:
             
-            return jsonify({"message":"user is flagged, kindly contact the admin"}),403
+            return jsonify({"message":"user is flagged, kindly contact the admin"}),404
 
 
         if verify_password(password,user.password):
@@ -82,10 +82,10 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore,cache):
             return jsonify({"message":"Not today Hacker, I'm the only Admin"},400)
         
         if not email or not password or role not in ['customer','professional']:
-            return jsonify({"message":"Invalid data"},400)
+            return jsonify({"message":"Invalid data"},404)
         
         if userdatastore.find_user(email=email):
-            return jsonify({"message":"User already exists"},400)
+            return jsonify({"message":"User already exists"},404)
 
         
         #professional must be kept inactive until admin approves it
