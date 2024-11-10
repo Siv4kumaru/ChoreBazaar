@@ -17,7 +17,7 @@ const Navbar = {
                     <li class="nav-item ms-3"><router-link class="nav-link" :class="{ active: isActive('/login') }" to="/login">Login</router-link></li>
 
                     <li class="nav-item dropdown ms-3">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Signin</a>
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Signup</a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <li class="nav-item"><router-link class="nav-link" :class="{ active: isActive('/customerSignup') }" to="/customerSignup">Customer Signup</router-link></li>
                         <li class="nav-item"><router-link class="nav-link" :class="{ active: isActive('/proSignup') }" to="/proSignup">Professional Signup</router-link></li>
