@@ -116,7 +116,7 @@ custpatch.add_argument('pincode',type=int)
 class CustomerSauce(Resource):
     @auth_required('token')
     @roles_accepted('admin','customer')
-    @cache.cached(timeout=20, key_prefix='cust')
+    @cache.cached(timeout=10, key_prefix='cust')
     def get(self):
         list=[]
         customer=Customer.query.all()
@@ -155,7 +155,7 @@ propatch.add_argument('experience',type=str)
 class ProfessionalSauce(Resource):
     @auth_required('token')
     @roles_accepted('admin','customer','professional')
-    @cache.cached(timeout=20, key_prefix='pro')
+    @cache.cached(timeout=10, key_prefix='pro')
     def get(self):
         list=[]
         pro=Professional.query.all()
@@ -207,7 +207,7 @@ api.add_resource(ProfessionalNameSauce,'/professional/<string:email>')
 class requestSauce(Resource):
     @auth_required('token')
     @roles_accepted('admin','customer','professional')
-    @cache.cached(timeout=20, key_prefix='requests')
+    @cache.cached(timeout=10, key_prefix='requests')
     def get(self):
         list=[]
         requests=ServiceRequest.query.all()
@@ -366,7 +366,7 @@ class ServiceSauce(Resource):
     # @auth_required()
     # @roles_accepted('admin')
     @marshal_with(service_fields)
-    @cache.cached(timeout=20, key_prefix='service')
+    @cache.cached(timeout=10, key_prefix='service')
     def get(self):
         allServices=Service.query.all()
         return allServices
@@ -448,12 +448,12 @@ class searchall(Resource):
     @auth_required('token')
     @roles_accepted('admin')
     def get(self,searchType):
-        list=[]
+        listu=[]
         if searchType=="service":
             service=Service.query.all()
             for ser in service:
-                list.append({"id":ser.id,"name":ser.name,"description":ser.description,"price":ser.price})
-            return list,200
+                listu.append({"id":ser.id,"name":ser.name,"description":ser.description,"price":ser.price})
+            return listu,200
         if searchType=="service Request":
             requests=ServiceRequest.query.all()
             for req in requests:
@@ -468,19 +468,20 @@ class searchall(Resource):
                 else:
                     serviceName=service.name
                 requ={"id":req.id,"custemail":custemail,"proemail":proemail,"serviceName":serviceName,"dateofrequest":req.dateofrequest,"dateofcompletion":req.dateofcompletion,"serviceStatus":req.serviceStatus,"feedback":req.feedback}
-                list.append(requ)
+                listu.append(requ)
+            return listu,200
         if searchType=="customer":
             customer=Customer.query.all()
             for cus in customer:
                 user=User.query.filter_by(id=cus.userId).first()
-                list.append({"id":user.id,"name":cus.name,"email":user.email,"phone":cus.phone,"address":cus.address,"pincode":cus.pincode,"active":user.active})
-            return list,200
+                listu.append({"id":user.id,"name":cus.name,"email":user.email,"phone":cus.phone,"address":cus.address,"pincode":cus.pincode,"active":user.active})
+            return listu,200
         if searchType=="professional":
             pro=Professional.query.all()
             for p in pro:
                 user=User.query.filter_by(id=p.userId).first()
-                list.append({"id":user.id,"name":p.name,"email":user.email,"phone":p.phone,"address":p.address,"pincode":p.pincode,"serviceName":p.serviceName,"serviceId":p.serviceId,"experience":p.experience,"active":user.active})
-            return list,200
+                listu.append({"id":user.id,"name":p.name,"email":user.email,"phone":p.phone,"address":p.address,"pincode":p.pincode,"serviceName":p.serviceName,"serviceId":p.serviceId,"experience":p.experience,"active":user.active})
+            return listu,200
 
 class custEmail(Resource):
     @auth_required('token')

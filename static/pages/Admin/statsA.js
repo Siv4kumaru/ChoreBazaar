@@ -1,28 +1,39 @@
 const statsA = {
     template:`<div>
-    <div class="container"> 
-        <div class="row">
-            <div class="col-8"><canvas id="myChart"></canvas></div>
-            <div class="col-4"><canvas id="myChart2"></canvas></div>
-            </div>
-        <br>
-        <div class="row">
-            <div class="col-8"><canvas id="myChart3"></canvas></div>
+    {{currentTab}}
+    <ul class="nav nav-tabs" id="myTabs">
+        <li class="nav-item">
+            <a class="nav-link active" id="tab1" data-bs-toggle="tab" href="#" @click="currentTab='tab1'" >Chart 1</a>
+        </li>
+        <li class="nav-item" >
+            <a class="nav-link" id="tab2" data-bs-toggle="tab" href="#" @click="currentTab='tab2'">chart 2</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="tab3" data-bs-toggle="tab" href="#" @click="currentTab='tab3'">Chart 3</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="tab4" data-bs-toggle="tab" href="#" @click="currentTab='tab4'">chart 4</a>
+        </li>
+    </ul>
 
-        </div>    
-        <div class="row">
-            <div class="col-8"><canvas id="myChart4"></canvas></div>
-        </div>  
+    <div class="tab-pane fade show active" id="content1" >
+        <canvas id="myChart" style="width:0.8rem;height:0.3rem"></canvas>
     </div>
-    serviceName:{{serviceName}}
-    proservcount:{{proservcount}}
-    procount:{{procount}}
-    custcount:{{custcount}}
-    servicecount:{{servicecount}}
+    <div class="tab-pane fade" id="content2" style="margein:0 0;" >
+        <canvas id="myChart2" style="width:0.8rem;height:0.3rem"></canvas>
+    </div>
+    <span  class="tab-pane fade" id="content3">
+        <canvas id="myChart3" style="width:0.8rem;height:0.3rem"></canvas>
+    </span>
+    <div class="tab-pane fade" id="content4">
+        <canvas id="myChart4" style="width:0.8rem;height:0.3rem"></canvas>
+    </div>
 </div>
+
     `,
     data(){
         return{
+          currentTab: 'tab1',
             serviceName:[],
             proservcount:{},
             procount:0,
@@ -270,12 +281,25 @@ function getRandomColor() {
     config4
   );
   
+  const tabs = new bootstrap.Tab(document.querySelector('#tab1'));
+  tabs.show(); // Show the first tab on page load
+
+  // This part ensures that when a tab is clicked, it switches its content accordingly
+  document.querySelectorAll('.nav-link').forEach(tab => {
+    tab.addEventListener('click', function (event) {
+      const targetContent = document.querySelector('#content' + tab.id.slice(-1));
+      document.querySelectorAll('.tab-pane').forEach(content => {
+        content.classList.remove('show', 'active');
+      });
+      targetContent.classList.add('show', 'active');
+    });
+  });
+
         
 
-        //earning vs pro
-
  
-    }
+    },
+
 };
 
 export default statsA;

@@ -11,6 +11,9 @@ const searchA = {
         <button><i class="fa-solid fa-magnifying-glass"></i></button>
         <br>
         <br>
+        <div v-if="dataloaded">
+            <h1>LOADING</h1>
+        </div>
         <commonTable v-if="this.title=='Services'" :title="title" :data="data" :selector="selector" :columns="columns">
             <template v-slot:actions="{ row }">
             <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
@@ -30,7 +33,7 @@ const searchA = {
         <commonTable v-if="this.title=='Customers'" :title="title" :data="data" :selector="selector" :columns="columns">
             <template v-slot:actions="{ row }">
             <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
-            <button v-if="row.active=='Not Blocked'" class="btn btn-danger btn-sm" @click="blockCus(row)">Block</button>
+            <button v-if="row.active" class="btn btn-danger btn-sm" @click="blockCus(row)">Block</button>
             <button v-else class="btn btn-warning btn-sm" @click="unblockCus(row)">Unblock</button>
             </template>
         </commonTable>
@@ -38,7 +41,7 @@ const searchA = {
         <commonTable v-if="this.title=='Professionals'" :title="title" :data="data" :selector="selector" :columns="columns">
             <template v-slot:actions="{ row }">
             <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
-            <button v-if="row.active=='Not Blocked'" class="btn btn-danger btn-sm" @click="blockPro(row)">Block</button>
+            <button v-if="row.active" class="btn btn-danger btn-sm" @click="blockPro(row)">Block</button>
             <button v-else class="btn btn-warning btn-sm" @click="unblockPro(row)">Unblock</button>
             </template>
         </commonTable>
@@ -74,7 +77,8 @@ const searchA = {
             selector:'',
             title:'',
             columns:null,
-            viewRow: {}
+            viewRow: {},
+            dataloaded: false,
         }
     },
 
@@ -104,15 +108,8 @@ const searchA = {
                 if (res.ok) {
                     const data = await res.json();
                     console.log(data);
-                    if(data != null){
-                        if(data[0].active != undefined){
-                            if(data[0].active == true){
-                                data[0].active = "Blocked";
-                            }
-                            else{
-                                data[0].active = "Not Blocked";
-                            }
-                    }}
+                    
+                            
                     if (this.selectedType === "service") {
                         this.data=data;
                         this.selector="table";
@@ -166,6 +163,7 @@ const searchA = {
                             { "data": "pincode", "title": "Pincode" },
                             { "data": "active", "title": "Active" },
                         ];
+                        this.dataloaded = true;
                     }
                 }else {
                     console.error("Failed to fetch data : ", res.statusText);
@@ -285,7 +283,7 @@ const searchA = {
                 
                 const index = this.data.findIndex(item => item.id === row.id);
                 if (index !== -1) {
-                     this.data[index].active = "Blocked"; // Remove the row from the array
+                     this.data[index].active = false; // Remove the row from the array
                 }
             })
             .catch(error => {
@@ -316,7 +314,7 @@ const searchA = {
                 // Find the index of the row in the relevant data array and remove it
                 const index = this.data.findIndex(item => item.id === row.id);
                 if (index !== -1) {
-                     this.data[index].active = "Not Blocked"; // Remove the row from the array
+                     this.data[index].active = "true"; // Remove the row from the array
                 }
             })
             .catch(error => {
@@ -346,7 +344,7 @@ const searchA = {
                 const index = this.data.findIndex(item => item.id === row.id);
                 // Find the index of the row in the relevant data array and remove it
                 if (index !== -1) {
-                     this.data[index].active = "Blocked"; // Remove the row from the array
+                     this.data[index].active = false; // Remove the row from the array
                 }
             })
             .catch(error => {
@@ -373,9 +371,10 @@ const searchA = {
             })
             .then(data => {
                 console.log(data);
+                console.log(row.id);
                 const index = this.data.findIndex(item => item.id === row.id);
                 if (index !== -1) {
-                     this.data[index].active = "Not Blocked"; // Remove the row from the array
+                     this.data[index].active = true; // Remove the row from the array
                 }
             })
             .catch(error => {

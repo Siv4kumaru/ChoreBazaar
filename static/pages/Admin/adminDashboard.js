@@ -3,14 +3,35 @@ import commonTable from "../../components/commonTable.js";
 const adminDashboard ={
     template:`
     <div>
-        <commonTable v-if="this.columns[0]" :title="title[0]" :data="data[0]" :selector="selector[0]" :columns="columns[0]" >
+
+  <div class="container mt-5">
+  <ul class="nav nav-tabs" id="myTabs">
+    <li class="nav-item">
+      <a class="nav-link active" id="tab1" data-bs-toggle="tab" href="#">Customer</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="tab2" data-bs-toggle="tab" href="#">Professional</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="tab3" data-bs-toggle="tab" href="#">Services</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="tab4" data-bs-toggle="tab" href="#">Requests</a>
+    </li>
+  </ul>
+
+
+
+</div>
+    <div class="tab-content mt-3">
+        <commonTable class="tab-pane fade show active" id="content1" v-if="this.columns[0]" :title="title[0]" :data="data[0]" :selector="selector[0]" :columns="columns[0]" >
             <template v-slot:actions="{ row }">
             <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
             <button class="btn btn-danger btn-sm" @click="blockCus(row)" v-if="row.active">Block</button>
             <button class="btn btn-warning btn-sm" @click="unblockCus(row)" v-if="!row.active">Unblock</button>
             </template>
         </commonTable>
-        <commonTable v-if="this.columns[1]" :title="title[1]" :data="data[1]" :selector="selector[1]" :columns="columns[1]">
+        <commonTable class="tab-pane fade" id="content2" v-if="this.columns[1]" :title="title[1]" :data="data[1]" :selector="selector[1]" :columns="columns[1]">
             <template v-slot:actions="{ row }">
             <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
             <button class="btn btn-danger btn-sm" @click="blockPro(row)" v-if="row.active">Block</button>
@@ -18,8 +39,8 @@ const adminDashboard ={
             </template>
         
         </commonTable>
-    {{data[1]}}
-        <commonTable v-if="this.columns[2]" :title="title[2]" :data="data[2]" :selector="selector[2]" :columns="columns[2]">
+
+        <commonTable class="tab-pane fade" id="content3" v-if="this.columns[2]" :title="title[2]" :data="data[2]" :selector="selector[2]" :columns="columns[2]">
         <button><a href='#/addService'>Add Service</a></button>
         <template v-slot:actions="{ row }">
             <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
@@ -28,7 +49,7 @@ const adminDashboard ={
             </template>
         </commonTable>
 
-        <commonTable v-if="this.columns[3]" :title="title[3]" :data="data[3]" :selector="selector[3]" :columns="columns[3]">
+        <commonTable class="tab-pane fade" id="content4" v-if="this.columns[3]" :title="title[3]" :data="data[3]" :selector="selector[3]" :columns="columns[3]">
             <template v-slot:actions="{ row }">
             <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
             <button class="btn btn-success btn-sm" @click="editR(row)">Edit</button>
@@ -55,6 +76,7 @@ const adminDashboard ={
                     </div>
                 </div>
             </div>
+        </div>
         </div>`,
     data() {
         return {
@@ -62,7 +84,8 @@ const adminDashboard ={
             title:[],
             data:[],
             columns:[],
-            viewRow: {}
+            viewRow: {},
+
         };
     },
     methods: {
@@ -274,6 +297,20 @@ const adminDashboard ={
       },
 
     async mounted() {
+        //bootstrap tab
+        const tabs = new bootstrap.Tab(document.querySelector('#tab1'));
+        tabs.show(); // Show the first tab on page load
+    
+        // This part ensures that when a tab is clicked, it switches its content accordingly
+        document.querySelectorAll('.nav-link').forEach(tab => {
+          tab.addEventListener('click', function (event) {
+            const targetContent = document.querySelector('#content' + tab.id.slice(-1));
+            document.querySelectorAll('.tab-pane').forEach(content => {
+              content.classList.remove('show', 'active');
+            });
+            targetContent.classList.add('show', 'active');
+          });
+        });
 
         console.log("mounted");
 
