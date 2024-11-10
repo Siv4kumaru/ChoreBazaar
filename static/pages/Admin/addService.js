@@ -1,9 +1,14 @@
 const addService = {
   template: `
-  <p v-if="message" class="mt-3 text-center">{{ message }}</p>
-    <div class="container mt-5">
-    {{service.image}}
-  <h1 class="text-center mb-4">Add Service</h1>
+  <div class="container mt-4">
+<div v-if="eMsg" class="alert alert-danger" role="alert">
+  {{ eMsg }}
+</div>
+
+<div v-if="sMsg" class="alert alert-success" role="alert">
+  {{ sMsg }}
+</div>
+  <h1>Add Service</h1>
   <form @submit.prevent="AddService">
     <div class="mb-3">
       <label for="name" class="form-label">Service Name:</label>
@@ -17,74 +22,57 @@ const addService = {
       <label for="price" class="form-label">Price:</label>
       <input v-model="service.price" type="number" id="price" class="form-control" required />
     </div>
-    <div class="mb-3">
-      <label for="image" class="form-label">Image:</label>
-<input type="file" id="image" accept="image/*" @change="handleFileUpload" class="form-control" required />    </div>
-    <button type="submit" class="btn" style="background-color: #FAC012; color: white;">Add Service</button>
+    <button type="submit" class="btn" style="background-color: #FAC012;">Add Service</button>
   </form>
 </div>
-
-    `,
-    data() {
-      return {
-        service: {
-            id: null,
-            name: '',
-            description: '',
-            price: null,
-            image: null,
+  `,
+  data() {
+    return {
+      service: {
+          id: null,
+          name: '',
+          description: '',
+          price: null,
+        },
+        sMsg:'',
+        eMsg:'',
+    };
+  },
+  methods: {
+    // Fetch the service details
+    // Update the service using PATCH
+    async AddService() {
+      const serviceId = this.$route.params.id;
+      try {
+        const response = await fetch('/api/services', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            "Authentication-token":sessionStorage.getItem("token")
           },
-        message: '',
-      };
-    },
-    methods: {
-      handleFileUpload(event) {
-        const file = event.target.files[0];
-        const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-        if (file.size > maxSize) {
-          alert("File size exceeds the 5MB limit.");
-          event.target.value = ""; // Clear the input if file is too large
-          this.service.image = null;
-        } else {
-          this.service.image = file;
+          body: JSON.stringify({
+            "name": this.service.name,
+            "description": this.service.description,
+            "price": this.service.price,
+          }),
+        });
+        if (response.ok) {
+          this.sMsg = 'Service added successfully.';
+          console.log(this.message);
+          this.$router.push("/Dashboard-Admin");
+          this.sMsg = this.message;
         }
-      },
 
-      // Fetch the service details
-      // Update the service using PATCH
-      async AddService() {
-        const serviceId = this.$route.params.id;
-        console.log(this.service.image);
-        try {
-          const response = await fetch('/api/services', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              "Authentication-token":sessionStorage.getItem("token")
-            },
-            body: JSON.stringify({
-              "name": this.service.name,
-              "description": this.service.description,
-              "price": this.service.price,
-            }),
-          });
-          if (response.ok) {
-            this.message = 'Service added successfully.';
-            console.log(this.message);
-            this.$router.push("/Dashboard-Admin");
-          }
-  
-          if (!response.ok) {
-            throw new Error("Error updating service");
-          }
-          const data = await response.json();
-          this.message = data.message;
-        } catch (error) {
-          console.error(error);
-          this.message = 'Error updating service.';
+        else {
+          var msg= await response.json() 
+          this.eMsg = msg['message'];
         }
-      },
+      } catch (error) {
+        console.error(error);
+        this.eMsg = 'Error updating service.';
+      }
     },
-  };
-  
-  export default addService;
+  },
+};
+
+export default addService;

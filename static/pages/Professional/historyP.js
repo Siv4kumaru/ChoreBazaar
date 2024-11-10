@@ -5,7 +5,7 @@ const historyP = {
         <input v-model="query" type="text" placeholder="Search.." id="query" name="query" @keyup="eachkey()">
         <button><i class="fa-solid fa-magnifying-glass" @click="eachhkey()"></i></button>
         <changedCommonTable title="History" :data="data" :columns="columns" selector="history" :condition="(row) => true"></changedCommonTable>
-        <button class="btn btn-primary" @click="back">Back</button>
+        <button class="btn btn-primary"  style="background-color: #FAC012; color: white;" @click="back">Back</button>
     </div>`,
     
     data() {

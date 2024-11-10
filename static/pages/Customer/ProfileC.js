@@ -38,7 +38,7 @@ const ProfileC = {
                                     <label for="pincode" class="form-label me-3" style="min-width: 100px;">Pincode</label>
                                     <input type="text" class="form-control" id="pincode" placeholder="Enter your pincode" v-model="pincode" required style="flex: 1;">
                                 </div>
-                                <button type="submit" class="btn btn-primary">Update</button>
+                                <button type="submit"  style="background-color: #FAC012; color: white;" class="btn btn-primary">Update</button>
                             </form>
                         </div>
                     </div>
@@ -57,12 +57,12 @@ const ProfileC = {
                                 <label for="confirm-password" class="form-label me-5" style="width: 150px;">Confirm New Password</label>
                                 <input type="password" class="form-control" id="confirm-password" required style="flex: 1;">
                             </div>
-                            <button type="submit" class="btn btn-primary">Change Password</button>
+                            <button type="submit"  style="background-color: #FAC012; color: white;" class="btn btn-primary">Change Password</button>
                         </form>
                     </div>
                 </div>
             </div>
-        </div>
+
     </div>
     `,
     data() {

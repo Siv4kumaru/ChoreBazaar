@@ -75,21 +75,23 @@
       background-color: #FAC012;
       color: white;
     }
-
-  .btn:active{
-    background-color: #d5ef0b; /* Darken the button on hover */
-    transform: scale(1.05);
-  }
+    .btn:active{
+      background-color: #d5ef0b; /* Darken the button on hover */
+      transform: scale(1.05);
+    }
     
     body {
       padding: 1rem;
       text-align: center;
     }
-
+    
     #home{
       margin: 1% 20%;
     }
+    
+ 
 
+  
 
 
     
