@@ -3,17 +3,25 @@ import commonTable from "../../components/commonTable.js";
 const adminDashboard ={
     template:`
     <div>
+    
+    
+    <div class="container mt-5">
+    <div v-if="pdfE" class="alert alert-danger" role="alert">
+    {{pdfE}}
+    </div>
+    <div v-if="pdfS" class="alert alert-success" role="alert">
+    {{pdfS}}
+    </div>
 
-  <div class="container mt-5">
-  <ul class="nav nav-tabs" id="myTabs">
+    <ul class="nav nav-tabs" id="myTabs">
     <li class="nav-item">
-      <a class="nav-link active" id="tab1" data-bs-toggle="tab" href="#">Customer</a>
+    <a class="nav-link active" id="tab1" data-bs-toggle="tab" href="#">Customer</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" id="tab2" data-bs-toggle="tab" href="#">Professional</a>
+    <a class="nav-link" id="tab2" data-bs-toggle="tab" href="#">Professional</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" id="tab3" data-bs-toggle="tab" href="#">Services</a>
+    <a class="nav-link" id="tab3" data-bs-toggle="tab" href="#">Services</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" id="tab4" data-bs-toggle="tab" href="#">Requests</a>
@@ -34,6 +42,7 @@ const adminDashboard ={
         <commonTable class="tab-pane fade" id="content2" v-if="this.columns[1]" :title="title[1]" :data="data[1]" :selector="selector[1]" :columns="columns[1]">
             <template v-slot:actions="{ row }">
             <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
+            <button class="btn btn-success btn-sm" @click="pdf(row)">Resume</button>
             <button class="btn btn-danger btn-sm" @click="blockPro(row)" v-if="row.active">Block</button>
             <button class="btn btn-warning btn-sm" @click="unblockPro(row)" v-if="!row.active">Unblock</button>
             </template>
@@ -85,10 +94,42 @@ const adminDashboard ={
             data:[],
             columns:[],
             viewRow: {},
-
+            pdfS:'',
+            pdfE:''
         };
     },
     methods: {
+        async pdf(row){
+
+
+            const downloadUrl = `${window.location.origin}/download_pdf/${row.email}`;
+            const res= await fetch(downloadUrl)
+            if(!res.ok){
+                console.error('Network response was not ok');
+                this.pdfE="Error in downloading pdf";
+                setTimeout(() => {
+                    this.pdfE = "";  // Hide error message after 5 seconds
+                }, 5000);
+                return;
+            }
+            // Create a temporary anchor element to trigger the download
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = true;  // This ensures the browser knows to download the file
+            document.body.appendChild(a);
+            a.click();  // Simulate click on the anchor tag
+            document.body.removeChild(a);
+            this.pdfS=`downloaded ${row.email} resume successfully`; 
+            setTimeout(() => {
+                this.pdfS = "";  // Hide error message after 5 seconds
+            }, 5000);
+            return;
+            
+
+
+
+            
+        },
         editR(row) {
             this.$router.push({ name: 'editRequest', params:{ id: row.id }});
         },

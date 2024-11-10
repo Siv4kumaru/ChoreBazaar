@@ -7,6 +7,8 @@ from models import Professional,User,Customer,Service,ServiceRequest
 from tasks import csvtask
 from celery.result import AsyncResult
 import flask_excel as excel
+from werkzeug.utils import secure_filename
+import os
 
 def create_view(app,userdatastore:SQLAlchemyUserDatastore,cache):
     
@@ -61,7 +63,7 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore,cache):
             return jsonify({"message":"User not found"}),404
         if not user.active:
             
-            return jsonify({"message":"user is flagged, kindly contact the admin"}),404
+            return jsonify({"message":"Admin is curently reviewing your credentials , kindly wait fro few days"}),404
 
 
         if verify_password(password,user.password):
@@ -72,58 +74,91 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore,cache):
 
 
 
-    @app.route('/register',methods=['POST'])
+    UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)  # Ensure the upload directory exists
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    ALLOWED_EXTENSIONS = {'pdf'}
+    MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB limit
+
+    def allowed_file(file):
+        return file and file.filename.endswith('.pdf') and file.content_length <= MAX_FILE_SIZE
+
+    @app.route('/register', methods=['POST'])
     def register():
-        data= request.get_json()
+        data = request.form.to_dict()  # Use form data for non-JSON form submission
+        pdf_file = request.files.get('pdfDocument')  # Get file from form
+    
+        email = data.get('email')
+        password = data.get('password')
+        role = data.get('role')
         
-        email=data.get('email')
-        password=data.get('password')
-        role=data.get('role')
-        
-        if role=='admin':
-            return jsonify({"message":"Not today Hacker, I'm the only Admin"}),404
-        
-        if not email or not password or role not in ['customer','professional']:
-            return jsonify({"message":"Invalid data"}),404
+        # Validation checks
+        if role == 'admin':
+            return jsonify({"message": "Not today Hacker, I'm the only Admin"}), 404
+
+        if not email or not password or role not in ['customer', 'professional']:
+            return jsonify({"message": "Invalid data"}), 404
         
         if userdatastore.find_user(email=email):
-            return jsonify({"message":"User already exists"}),404
+            return jsonify({"message": "User already exists"}), 404
 
-        
-        #professional must be kept inactive until admin approves it
-        if role=='professional':
-            active=False #set false at end
-        if role=='customer':    
-            active=True
-        
+        # Set user activation based on role
+        active = role == 'customer'
+
         try:
-            user=userdatastore.create_user(email=email,password=hash_password(password),active=active,roles=[role])
-                    
-            name=data.get('name')
-            phone=data.get('phone')
-            address=data.get('address')
-            pincode=data.get('pincode')
+            # Create user
+            user = userdatastore.create_user(email=email, password=hash_password(password), active=active, roles=[role])
             db.session.add(user)
-            if role=='professional':
-                serviceName=data.get('service')
-                experience=data.get('experience')
-                useru=User.query.filter_by(email=email).first()
-                service=Service.query.filter_by(name=serviceName).first()
+
+            # Additional data
+            name = data.get('name')
+            phone = data.get('phone')
+            address = data.get('address')
+            pincode = data.get('pincode')
+
+            if role == 'professional':
+                serviceName = data.get('service')
+                experience = data.get('experience')
+
+                # Check if service exists
+                service = Service.query.filter_by(name=serviceName).first()
                 if service is None:
-                    return jsonify({"message":"Service not found"}),404
-                professional=Professional(userId=useru.id,serviceId=service.id,name=name,phone=phone,address=address,pincode=pincode,serviceName=serviceName,experience=experience)
-                db.session.add(professional)
-            if role=='customer':
-                useru=User.query.filter_by(email=email).first()
-                customer=Customer(userId=useru.id,name=name,phone=phone,address=address,pincode=pincode)
+                    return jsonify({"message": "Service not found"}), 404
+                
+                # Handle PDF file upload
+                if pdf_file and allowed_file(pdf_file):
+                    filename = secure_filename(email + '.pdf')
+                    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    pdf_file.save(file_path)  # Save the file to the upload folder
+
+                    # Create Professional entry with file path
+                    professional = Professional(
+                        userId=user.id, 
+                        serviceId=service.id,
+                        name=name,
+                        phone=phone,
+                        address=address,
+                        pincode=pincode,
+                        serviceName=serviceName,
+                        experience=experience,
+                        pdf_path=file_path  # Store the file path in the database
+                    )
+                    db.session.add(professional)
+                else:
+                    return jsonify({"message": "PDF is missing, invalid, or too large"}), 400
+
+            elif role == 'customer':
+                # Create Customer entry
+                customer = Customer(userId=user.id, name=name, phone=phone, address=address, pincode=pincode)
                 db.session.add(customer)
+
             db.session.commit()
-        except:
-            print('Error creating user')
+            return jsonify({"message": "User created successfully"}), 200
+        except Exception as e:
+            print(f"Error creating user: {e}")
             db.session.rollback()
-            return jsonify({"message":"Error creating user"}),404
-        return jsonify({"message":"created user"}),200
-            
+            return jsonify({"message": "Error creating user"}), 500
+                
 
     @app.route('/dropdownService', methods=['GET'])
     def dropdown_services():
@@ -157,6 +192,22 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore,cache):
         user.active=True
         db.session.commit()
         return jsonify({"message":f"user {user.email} is activated"}),200
+    
+    @roles_accepted('admin')
+    @app.route('/download_pdf/<email>', methods=['GET'])
+    def download_pdf(email):
+        # Query the Professional user by their ID
+        user=userdatastore.find_user(email=email)
+        professional=Professional.query.filter_by(userId=user.id).first()
+        if professional and professional.pdf_path:
+            try:
+                # Serve the file from the saved path
+                return send_file(professional.pdf_path, as_attachment=True)
+            except Exception as e:
+                print(f"Error sending file: {e}")
+                return jsonify({"message": "Error downloading file"}), 500
+        else:
+            return jsonify({"message": "File not found"}), 404
     
     @roles_accepted('admin')
     @app.route('/deactivate/<id>',methods=['GET'])
