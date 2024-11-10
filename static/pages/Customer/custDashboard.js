@@ -3,14 +3,41 @@ import changedCommonTable from "../../components/changedCommonTable.js";
 import star from "../../components/star.js";
 const custDashboard = {
   template:`<div>
+
+
+
+
     <h1>Customer Dashboard</h1>
-    <button class="btn btn-primary" @click='history'>history</button>
-      <div class="d-flex flex-row justify-content-center">
-        <div v-for="service in allServices">
-        <services :name="service.name" :description="service.description" :price="service.price" ></services>
-        </div>
+      <!-- Nav tabs -->
+      
+      <div class="d-flex flex-row justify-content-center mt-3">
+      <div v-for="service in allServices">
+      <services :name="service.name" :description="service.description" :price="service.price" ></services>
       </div>
-<div v-if="data[0] && data[0][0]">
+      </div>
+      <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Pending Requests</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Accepted/Ongoing</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="messages-tab" data-bs-toggle="tab" data-bs-target="#messages" type="button" role="tab" aria-controls="messages" aria-selected="false">Rejected/Cancelled</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link"id="report-tab" data-bs-toggle="tab" data-bs-target="#report" type="button" role="tab" aria-controls="messagesu" aria-selected="false" @click="Report">Report</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link"id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false" @click='history' >history</button>
+        </li>
+      </ul>
+      
+      <!-- Tab panes -->
+      
+      <div v-if="data[0] && data[0][0]">
+      <div class="tab-content">
+  <div class="tab-pane active" id="home" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
   <!-- can also use (row) => row.approve === 'Pending' arrow function in condition , here in condition isPending without paranthesis is just passing a reference the function rather than actually invoking with paranthesis and all, no paranthesis function means reference being passed-->
   <changedCommonTable  :condition="Pending"  :title="title[0]" :data="data[0]" :selector="selector[0]" :columns="columns[0]">
         <template v-slot:actions="{ row }">
@@ -18,6 +45,8 @@ const custDashboard = {
         <button v-if="row.serviceStatus!='Customer Cancellation'" class="btn btn-danger btn-sm" @click="cancel(row)">Cancel</button>
         </template>
   </changedCommonTable>
+  </div>
+  <div class="tab-pane" id="profile" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
     <changedCommonTable  :condition="Accepted"  title='Accepted/Ongoing' :data="data[0]" :selector="selector[0]" :columns="columns[1]">
         <template v-slot:actions="{ row }">
         <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
@@ -25,15 +54,36 @@ const custDashboard = {
         <button  class="btn btn-danger btn-sm" @click="openFeedbackModal(row,'Not Completed')">Not Completed</button>
         </template>
   </changedCommonTable>
+  </div>
+  <div class="tab-pane" id="messages" role="tabpanel" aria-labelledby="messages-tab" tabindex="0">
   <changedCommonTable  :condition="Rejected"  title='Rejected/Cancelled' :data="data[0]" :selector="selector[0]" :columns="columns[0]">
         <template v-slot:actions="{ row }">
         <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
         <button v-if="row.serviceStatus!='Customer Cancellation'" class="btn btn-danger btn-sm" @click="cancel(row)">Cancel</button>
         </template>
   </changedCommonTable>
-  <button @click="Report">Report</button><span v-if='iswaiting'> Waiting... </span>
+  </div>
+    <div class="tab-pane" id="report" role="tabpanel" aria-labelledby="report-tab" tabindex="0">
+<div class="tab-pane" id="messagesu" role="tabpanel" aria-labelledby="messagesu-tab" tabindex="0">
+    <div v-if="iswaiting" class="alert alert-info d-flex align-items-center">
+        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+        <span>Waiting for the download to complete...</span>
+    </div>
+    <div v-else class="alert alert-success d-flex align-items-center">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span>Downloaded successfully!</span>
+    </div>
+</div>
 
 </div>
+<div class="tab-pane" id="history" role="tabpanel" aria-labelledby="history-tab" tabindex="0">
+<div class="alert alert-warning d-flex align-items-center">Redirecting you......</div> 
+</div>
+  
+  </div>
+  </div>
+      
+
 
       <!-- Feedback Modal -->
       <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
@@ -222,6 +272,18 @@ const custDashboard = {
   },      
 
   async mounted() {
+
+    //bootstrap tabbing
+    const triggerTabList = document.querySelectorAll('#myTab button')
+    triggerTabList.forEach(triggerEl => {
+      const tabTrigger = new bootstrap.Tab(triggerEl)
+
+      triggerEl.addEventListener('click', event => {
+        event.preventDefault()
+        tabTrigger.show()
+      })
+    })
+    //bootstrap tabbing
     const ratingGroup = document.querySelector('.rating-group');
     const self = this; // store reference to Vue component instance
     ratingGroup.addEventListener('change', function(event) {

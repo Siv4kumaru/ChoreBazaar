@@ -53,11 +53,11 @@ const Navbar = {
                     <li v-if="state.role === 'customer'" class="nav-item ms-3">
                     <router-link class="nav-link" :class="{ active: isActive('/searchC') }" to="/searchC">Search</router-link>
                     </li>
-                    <li v-if="state.role === 'professional'" class="nav-item ms-3">
-                    <router-link class="nav-link" :class="{ active: isActive('/statsP') }" to="/statsP">Stats</router-link>
+                    <li v-if="state.role === 'customer'" class="nav-item ms-3">
+                    <router-link class="nav-link" :class="{ active: isActive('/statsC') }" to="/statsC">Stats</router-link>
                     </li>
                     <li v-if="state.role === 'professional'" class="nav-item ms-3">
-                    <router-link class="nav-link" :class="{ active: isActive('/searchP') }" to="/searchP">Search</router-link>
+                    <router-link class="nav-link" :class="{ active: isActive('/statsP') }" to="/statsP">Stats</router-link>
                     </li>
                     <li v-if="state.role === 'admin'" class="nav-item ms-3">
                     <router-link class="nav-link" :class="{ active: isActive('/searchA') }" to="/searchA">Search</router-link>
