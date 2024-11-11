@@ -15,19 +15,19 @@ const adminDashboard ={
 
     <ul class="nav nav-tabs" id="myTabs">
     <li class="nav-item">
-    <a class="nav-link active" id="tab1" data-bs-toggle="tab" href="#">Customer</a>
+    <a class="nav-link active" id="tab1" data-bs-toggle="tab" href="#content1">Customer</a>
     </li>
     <li class="nav-item">
-    <a class="nav-link" id="tab2" data-bs-toggle="tab" href="#">Professional</a>
+    <a class="nav-link" id="tab2" data-bs-toggle="tab" href="#content2">Professional</a>
     </li>
     <li class="nav-item">
-    <a class="nav-link" id="tab3" data-bs-toggle="tab" href="#">Services</a>
+    <a class="nav-link" id="tab3" data-bs-toggle="tab" href="#content3">Services</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" id="tab4" data-bs-toggle="tab" href="#">Requests</a>
+      <a class="nav-link" id="tab4" data-bs-toggle="tab" href="#content4">Requests</a>
     </li>
     <li class="nav-item" >
-          <button class="nav-link" id="tab5" data-bs-toggle="tab" data-bs-target="#report" type="button" role="tab" aria-controls="messagesu" aria-selected="false" @click="Report">Report</button>
+          <button class="nav-link" id="tab5" data-bs-toggle="tab" href="#content5" type="button" @click="Report">Report</button>
         </li>
   </ul>
 
@@ -35,16 +35,7 @@ const adminDashboard ={
 
 </div>
     <div class="tab-content mt-3">
-        <div class="tab-pane fade show active" id="content5" role="tabpanel" aria-labelledby="report-tab" tabindex="0">
-            <div v-if="iswaiting" class="alert alert-info d-flex align-items-center">
-        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
-        <span>Waiting for the download to complete...</span>
-      </div>
-      <div v-else class="alert alert-success d-flex align-items-center">
-        <i class="bi bi-check-circle-fill me-2"></i>
-        <span>Downloaded successfully!</span>
-    </div>
-        </div>
+
         <commonTable class="tab-pane fade show active" id="content1" v-if="this.columns[0]" :title="title[0]" :data="data[0]" :selector="selector[0]" :columns="columns[0]" >
             <template v-slot:actions="{ row }">
             <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
@@ -78,6 +69,17 @@ const adminDashboard ={
             <button class="btn btn-danger btn-sm" @click="deleteRequest(row)">Delete</button>
             </template>
         </commonTable>
+    <div class="tab-pane fade" id="content5" >
+            <div v-if="iswaiting" class="alert alert-info d-flex align-items-center">
+        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+        <span>Waiting for the download to complete...</span>
+      </div>
+      <div v-else class="alert alert-success d-flex align-items-center">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span>Downloaded successfully!</span>
+    </div>
+        </div>
+        </div>
         
         <!-- view Modal -->
             <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
@@ -153,7 +155,7 @@ const adminDashboard ={
                 this.pdfE="Error in downloading pdf";
                 setTimeout(() => {
                     this.pdfE = "";  // Hide error message after 5 seconds
-                }, 5000);
+                }, 3000);
                 return;
             }
             // Create a temporary anchor element to trigger the download

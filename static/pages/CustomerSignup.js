@@ -31,7 +31,7 @@ const CustomerSignup = {
         <div class="form-group mb-4">
           <input v-model="password" type="password" class="form-control" placeholder="Password" required/>
         </div>
-          <button class="btn w-100 py-2" @click="submitInfo" style="background-color: #FAC012; border-color: #FAC012; color: black;">Login</button>
+          <button class="btn w-100 py-2" @click="submitInfo" style="background-color: #FAC012; border-color: #FAC012; color: black;">sign up</button>
         </form>
           </div>
     </div>

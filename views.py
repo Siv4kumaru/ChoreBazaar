@@ -85,9 +85,12 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore,cache):
 
     @app.route('/register', methods=['POST'])
     def register():
-        data = request.form.to_dict()  # Use form data for non-JSON form submission
-        pdf_file = request.files.get('pdfDocument')  # Get file from form
-    
+        if  not request.form: # Use JSON data for API requests
+            data = request.get_json()
+        else:
+            data = request.form.to_dict()  # Use form data for non-JSON form submission
+            pdf_file = request.files.get('pdfDocument')  # Get file from form
+
         email = data.get('email')
         password = data.get('password')
         role = data.get('role')
@@ -103,23 +106,28 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore,cache):
             return jsonify({"message": "User already exists"}), 404
 
         # Set user activation based on role
-        active = role == 'customer'
+        #professional must be kept inactive until admin approves it
+        if role=='professional':
+            active=False #set false at end
+        if role=='customer':    
+            active=True
 
         try:
             # Create user
             user = userdatastore.create_user(email=email, password=hash_password(password), active=active, roles=[role])
-            db.session.add(user)
 
             # Additional data
             name = data.get('name')
             phone = data.get('phone')
             address = data.get('address')
             pincode = data.get('pincode')
+            db.session.add(user)
+            db.session.commit()
 
             if role == 'professional':
                 serviceName = data.get('service')
                 experience = data.get('experience')
-
+                useru=User.query.filter_by(email=email).first()
                 # Check if service exists
                 service = Service.query.filter_by(name=serviceName).first()
                 if service is None:
@@ -149,7 +157,8 @@ def create_view(app,userdatastore:SQLAlchemyUserDatastore,cache):
 
             elif role == 'customer':
                 # Create Customer entry
-                customer = Customer(userId=user.id, name=name, phone=phone, address=address, pincode=pincode)
+                useru=User.query.filter_by(email=email).first()
+                customer = Customer(userId=useru.id, name=name, phone=phone, address=address, pincode=pincode)
                 db.session.add(customer)
 
             db.session.commit()

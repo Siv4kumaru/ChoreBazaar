@@ -43,7 +43,7 @@ const ProSignup = {
         <label>Resume</label>
         <input type="file" @change="validatePdf" class="form-control" accept="application/pdf" required />
       </div>
-      <button class="btn w-100 py-2" type="submit" @click="submitInfo" style="background-color: #FAC012; border-color: #FAC012; color: black;">Register</button>
+      <button class="btn w-100 py-2" type="submit" @click="submitInfo" style="background-color: #FAC012; border-color: #FAC012; color: black;">sign up</button>
     </div>
   </form>
 </div>
