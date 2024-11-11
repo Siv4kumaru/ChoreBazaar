@@ -5,15 +5,31 @@ from mail import send_message
 from flask_excel import make_response_from_query_sets
 from extensions import db
 import time
+from datetime import datetime
 
 
 
 
 @shared_task(ignore_result=False)
 def csvtask():
-    serv=Service.query.with_entities(Service.name,Service.price).all()
-    csv_out=make_response_from_query_sets(serv,['name','price'],'csv')
-    filename='test.csv'
+    req = ServiceRequest.query.with_entities(
+        ServiceRequest.id,
+        ServiceRequest.customerId,
+        ServiceRequest.professionalId,
+        ServiceRequest.serviceId,
+        ServiceRequest.dateofrequest,
+        ServiceRequest.dateofcompletion,
+        ServiceRequest.serviceStatus,
+        ServiceRequest.feedback
+    ).all()
+
+# Corrected column headers for the ServiceRequest table
+    csv_out = make_response_from_query_sets(
+    req,
+    ['id', 'customerId', 'professionalId', 'serviceId', 'serviceStatus', 'feedback'],
+    'csv')
+
+    filename='ALLServiceRequests.csv'
     
     with open(filename,'wb') as f:
         f.write(csv_out.data)
@@ -35,19 +51,23 @@ def monthlyReport():
         cust_email=User.query.filter_by(id=usercustid).first().email
         cust_name=Customer.query.filter_by(id=cid).first().name  
         
+        service=Service.query.filter_by(id=i.serviceId).first().name
+        
+        
         if i.approve in Status :
-            Status[i.approve].append({"customer":cust_name,"professional":pro_name,"service":i.serviceId,"date":i.dateofrequest})
+            Status[i.approve].append({"customer":cust_name,"professional":pro_name,"customerEmail":cust_email,"professionalEmail":pro_email,"service":service,"date":i.dateofrequest,"doc":i.dateofcompletion})
         else:
             Status[i.approve]=[]
-            Status[i.approve].append({"customer":cust_name,"professional":pro_name,"service":i.serviceId,"date":i.dateofrequest})
+            Status[i.approve].append({"customer":cust_name,"professional":pro_name,"customerEmail":cust_email,"professionalEmail":pro_email,"service":service,"date":i.dateofrequest,"doc":i.dateofcompletion})
         if i.serviceStatus in Status:
-            Status[i.serviceStatus].append({"customer":cust_name,"professional":pro_name,"service":i.serviceId,"date":i.dateofrequest})
+            Status[i.serviceStatus].append({"customer":cust_name,"customerEmail":cust_email,"professionalEmail":pro_email,"professional":pro_name,"service":service,"date":i.dateofrequest,"doc":i.dateofcompletion})
         else:
             Status[i.serviceStatus]=[]
-            Status[i.serviceStatus].append({"customer":cust_name,"professional":pro_name,"service":i.serviceId,"date":i.dateofrequest})
+            Status[i.serviceStatus].append({"customer":cust_name,"customerEmail":cust_email,"professionalEmail":pro_email,"professional":pro_name,"service":service,"date":i.dateofrequest,"doc":i.dateofcompletion})
 
     with open('MonthlyReport.html', 'r') as f:
         template = Template(f.read())
+
         send_message('admin@gmail.com', "Monthly Report",
                         template.render( data=Status))
 

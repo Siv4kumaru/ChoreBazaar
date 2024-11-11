@@ -25,9 +25,7 @@ const custDashboard = {
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="messages-tab" data-bs-toggle="tab" data-bs-target="#messages" type="button" role="tab" aria-controls="messages" aria-selected="false">Rejected/Cancelled</button>
         </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link"id="report-tab" data-bs-toggle="tab" data-bs-target="#report" type="button" role="tab" aria-controls="messagesu" aria-selected="false" @click="Report">Report</button>
-        </li>
+
         <li class="nav-item" role="presentation">
           <button class="nav-link"id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false" @click='history' >history</button>
         </li>
@@ -61,10 +59,10 @@ const custDashboard = {
         <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
         <button v-if="row.serviceStatus!='Customer Cancellation'" class="btn btn-danger btn-sm" @click="cancel(row)">Cancel</button>
         </template>
-  </changedCommonTable>
-  </div>
+    </changedCommonTable>
+    </div>
     <div class="tab-pane" id="report" role="tabpanel" aria-labelledby="report-tab" tabindex="0">
-<div class="tab-pane" id="messagesu" role="tabpanel" aria-labelledby="messagesu-tab" tabindex="0">
+    <div class="tab-pane" id="messagesu" role="tabpanel" aria-labelledby="messagesu-tab" tabindex="0">
     <div v-if="iswaiting" class="alert alert-info d-flex align-items-center">
         <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
         <span>Waiting for the download to complete...</span>

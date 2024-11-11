@@ -26,12 +26,25 @@ const adminDashboard ={
     <li class="nav-item">
       <a class="nav-link" id="tab4" data-bs-toggle="tab" href="#">Requests</a>
     </li>
+    <li class="nav-item" >
+          <button class="nav-link" id="tab5" data-bs-toggle="tab" data-bs-target="#report" type="button" role="tab" aria-controls="messagesu" aria-selected="false" @click="Report">Report</button>
+        </li>
   </ul>
 
 
 
 </div>
     <div class="tab-content mt-3">
+        <div class="tab-pane fade show active" id="content5" role="tabpanel" aria-labelledby="report-tab" tabindex="0">
+            <div v-if="iswaiting" class="alert alert-info d-flex align-items-center">
+        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+        <span>Waiting for the download to complete...</span>
+      </div>
+      <div v-else class="alert alert-success d-flex align-items-center">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span>Downloaded successfully!</span>
+    </div>
+        </div>
         <commonTable class="tab-pane fade show active" id="content1" v-if="this.columns[0]" :title="title[0]" :data="data[0]" :selector="selector[0]" :columns="columns[0]" >
             <template v-slot:actions="{ row }">
             <button class="btn btn-primary btn-sm" @click="view(row)">View</button>
@@ -95,10 +108,41 @@ const adminDashboard ={
             columns:[],
             viewRow: {},
             pdfS:'',
-            pdfE:''
+            pdfE:'',
+            iswaiting:false,
+
         };
     },
     methods: {
+        async Report(){
+            this.iswaiting=true
+            const res= await fetch('/csv')
+            if(res.ok){
+              const data=await res.json();
+              if (res.ok){
+                const taskId = data['task_id'];
+                const intv= setInterval(async () => {
+                  const csv_down= await fetch(`/get_csv/${taskId}`);
+                  if(csv_down.ok){
+                    this.iswaiting=false;
+                    clearInterval(intv);
+                    const blob = await csv_down.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = 'AllServiceRequests.csv';
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    // Cleanup
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                  }
+                }, 1000);
+              }
+            }
+        },
         async pdf(row){
 
 
