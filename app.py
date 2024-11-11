@@ -6,7 +6,7 @@ from flask_caching import Cache
 from create_initial_data import create_data
 from worker import celery_init_app  
 from celery.schedules import crontab
-from tasks import daily_reminder
+from tasks import daily_reminder,monthlyReport
 import flask_excel as excel
 
 
@@ -66,8 +66,12 @@ celery_app = celery_init_app(app)
 @celery_app.on_after_configure.connect
 def send_email(sender, **kwargs):
     sender.add_periodic_task(
-        crontab(minute='*'),
-        daily_reminder.s('dummyrecievetriple777@gmaiwl.com', 'Daily Test'),
+        crontab( minute='*'),
+        daily_reminder.s(),
+    )
+    sender.add_periodic_task(
+        crontab(minute="*"),
+        monthlyReport.s(),
     )
     
 

@@ -5,9 +5,6 @@ new Vue({
     el: '#app',
     template: ` 
     <div>
-    <div v-for="(message, index) in flashMessages" :key="index" class="popup">
-    {{ message }}
-    </div>
     <Navbar/>
     <router-view/>
     </div>
@@ -15,7 +12,6 @@ new Vue({
     router,
     store,
     data: {
-        flashMessages: []
     },        
     components: {
         Navbar,

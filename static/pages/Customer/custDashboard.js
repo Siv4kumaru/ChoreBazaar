@@ -184,7 +184,7 @@ const custDashboard = {
             },
             body: JSON.stringify({
               id: row.id,
-              appprove: "Customer Cancellation",
+              approve: "Customer Cancellation",
               serviceStatus: "Customer Cancellation",
             })
           });

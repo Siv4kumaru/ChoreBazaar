@@ -1,7 +1,7 @@
 const Navbar = {
     template: `
       <div id="navbar">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-between">
+        <nav class="navbar navbar-expand-md navbar-light bg-light justify-content-between">
           <div class="container-fluid">
             <router-link class="navbar-brand" to="/"><img src="/static/src/LOGO.png" width="145em" alt="Logo" /></router-link>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

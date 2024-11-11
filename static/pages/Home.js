@@ -1,6 +1,6 @@
 const Home = {
     template : `
-    <div>
+    <div class="mt-100">
 
         <div id="home" class="container d-flex  flex-row align-items-center" >
                 <img src="static/src/sillohoute.png" width="50%" alt="Mascot"/>

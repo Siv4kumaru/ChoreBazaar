@@ -517,7 +517,7 @@ class proEarning(Resource):
         proId=pro.id
         earningPerService={}
         tot=0
-        proStatus={"Customer Cancellation":0,"Pending":0,"accepeted":0,"Professional Rejection":0,"Completed":0,"Rejected":0,"Ongoing":0,"Not Completed":0}
+        proStatus={"Customer Cancellation":0,"Pending":0,"accepted":0,"Professional Rejection":0,"Completed":0,"Rejected":0,"Ongoing":0,"Not Completed":0}
         requests=ServiceRequest.query.filter_by(professionalId=proId).all()
         for req in requests:
             for j in proStatus:
@@ -557,7 +557,8 @@ class custspending(Resource):
             if service.name in spendingperservice:
                 spendingperservice[service.name]+=service.price
             else:
-                spendingperservice[service.name]=service.price
+                if req.serviceStatus=="Completed":
+                    spendingperservice[service.name]=service.price
         return {"status":custstatus,"spend":spendingperservice},200
     
 class servearning(Resource):
