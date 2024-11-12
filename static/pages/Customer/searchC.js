@@ -11,7 +11,7 @@ import services from "../../components/services.js";
             <select  disabled>
             <option selected>professional</option>
             </select>
-          <select v-model="service" @click="filterTable()">
+          <select id="select" v-model="service" @click="filterTable()">
             <option value="" disabled selected>Service Type</option>
             <option v-for="service in services" :key="service.id" :value="service.name">
               {{ service.name }}
@@ -65,6 +65,7 @@ import services from "../../components/services.js";
             }
         },  
         methods:{
+            
             filterTable() {
                 console.log("Filtering table..."+this.service);
                 const selectedService = this.service.toLowerCase(); // Get the selected service
@@ -245,6 +246,9 @@ import services from "../../components/services.js";
 
 
         },
+        created(){
+            this.filterTable();
+        },
         async mounted(){
             const service = await fetch('/dropdownService');
             if (service.ok) {
@@ -257,12 +261,15 @@ import services from "../../components/services.js";
             if(this.$route.params.name){
                 this.service=this.$route.params.name;
             }
-    // Wait for the table to be fully rendered, then apply the filter
-    this.$nextTick(() => {
-        setTimeout(() => {
-            this.filterTable(); // Call the filter after a slight delay to ensure DOM is ready
-        }, 300); // Delay to ensure table is rendered
-    });
+            
+            this.filterTable();
+            if($("#select").val()!='Service Type'){
+                setTimeout(() => {
+                    this.filterTable();
+                }, 3000);   
+                console.log("Filtering table..."+this.service);
+                $("#select").click();
+            }
         },
  
         components: {changedCommonTable}
