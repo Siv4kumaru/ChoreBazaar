@@ -11,6 +11,8 @@ new Vue({
     `,
     router,
     store,
+    data: {
+    },        
     components: {
         Navbar,
     },

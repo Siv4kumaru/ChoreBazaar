@@ -1,24 +1,25 @@
 const EditService = {
   template: `
-    <div>
-      <h1>Edit Service</h1>
-      <form @submit.prevent="updateService">
-        <div>
-          <label for="name">Service Name:</label>
-          <input v-model="service.name" type="text" id="serviceName" required />
-        </div>
-        <div>
-          <label for="description">Description:</label>
-          <textarea v-model="service.description" id="description" required></textarea>
-        </div>
-        <div>
-          <label for="price">Price:</label>
-          <input v-model="service.price" type="number" id="price" required />
-        </div>
-        <button type="submit">Update Service</button>
-      </form>
-      <p v-if="message">{{ message }}</p>
+<div class="container mt-5">
+  <h1 class="text-center mb-4">Edit Service</h1>
+  <form @submit.prevent="updateService">
+    <div class="mb-3">
+      <label for="serviceName" class="form-label">Service Name:</label>
+      <input v-model="service.name" type="text" id="serviceName" class="form-control" required />
     </div>
+    <div class="mb-3">
+      <label for="description" class="form-label">Description:</label>
+      <textarea v-model="service.description" id="description" class="form-control" required></textarea>
+    </div>
+    <div class="mb-3">
+      <label for="price" class="form-label">Price:</label>
+      <input v-model="service.price" type="number" id="price" class="form-control" required />
+    </div>
+    <button type="submit" class="btn" style="background-color: #FAC012; color: white;">Update Service</button>
+  </form>
+  <p v-if="message" class="mt-3 text-center">{{ message }}</p>
+</div>
+
   `,
   data() {
     return {
@@ -72,6 +73,7 @@ const EditService = {
             "name": this.service.name,
             "description": this.service.description,
             "price": this.service.price,
+            
           }),
         });
         if (response.ok) {

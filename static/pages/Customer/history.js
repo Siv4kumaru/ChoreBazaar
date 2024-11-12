@@ -3,7 +3,7 @@ import changedCommonTable from '../../components/changedCommonTable.js'
 const history = {
     template: `<div>
         <changedCommonTable title="History" :data="data" :columns="columns" selector="history" :condition="(row) => true"></changedCommonTable>
-        <button class="btn btn-primary" @click="back">Back</button>
+<button class="btn btn-primary" style="background-color: #FAC012; color: white;" @click="back">Back</button>
     </div>`,
     
     data() {

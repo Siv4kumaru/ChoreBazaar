@@ -1,0 +1,24 @@
+terminal>1:
+redis-server
+
+terminal>2:
+~/go/bin/MailHog
+
+terminal>3
+source ./venv/bin/activate
+celery -A app:celery_app worker -l INFO
+
+terminal>4
+source ./venv/bin/activate
+celery -A app:celery_app worker -l INFO
+
+terminal>5  (irrelevent to redis)
+source ./venv/bin/activate
+flask run
+
+navigate tmux
+ctrl-b , w
+
+port running INFO
+lsof -i:<port number>
+kill -9 <pid>

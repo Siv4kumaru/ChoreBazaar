@@ -1,9 +1,9 @@
 const Profile ={
-    template:`<div>
-<div class="container mt-5">
+    template:`
+<div class="container mt-0">
     <h2>Service Information</h2>
     <form>
-        <div class="mb-3">
+        <div class="mb-3 ">
             <label for="name" class="form-label">Name</label>
             <input type="text" class="form-control" id="name" placeholder="Enter your name" required>
         </div>
@@ -38,7 +38,7 @@ const Profile ={
 </div>
 
         
-    </div>`,
+    </div>  `,
     data(){
         return{
             email:sessionStorage.getItem('email')

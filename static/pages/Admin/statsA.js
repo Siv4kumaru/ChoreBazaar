@@ -1,281 +1,320 @@
 const statsA = {
-    template:`<div>
-    <div class="container"> 
-        <div class="row">
-            <div class="col-8"><canvas id="myChart"></canvas></div>
-            <div class="col-4"><canvas id="myChart2"></canvas></div>
-            </div>
-        <br>
-        <div class="row">
-            <div class="col-8"><canvas id="myChart3"></canvas></div>
+  template: `
+    <div class="stats-container">
+      <ul class="nav nav-tabs" id="myTabs">
+        <li class="nav-item" v-for="n in 4" :key="n">
+          <a 
+            class="nav-link" 
+            :class="{ active: currentTab === 'tab' + n }"
+            :id="'tab' + n"
+            href="#"
+            @click.prevent="switchTab(n)"
+          >
+            Chart {{n}}
+          </a>
+        </li>
+      </ul>
 
-        </div>    
-        <div class="row">
-            <div class="col-8"><canvas id="myChart4"></canvas></div>
-        </div>  
+      <div class="chart-container" style="position: relative; height: 400px; width: 100%;">
+        <canvas 
+          v-for="n in 4" 
+          :key="n"
+          :id="'myChart' + n"
+          v-show="currentTab === 'tab' + n"
+          style="width: 100%; height: 100%;"
+        ></canvas>
+      </div>
     </div>
-    serviceName:{{serviceName}}
-    proservcount:{{proservcount}}
-    procount:{{procount}}
-    custcount:{{custcount}}
-    servicecount:{{servicecount}}
-</div>
-    `,
-    data(){
-        return{
-            serviceName:[],
-            proservcount:{},
-            procount:0,
-            custcount:0,
-            servicecount:0,
-            bubbleData: [],
-            proexp:[],
-            proincome:[],
-            prorequestcount:[],
-            reqcount:[]
-        };
+  `,
+
+  data() {
+    return {
+      currentTab: 'tab1',
+      charts: {
+        1: null,
+        2: null,
+        3: null,
+        4: null
+      },
+      chartData: {
+        professionals: null,
+        customers: null,
+        earnings: null,
+        proEarnings: null
+      }
+    };
+  },
+
+  methods: {
+    async fetchData(url) {
+      try {
+        const response = await fetch(url, {
+          headers: {
+            "Content-Type": "application/json",
+            "Authentication-token": sessionStorage.getItem("token")
+          }
+        });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        return await response.json();
+      } catch (error) {
+        console.error(`Error fetching data from ${url}:`, error);
+        return null;
+      }
     },
-    async mounted(){
 
-        const req= await fetch(window.location.origin+'/api/requests', {
-            headers:{
-                "Content-Type": "application/json",
-                "Authentication-token":sessionStorage.getItem("token")
-            }
+    destroyChart(chartType) {
+      if (this.charts[chartType]) {
+        this.charts[chartType].destroy();
+        this.charts[chartType] = null;
+      }
+    },
+
+    async switchTab(tabNumber) {
+      this.currentTab = 'tab' + tabNumber;
+      await this.$nextTick();
+      await this.renderChart(tabNumber);
+    },
+
+    getChartColors(count) {
+      const baseColors = [
+        { bg: 'rgba(255, 99, 132, 0.5)', border: 'rgb(255, 99, 132)' },
+        { bg: 'rgba(54, 162, 235, 0.5)', border: 'rgb(54, 162, 235)' },
+        { bg: 'rgba(255, 206, 86, 0.5)', border: 'rgb(255, 206, 86)' },
+        { bg: 'rgba(75, 192, 192, 0.5)', border: 'rgb(75, 192, 192)' },
+        { bg: 'rgba(153, 102, 255, 0.5)', border: 'rgb(153, 102, 255)' }
+      ];
+
+      // If we need more colors than our base set, generate them
+      while (baseColors.length < count) {
+        const r = Math.floor(Math.random() * 255);
+        const g = Math.floor(Math.random() * 255);
+        const b = Math.floor(Math.random() * 255);
+        baseColors.push({
+          bg: `rgba(${r}, ${g}, ${b}, 0.5)`,
+          border: `rgb(${r}, ${g}, ${b})`
         });
-        if(req.ok){
-            const reqdata=await req.json();
-            console.log(reqdata);
-            
-            var reqServCalled={};
-            for (let i in reqdata){
+      }
 
-                if(reqServCalled[reqdata[i].serviceName]){
-                    reqServCalled[reqdata[i].serviceName]+=1;
-                }
-                else{
-                    reqServCalled[reqdata[i].serviceName]=1;
-                }
-            } 
+      return baseColors;
+    },
 
-        }
+    async renderProfessionalsChart() {
+      if (!this.chartData.professionals) {
+        this.chartData.professionals = await this.fetchData(`${window.location.origin}/api/professional`);
+      }
 
-        var servicePrice=null;
-        const servprice= await fetch(window.location.origin+'/api/earning', {
-            headers:{
-                "Content-Type": "application/json",
-                "Authentication-token":sessionStorage.getItem("token")
+      const data = this.chartData.professionals;
+      if (!data) return;
+
+      const proServiceCount = {};
+      data.forEach(pro => {
+        const service = pro.serviceName;
+        proServiceCount[service] = (proServiceCount[service] || 0) + 1;
+      });
+
+      this.destroyChart(1);
+      const ctx = document.getElementById('myChart1');
+      if (!ctx) return;
+
+      this.charts[1] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(proServiceCount),
+          datasets: [{
+            label: '# of Professionals',
+            data: Object.values(proServiceCount),
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgb(54, 162, 235)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true
             }
-        });  
-        if(servprice.ok){
-
-            var servicePriceData=[];
-            servicePrice=await servprice.json();
-            console.log(servicePrice);
-            for(let i in servicePrice){
-                servicePriceData.push(servicePrice[i]);
-            }
+          }
         }
+      });
+    },
 
+    async renderDonutChart() {
+      if (!this.chartData.professionals || !this.chartData.customers) {
+        this.chartData.professionals = await this.fetchData(`${window.location.origin}/api/professional`);
+        this.chartData.customers = await this.fetchData(`${window.location.origin}/api/customer`);
+      }
 
-        const proserv= await fetch(window.location.origin+'/api/professional',{
-            headers:{
-                "Content-Type": "application/json",
-                "Authentication-token":sessionStorage.getItem("token")
-            }
-        });
-        if(proserv.ok){
-            const pros=await proserv.json();
-            console.log(pros);
-            for (let i in pros){
-                this.procount+=1;
-                var service=pros[i].serviceName;
-                if (this.proservcount[service]){
-                    this.proservcount[service]+=1;
-                }
-                else{
-                    this.proservcount[service]=1;
-                }
+      if (!this.chartData.professionals || !this.chartData.customers) return;
 
-            }
+      this.destroyChart(2);
+      const ctx = document.getElementById('myChart2');
+      if (!ctx) return;
+
+      this.charts[2] = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Professional', 'Customer'],
+          datasets: [{
+            data: [
+              this.chartData.professionals.length,
+              this.chartData.customers.length
+            ],
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.5)',
+              'rgba(54, 162, 235, 0.5)'
+            ],
+            borderColor: [
+              'rgb(255, 99, 132)',
+              'rgb(54, 162, 235)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
         }
-        else{
-            console.error("Error fetching professionals");
-        }
-        const ctx = document.getElementById('myChart');
-        console.log(typeof(Chart));
-        new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: this.serviceName,
-            datasets: [{
-              label: '# of Professionals',
-              data: this.proservcount,
-              borderWidth: 1
-            }]
+      });
+    },
+
+    async renderEarningsChart() {
+      if (!this.chartData.earnings) {
+        this.chartData.earnings = await this.fetchData(`${window.location.origin}/api/earning`);
+      }
+
+      const data = this.chartData.earnings;
+      if (!data) return;
+
+      this.destroyChart(3);
+      const ctx = document.getElementById('myChart3');
+      if (!ctx) return;
+
+      const colors = this.getChartColors(Object.keys(data).length);
+
+      this.charts[3] = new Chart(ctx, {
+        type: 'polarArea',
+        data: {
+          labels: Object.keys(data),
+          datasets: [{
+            label: 'Service Earnings',
+            data: Object.values(data),
+            backgroundColor: colors.map(c => c.bg),
+            borderColor: colors.map(c => c.border),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              beginAtZero: true
+            }
           },
-          options: {
-            scales: {
-              y: {
-                beginAtZero: true
+          plugins: {
+            legend: {
+              position: 'right'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.label}: $${context.raw.toLocaleString()}`;
+                }
               }
             }
           }
-        });
+        }
+      });
+    },
 
-        console.log(reqServCalled);  
-        console.log(servicePrice);
-        console.log('*********');
+    async renderProEarningsChart() {
+      if (!this.chartData.proEarnings) {
+        this.chartData.proEarnings = await this.fetchData(`${window.location.origin}/api/proEarning`);
+      }
 
+      const data = this.chartData.proEarnings;
+      if (!data) return;
 
-        //cust api
-        const cust= await fetch(window.location.origin+'/api/customer',{
-            headers:{
-                "Content-Type": "application/json",
-                "Authentication-token":sessionStorage.getItem("token")
+      this.destroyChart(4);
+      const ctx = document.getElementById('myChart4');
+      if (!ctx) return;
+
+      const colors = this.getChartColors(Object.keys(data).length);
+
+      this.charts[4] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(data),
+          datasets: [{
+            label: 'Professional Earnings',
+            data: Object.values(data),
+            backgroundColor: colors.map(c => c.bg),
+            borderColor: colors.map(c => c.border),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return '$' + value.toLocaleString();
+                }
+              }
             }
-        });
-        if(cust.ok){
-            const custs=await cust.json();
-            console.log(custs);
-            var custcount=0;
-            for (let i in custs){
-                this.custcount+=1;
+          },
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `Earnings: $${context.raw.toLocaleString()}`;
+                }
+              }
             }
-
+          }
         }
-        else{
-            console.error("Error fetching customers");}
-        //cust api
+      });
+    },
 
-        //Donut
-        for (let i in this.proservcount){
-            this.proservcount[i]=this.proservcount[i]
+    async renderChart(chartType) {
+      try {
+        switch (chartType) {
+          case 1:
+            await this.renderProfessionalsChart();
+            break;
+          case 2:
+            await this.renderDonutChart();
+            break;
+          case 3:
+            await this.renderEarningsChart();
+            break;
+          case 4:
+            await this.renderProEarningsChart();
+            break;
         }
-        console.log(this.proservcount);
-        const data = {
-            labels: [
-              'Professional',
-            'Customer',
-            ],
-            datasets: [{
-              label: 'My First ',
-              data: [this.procount, this.custcount],
-              backgroundColor: [
-                'rgb(255, 99, 132)',
-                'rgb(54, 162, 235)',
-                'rgb(255, 205, 86)'
-              ],
-              hoverOffset: 4
-            }]
-          };
-
-
-        const config = {
-            type: 'pie',
-            data: data,
-            };
-            new Chart($('#myChart2'), config);
-
-        //Donut
-
-        //Polar area
-
-          const data2 = {
-            labels:this.serviceName,
-            datasets: [{
-              label: 'Earnings',
-              data:  servicePriceData,
-
-            }]
-          };
-          const config2 = {
-            type: 'polarArea',
-            data: data2,
-            options: {}
-          };
-        new Chart($('#myChart3'), config2);
-        //Polar area
-
-        //pro vs pro
-
-        
-
-// Function to generate random RGBA colors
-function getRandomColor() {
-    const r = Math.floor(Math.random() * 255);
-    const g = Math.floor(Math.random() * 255);
-    const b = Math.floor(Math.random() * 255);
-    return `rgba(${r}, ${g}, ${b}, 0.2)`; // Adjust alpha (0.2) for background
-  }
-  
-  // Function to generate random RGB colors for border
-  function getRandomBorderColor() {
-    const r = Math.floor(Math.random() * 255);
-    const g = Math.floor(Math.random() * 255);
-    const b = Math.floor(Math.random() * 255);
-    return `rgb(${r}, ${g}, ${b})`;
-  }
-  
-  // Fetch dynamic data from API
-  const proEarningall = await fetch(window.location.origin + '/api/proEarning', {
-    headers: {
-      "Content-Type": "application/json",
-      "Authentication-token": sessionStorage.getItem("token")
-    }
-  });
-  
-  let proEarningData = [];
-  let proLabels = [];
-  
-  if (proEarningall.ok) {
-    const proEarning = await proEarningall.json();
-    console.log(proEarning);
-    
-    // Extract labels (pro names) and data (income)
-    proLabels = Object.keys(proEarning); // ['pro', 'new pro']
-    proEarningData = Object.values(proEarning); // [20000.0, 20000.0]
-  }
-  
-  // Dynamically generate random colors based on the length of the data array
-  const backgroundColors = proEarningData.map(() => getRandomColor());
-  const borderColors = proEarningData.map(() => getRandomBorderColor());
-  
-  const data4 = {
-    labels: proLabels, // Use pro names as labels
-    datasets: [{
-      label: 'Pro Earnings',
-      data: proEarningData, // Use dynamic data array from API
-      backgroundColor: backgroundColors, // Use dynamically generated background colors
-      borderColor: borderColors, // Use dynamically generated border colors
-      borderWidth: 1
-    }]
-  };
-  
-  const config4 = {
-    type: 'bar',
-    data: data4,
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true
-        }
+      } catch (error) {
+        console.error(`Error rendering chart ${chartType}:`, error);
       }
     }
-  };
-  
-  // Create and render the chart
-  const myChart = new Chart(
-    document.getElementById('myChart4'),
-    config4
-  );
-  
-        
+  },
 
-        //earning vs pro
+  async mounted() {
+    // Initialize first chart after component is mounted
+    await this.$nextTick();
+    await this.renderChart(1);
+  },
 
- 
-    }
+  // Clean up charts when component is destroyed
+  beforeDestroy() {
+    Object.keys(this.charts).forEach(chartType => {
+      this.destroyChart(Number(chartType));
+    });
+  }
 };
 
 export default statsA;

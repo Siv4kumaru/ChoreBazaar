@@ -1,42 +1,43 @@
 const EditService = {
     template: `
-      <div>
-        <h1>Edit Request</h1>
-        <form @submit.prevent="updateService">
-          <div>
-            <label for="custE">Customer Email:</label>
-            <select v-model="selectedCustEmail" id="custE" required>
-              <option v-for="email in custEmail" :value="email">{{ email }}</option>
-            </select>
-          </div>
-          <div>
-            <label for="proE">Professional Email:</label>
-            <select v-model="selectedProEmail" id="proE" required>
-              <option v-for="email in proEmail" :key="email" :value="email">{{ email }}</option>
-            </select>
-          </div>
-          <div>
-            <label for="servName">Service Name:</label>
-            <select v-model="selectedService" id="servName" required>
-              <option v-for="s in serviceName" :value="s">{{ s }}</option>
-            </select>
-          </div>
-          <div>
-            <label for="dateofrequest">Date of Request:</label>
-            <input v-model="request.dateofrequest" type="date" id="dateofrequest" required />
-          </div>
-          <div>
-            <label for="dateofcompletion">Date of Completion:</label>
-            <input v-model="request.dateofcompletion" type="date" id="dateofcompletion" required />
-          </div>
-          <div>
-            <label for="serviceStatus">Service Status:</label>
-            <input v-model="request.serviceStatus" type="text" id="serviceStatus" required />
-          </div>
-          <button type="submit">Update Service</button>
-        </form>
-        <p v-if="message">{{ message }}</p>
-      </div>
+ <div class="container mt-5">
+  <h1 class="text-center mb-4">Edit Request</h1>
+  <form @submit.prevent="updateService">
+    <div class="mb-3">
+      <label for="custE" class="form-label">Customer Email:</label>
+      <select v-model="selectedCustEmail" id="custE" class="form-select" required>
+        <option v-for="email in custEmail" :value="email">{{ email }}</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="proE" class="form-label">Professional Email:</label>
+      <select v-model="selectedProEmail" id="proE" class="form-select" required>
+        <option v-for="email in proEmail" :key="email" :value="email">{{ email }}</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="servName" class="form-label">Service Name:</label>
+      <select v-model="selectedService" id="servName" class="form-select" required>
+        <option v-for="s in serviceName" :value="s">{{ s }}</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="dateofrequest" class="form-label">Date of Request:</label>
+      <input v-model="request.dateofrequest" type="date" id="dateofrequest" class="form-control" required />
+    </div>
+    <div class="mb-3">
+      <label for="dateofcompletion" class="form-label">Date of Completion:</label>
+      <input v-model="request.dateofcompletion" type="date" id="dateofcompletion" class="form-control" required />
+    </div>
+    <div class="mb-3">
+      <label for="serviceStatus" class="form-label">Service Status:</label>
+      <input v-model="request.serviceStatus" type="text" id="serviceStatus" class="form-control" required />
+    </div>
+    <button type="submit" class="btn" style="background-color: #FAC012; color: white;">Update Service</button>
+  </form>
+  <p v-if="message" class="mt-3 text-center">{{ message }}</p>
+</div>
+
     `,
     data(){
       return {

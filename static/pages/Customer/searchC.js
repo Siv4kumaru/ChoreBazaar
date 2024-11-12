@@ -3,6 +3,9 @@ import services from "../../components/services.js";
     const searchC = {
         template:`
         <div>
+        <div v-if="error" class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
         <h1>Search</h1>
         <br>  
             <select  disabled>
@@ -47,6 +50,7 @@ import services from "../../components/services.js";
         </div>`,
         data() {
             return {
+                error: "",
                 req:null,
                 services: [],
                 queryy:'',
@@ -57,6 +61,7 @@ import services from "../../components/services.js";
                 columns:null,
                 viewRow: {},
                 noProId:[],
+                data:''
             }
         },  
         methods:{
@@ -176,6 +181,10 @@ import services from "../../components/services.js";
                             this.$router.push("/Dashboard-Customer");
                         } else {
                             const errorData = await req.json(); 
+                            this.error = errorData.message;
+                            setInterval(() => {
+                                this.error = "";
+                            }, 5000);
                             console.error("Error:", errorData.message);
                         }
                     } catch (error) {

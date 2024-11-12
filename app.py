@@ -1,12 +1,14 @@
-from flask import Flask
+from flask import Flask,flash,get_flashed_messages
 import views
 import Sauce as Sauce
 from extensions import db,security,cache
 from flask_caching import Cache
 from create_initial_data import create_data
 from worker import celery_init_app  
+from celery.schedules import crontab
+from tasks import daily_reminder,monthlyReport
+import flask_excel as excel
 
-celery_app = None
 
 def create_app():
     app = Flask(__name__)
@@ -24,12 +26,16 @@ def create_app():
     app.config["CACHE_DEFAULT_TIMEOUT"] = 300 #after 300 ms the cache will be deleted
     app.config["DEBUG"] = True
     app.config["CACHE_TYPE"] = "RedisCache"
+    app.config["CACHE_REDIS_DB"] = 2
     app.config["CACHE_REDIS_PORT"] = 6379 
+    app.config["CACHE_REDIS_HOST"] = "localhost"
+    app.config["CACHE_REDIS_URL"] = "redis://localhost:6379/2"
     #app.config['CACHE_REDIS_HOST'] = 'localhost'
+
     
     cache.init_app(app)
     db.init_app(app)
-    celery_app = celery_init_app(app)
+    excel.init_excel(app)    
 
     with app.app_context():
         from models import User, Role
@@ -53,6 +59,22 @@ def create_app():
 
     return app
 
+
+app=create_app()
+celery_app = celery_init_app(app)
+
+@celery_app.on_after_configure.connect
+def send_email(sender, **kwargs):
+    sender.add_periodic_task(
+        crontab( hour='23',minute='56'),
+        daily_reminder.s(),
+    )
+    sender.add_periodic_task(
+        crontab(minute="56",hour="23",day_of_month="1"),
+        monthlyReport.s(),
+    )
+    
+
+
 if __name__ == '__main__':
-    app=create_app()
     app.run(debug=True)

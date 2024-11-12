@@ -41,6 +41,8 @@ class Professional(db.Model):
     serviceId = db.Column(db.Integer, db.ForeignKey('service.id', ondelete='SET NULL'), nullable=True)
     serviceName = db.Column(db.String)    
     experience = db.Column(db.Integer)
+    pdf_path = db.Column(db.String)
+    #   wwstar=db.Column(db.Float,default=0)
    
     service = db.relationship('Service', back_populates='professionals')
     user = db.relationship('User', back_populates='professionals', single_parent=True)
