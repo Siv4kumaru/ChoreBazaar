@@ -11,7 +11,7 @@ import services from "../../components/services.js";
             <select  disabled>
             <option selected>professional</option>
             </select>
-          <select v-model="service" @change="filterTable()">
+          <select v-model="service" @click="filterTable()">
             <option value="" disabled selected>Service Type</option>
             <option v-for="service in services" :key="service.id" :value="service.name">
               {{ service.name }}
