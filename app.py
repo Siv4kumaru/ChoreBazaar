@@ -5,8 +5,6 @@ from extensions import db,security,cache
 from flask_caching import Cache
 from create_initial_data import create_data
 from worker import celery_init_app  
-from celery.schedules import crontab
-from tasks import daily_reminder,monthlyReport
 import flask_excel as excel
 
 
@@ -54,6 +52,7 @@ def create_app():
 
     views.create_view(app,user_datastore,cache)
     
+    excel.init_excel(app)
     #resouces
     Sauce.api.init_app(app)
 
