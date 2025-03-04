@@ -1,9 +1,7 @@
+
 ## Demo
-## Demo
-<video controls width="640" height="480">
-  <source src="https://drive.google.com/file/d/1av-1CUsJis6iRHAYayLmiB_8FxlYblf4/view?usp=sharing" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+
+https://drive.google.com/file/d/1av-1CUsJis6iRHAYayLmiB_8FxlYblf4/view?usp=sharing
 
 Project Overview
 
