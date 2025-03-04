@@ -83,11 +83,7 @@ bash
         Follow the tmux session instructions to start the application servers.
         Access the frontend and test APIs as needed.
 
-Demo
 
-Check out the video demo here:
-
-https://drive.google.com/file/d/1av1CUsJis6iRHAYayLmiB_8FxlYblf4/view?usp=sharing
 
 Contributors
 
