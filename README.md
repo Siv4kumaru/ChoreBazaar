@@ -1,5 +1,5 @@
 
-## Demo
+# ChoreBazaar | Day to Day Chore(🧹) and house maintanance services booking and management system 
 
 https://drive.google.com/file/d/1av-1CUsJis6iRHAYayLmiB_8FxlYblf4/view?usp=sharing
 
@@ -93,8 +93,4 @@ Contributors
     Mobile Number: +91 9359570029
 
 License
-
-[Add license information if applicable]
-Contact
-
-For any issues or contributions, please contact the contributor via the provided email addresses.
+SiV.pvt.ltd 
